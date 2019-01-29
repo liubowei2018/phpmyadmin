@@ -9,10 +9,20 @@
 namespace app\admins\controller;
 
 
+use app\admins\model\LoginModel;
 use think\Controller;
 use think\captcha\Captcha;
+use think\Config;
+use think\Session;
 class Login extends Controller
 {
+    public function _initialize()
+    {
+        if(Session::get('admin_uid') &&  Session::get('admin_name') ){
+            $this->redirect('admins/index/index');
+        }
+    }
+
     /**
      * 登陆页面
      * @return mixed
@@ -29,10 +39,17 @@ class Login extends Controller
 
     public function entry(){
         $param = input('post.');
-        $result = $this->validate($param,'');
+        $result = $this->validate($param,'LoginValidate.entry');
         if($result !== true){
             return json(['code'=>1012,'msg'=>$result]);
         }
+        if(!captcha_check($param['pin'])){
+            return json(['code'=>1012,'msg'=>'验证码错误']);
+        }
+        //查询账户是否存在
+        $LoginModel = new LoginModel();
+        $res = $LoginModel->getLoginInfo($param['adm'],$param['pw']);
+        return json($res);
     }
 
     public function verification_code(){

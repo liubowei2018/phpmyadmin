@@ -240,4 +240,5 @@ return [
         'var_page'  => 'page',
         'list_rows' => 15,
     ],
+    'auth_key'=>'JUD6FCtZsqrmVXc2apev4TRn3O8gAhxbSlH9wfPN'
 ];

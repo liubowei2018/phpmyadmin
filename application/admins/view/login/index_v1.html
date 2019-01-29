@@ -38,16 +38,17 @@
             </div>
         </div>
         <div class="col-sm-5">
-            <form method="post" action="index.html">
+            <form id="login_form">
                 <h4 class="no-margins">登录：</h4>
                 <p class="m-t-md">登录到 {$webConf.web_names} 管理系统</p>
-                <input type="text" class="form-control uname" placeholder="用户名" />
-                <input type="password" class="form-control pword m-b" placeholder="密码" />
+                <input type="text" name="adm" class="form-control uname" placeholder="用户名" />
+                <input type="password" name="pw" class="form-control pword m-b" placeholder="密码" />
                 <div style="margin-bottom:70px">
-                    <input type="text" class="form-control" placeholder="验证码" style="color:black;width:50%;float:left;margin:0px 0px;" name="code" id="code" />
+                    <input type="text" class="form-control" placeholder="验证码" style="color:black;width:50%;float:left;margin:0px 0px;" name="pin" id="code" />
                     <img src="{:url('verification_code')}" onclick="javascript:this.src='/admins/login/verification_code.html?tm='+Math.random();" style="float:right;cursor: pointer;width: 50%;height: 33px"/>
                 </div>
-                <button class="btn btn-success btn-block">登录</button>
+                <button type="button" class="btn btn-success btn-block" id="login_start">登录</button>
+                <button type="button" class="btn btn-success btn-block" id="login_ewait" style="display: none;">登录中。。。</button>
             </form>
         </div>
     </div>
@@ -62,5 +63,25 @@
 <script src="/common/js/jquery.min.js"></script>
 <script src="/common/js/layer/layer.js"></script>
 <script>
-
+    $('#login_start').click(function () {
+        $('#login_ewait').show();
+        $('#login_start').hide();
+        $.ajax({
+            'url':"{:url('login/entry')}",
+            'type':'post',
+            'dataType':'json',
+            'data':$('#login_form').serialize(),
+            'success':function (re) {
+                if(re.code == 1011){
+                    layer.msg(re.msg,{time:1500},function () {
+                        window.location.href="{:url('Index/index')}";
+                    });
+                }else{
+                    $('#login_ewait').hide();
+                    $('#login_start').show();
+                    layer.msg(re.msg,{time:1500});
+                }
+            },
+        });
+    });
 </script>

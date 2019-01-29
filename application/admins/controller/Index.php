@@ -12,6 +12,8 @@ namespace app\admins\controller;
 class Index extends Base
 {
     public function index(){
-
+        $webConf = getWebConfigList();
+        $this->assign('webConf',$webConf);
+        return $this->fetch();
     }
 }
