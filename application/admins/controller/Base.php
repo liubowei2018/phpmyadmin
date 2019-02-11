@@ -9,6 +9,7 @@
 namespace app\admins\controller;
 
 
+use app\admins\model\Node;
 use think\Cache;
 use think\Controller;
 use think\Db;
@@ -32,5 +33,25 @@ class Base extends Controller
             Session::delete('admin_name');
             $this->redirect('admins/login/index');
         }
+        //验证权限
+        $auth = new \com\Auth();
+        $module     = strtolower(request()->module());
+        $controller = strtolower(request()->controller());
+        $action     = strtolower(request()->action());
+        $url        = $module."/".$controller."/".$action;
+        //跳过检测以及主页权限
+        if($this->admin_uid!=1){
+            if(!in_array($url, ['admin/index/index','admin/index/indexpage','admin/upload/upload','admin/index/uploadface'])){
+                if(!$auth->check($url,session('uid'))){
+                   // $this->error('抱歉，您没有操作权限');
+                }
+            }
+        }
+        $node = new Node();
+        $this->assign([
+            'username'=>$this->admin_name,
+            'rolename'=>Session::get('rolename'),
+            'menu'=>$node->getMenu(Session::get('rule'))
+        ]);
     }
 }

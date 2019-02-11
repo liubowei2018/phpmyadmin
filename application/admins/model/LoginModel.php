@@ -28,8 +28,13 @@ class LoginModel extends Model
         }elseif ($info['state'] != 1){
             return ['code'=>1012,'msg'=>'登录账号已冻结'];
         }else{
-            Session::set('admin_uid',$info['id']);
-            Session::set('admin_name',$info['name']);
+            $userType = new UserType();
+            $userinfo = $userType->getRoleInfo($info['group_id']);
+            Session::set('admin_uid',$info['id']);      //管理员ID
+            Session::set('admin_name',$info['name']);   //管理员姓名
+            Session::set('rolename',$userinfo['title']);//角色名
+            Session::set('rule',$userinfo['rules']);    //角色节点
+            Session::set('name',$userinfo['name']);     //角色权限
             $token = md5(time().$key);
             $ip = request()->ip();
             Cache::set($info['name'].'token',$token,7200);
