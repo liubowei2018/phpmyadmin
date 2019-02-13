@@ -18,9 +18,9 @@ class AdminModel extends Model
     /**
      * 获取所有管理员
      */
-    public function getUserList($page,$row){
-        $count = $this->count();
-        $list  = $this->page($page,$row)->select();
+    public function getUserList($map,$page,$row){
+        $count = $this->where($map)->count();
+        $list  = $this->where($map)->page($page,$row)->select();
         $authType = new UserType();
         foreach ($list as $k=>$v){
             $list[$k]['end_time'] = date('Y-m-d H:i:s',$v['end_time']);
