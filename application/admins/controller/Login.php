@@ -22,7 +22,6 @@ class Login extends Controller
             $this->redirect('admins/index/index');
         }
     }
-
     /**
      * 登陆页面
      * @return mixed

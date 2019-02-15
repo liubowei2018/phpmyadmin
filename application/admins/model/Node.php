@@ -12,7 +12,6 @@ class Node extends Model
 
     /**
      * [getNodeInfo 获取节点数据]
-     * @author [田建龙] [864491238@qq.com]
      */
     public function getNodeInfo($id)
     {
@@ -36,11 +35,8 @@ class Node extends Model
 
         return "[" . substr($str, 0, -1) . "]";
     }
-
-
     /**
      * [getMenu 根据节点数据获取对应的菜单]
-     * @author [田建龙] [864491238@qq.com]
      */
     public function getMenu($nodeStr = '')
     {
@@ -49,5 +45,12 @@ class Node extends Model
         $result = Db::name('auth_rule')->where($where)->order('sort')->select();
         $menu = prepareMenu($result);
         return $menu;
+    }
+
+    /**
+     * 获取菜单列表
+     */
+    public function getMenuList($map,$page,$rows){
+        return $this->where($map)->page($page,$rows)->order('id DESC')->select();
     }
 }

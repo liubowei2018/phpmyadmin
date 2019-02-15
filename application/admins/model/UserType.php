@@ -16,7 +16,7 @@ class UserType extends Model
      */
     public function getRoleByWhere($map, $Nowpage, $limits)
     {
-        return $this->where($map)->page($Nowpage, $limits)->order('id desc')->select();
+        return $this->where($map)->page($Nowpage, $limits)->order('id ASC')->select();
     }
 
 
@@ -37,14 +37,14 @@ class UserType extends Model
     public function insertRole($param)
     {
         try{
-            $result =  $this->validate('RoleValidate')->save($param);
+            $result =  $this->validate('RoleValidate.add_role')->save($param);
             if(false === $result){               
-                return ['code' => -1, 'data' => '', 'msg' => $this->getError()];
+                return ['code' => 1012, 'data' => '', 'msg' => $this->getError()];
             }else{
-                return ['code' => 1, 'data' => '', 'msg' => '添加角色成功'];
+                return ['code' => 1011, 'data' => '', 'msg' => '添加角色成功'];
             }
         }catch( PDOException $e){
-            return ['code' => -2, 'data' => '', 'msg' => $e->getMessage()];
+            return ['code' => 1012, 'data' => '', 'msg' => $e->getMessage()];
         }
     }
 
@@ -56,18 +56,33 @@ class UserType extends Model
     public function editRole($param)
     {
         try{
-            $result =  $this->validate('RoleValidate')->save($param, ['id' => $param['id']]);
+            $result =  $this->validate('RoleValidate.add_role')->save($param, ['id' => $param['id']]);
             if(false === $result){
-                return ['code' => 0, 'data' => '', 'msg' => $this->getError()];
+                return ['code' => 1012, 'data' => '', 'msg' => $this->getError()];
             }else{
-                return ['code' => 1, 'data' => '', 'msg' => '编辑角色成功'];
+                return ['code' => 1011, 'data' => '', 'msg' => '编辑角色成功'];
             }
         }catch( PDOException $e){
-            return ['code' => 0, 'data' => '', 'msg' => $e->getMessage()];
+            return ['code' => 1012, 'data' => '', 'msg' => $e->getMessage()];
         }
     }
 
-
+    /**
+     * [stateRole 修改角色状态]
+     */
+    public function stateRole($id){
+        try{
+            $state = $this->where('id',$id)->value('status');
+            if($state == 1){
+                $this->where('id',$id)->update(['status'=>0]);
+            }else{
+                $this->where('id',$id)->update(['status'=>1]);
+            }
+            return ['code' => 1011, 'data' => '', 'msg' => '角色状态修改成功'];
+        }catch (\Exception $e){
+            return ['code' => 1012, 'data' => '', 'msg' => $e->getMessage()];
+        }
+    }
 
     /**
      * [getOneRole 根据角色id获取角色信息]
@@ -85,10 +100,10 @@ class UserType extends Model
     public function delRole($id)
     {
         try{
-            $this->where('id', $id)->delete();
-            return ['code' => 1, 'data' => '', 'msg' => '删除角色成功'];
-        }catch( PDOException $e){
-            return ['code' => 0, 'data' => '', 'msg' => $e->getMessage()];
+            $this->where(['id'=>['in',$id]])->delete();
+            return ['code' => 1011, 'data' => '', 'msg' => '删除角色成功'];
+        }catch( \PDOException $e){
+            return ['code' => 1012, 'data' => '', 'msg' => $e->getMessage()];
         }
     }
 

@@ -1,0 +1,87 @@
+{include file="public/header" /}
+<link rel="stylesheet" href="/common/layui/css/layui.css"  media="all">
+<body class="gray-bg">
+<div class="wrapper wrapper-content animated fadeInRight" style="background: #fff">
+    <div class="row">
+        <div class="col-sm-12">
+
+            <blockquote class="layui-elem-quote layui-text">
+                添加角色
+            </blockquote>
+
+            <form class="layui-form" lay-filter="example">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">角色名称</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="title" lay-verify="title" autocomplete="off" placeholder="请输入角色名称" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">角色状态</label>
+                    <div class="layui-input-block">
+                        <input type="radio" name="status" value="1" title="开启" checked="">
+                        <input type="radio" name="status" value="0" title="禁用">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-input-block">
+                        <button class="layui-btn" lay-submit="" type="button" lay-filter="demo1">立即提交</button>
+                        <button class="layui-btn layui-btn-danger"  type="button" onclick="javascript:history.back(-1);">返回上一页</button>
+                    </div>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+<script src="/common/layui/layui.js" charset="utf-8"></script>
+<script type="text/javascript">
+    layui.use(['form', 'layedit', 'laydate'], function(){
+        var form = layui.form
+            ,layer = layui.layer
+            ,layedit = layui.layedit
+            ,laydate = layui.laydate;
+        //创建一个编辑器
+        var editIndex = layedit.build('LAY_demo_editor');
+
+        //自定义验证规则
+        form.verify({
+            title: function(value){
+                if(value.length < 1){
+                    return '角色名称至少两个字';
+                }
+            }
+            ,pass: [
+                /^[\S]{6,12}$/
+                ,'密码必须6到12位，且不能出现空格'
+            ]
+            ,content: function(value){
+                layedit.sync(editIndex);
+            }
+        });
+        //监听提交
+        form.on('submit(demo1)', function(data){
+            var param = data.field;
+            layui.jquery.ajax({
+                url:"{:url('admins/adminlist/add_role')}",
+                type:'post',
+                dataType:'json',
+                data:JSON.stringify(param),
+                contentType: "application/json; charset=utf-8",
+                success:function(res){
+                    if(res.code==1011){
+                        layer.alert(res.msg,{icon:1},function () {
+                            window.location.href=document.referrer;
+                        });
+                    }else{
+                        layer.alert(res.msg,{icon: 5});
+                    }
+                }
+            });
+            return false;
+        });
+    });
+
+</script>
+</body>
+</html>
