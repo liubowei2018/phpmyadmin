@@ -41,6 +41,7 @@
                                     <span v-if="scope.row.status==1"><button class="btn btn-primary" type="button" @click="state(scope.row.id)">启用</button></span>
                                 </template>
                             </el-table-column>
+                            <el-table-column prop="sort" label="菜单排序" show-overflow-tooltip align="center"></el-table-column>
                             <el-table-column prop="create_time" label="添加时间" show-overflow-tooltip align="center"></el-table-column>
                             <el-table-column align="center" width="260"  label="操作">
                                 <template scope="scope">
@@ -151,7 +152,7 @@
             },
             //状态
             state(id){
-                $.post("{:url('admins/adminlist/state_role')}",{id:id},function (re) {
+                $.post("{:url('admins/adminlist/state_menu')}",{id:id},function (re) {
                     if(re.code == 1011){
                         layer.msg(re.msg,{icon:1});
                     }else{
@@ -171,13 +172,13 @@
                     array.push(row.id);
                 })
 
-                this.$confirm('此操作将永久删除该用户, 是否继续?', '提示', {
+                this.$confirm('此操作将永久删除该菜单, 是否继续?', '提示', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
                     type: 'warning'
                 }).then(() => {
                     $.ajax({
-                        url: '{:url("adminlist/del_role")}',
+                        url: '{:url("adminlist/del_menu")}',
                         data:"id="+array,
                         type: "POST",
                         dataType:'json',

@@ -135,10 +135,10 @@ class UserType extends Model
     {
         try{
             $this->save($param, ['id' => $param['id']]);
-            return ['code' => 1, 'data' => '', 'msg' => '分配权限成功'];
+            return ['code' => 1011, 'data' => '', 'msg' => '分配权限成功'];
 
         }catch( PDOException $e){
-            return ['code' => 0, 'data' => '', 'msg' => $e->getMessage()];
+            return ['code' => 1012, 'data' => '', 'msg' => $e->getMessage()];
         }
     }
 

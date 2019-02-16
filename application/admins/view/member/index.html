@@ -5,7 +5,7 @@
     <div class="ibox float-e-margins" id="app" v-cloak>
         <template>
             <div class="ibox-title">
-                <h5>角色列表</h5>
+                <h5>会员列表</h5>
             </div>
             <div class="ibox-content">
                 <!--工具条-->
@@ -33,18 +33,19 @@
                         <el-table :data="tableData" border highlight-current-row v-loading="listLoading" element-loading-text="拼命加载中..." @selection-change="handleSelectionChange" style="width: 100%">
                             <el-table-column type="selection" width="60" align="center"></el-table-column>
                             <el-table-column prop="id" label="ID" width="80" align="center"></el-table-column>
-                            <el-table-column prop="title" label="角色名称" show-overflow-tooltip align="center"></el-table-column>
-                            <el-table-column prop="status" label="状态" align="center">
+                            <el-table-column prop="name" label="用户名" show-overflow-tooltip align="center"></el-table-column>
+                            <el-table-column prop="group_id" label="角色" show-overflow-tooltip align="center"></el-table-column>
+                            <el-table-column prop="ip" label="上次登录ip" show-overflow-tooltip align="center"></el-table-column>
+                            <el-table-column prop="end_time" label="上次登录时间" show-overflow-tooltip align="center"></el-table-column>
+                            <el-table-column prop="state" label="状态" width="120" align="center">
                                 <template scope="scope">
-                                    <span v-if="scope.row.status==0"><button class="btn btn-danger" type="button" @click="state(scope.row.id)">禁用</button></span>
-                                    <span v-if="scope.row.status==1"><button class="btn btn-primary" type="button" @click="state(scope.row.id)">启用</button></span>
+                                    <span v-if="scope.row.state==0" style="color:#FF4949">禁用</span>
+                                    <span v-if="scope.row.state==1" style="color:#07a379">启用</span>
                                 </template>
                             </el-table-column>
-                            <el-table-column prop="create_time" label="添加时间" show-overflow-tooltip align="center"></el-table-column>
-                            <el-table-column align="center" width="260"  label="操作">
+                            <el-table-column align="center" width="120" label="操作">
                                 <template scope="scope">
-                                    <el-button size="small" type="text" @click="save_access(scope.row.id)"><button type="button" class="btn btn-primary">权限分配</button></el-button>
-                                    <el-button size="small" type="text" @click="edit(scope.row.id)"><button type="button" class="btn btn-success">编辑</button></el-button>
+                                    <el-button size="small" type="text" @click="edit(scope.row.id)">编辑</el-button>
                                 </template>
                             </el-table-column>
                         </el-table>
@@ -66,26 +67,10 @@
     </div>
 </div>
 </div>
-<!-- 角色分配 -->
-<div class="zTreeDemoBackground left" style="display: none" id="role">
-    <input type="hidden" id="nodeid">
-    <div class="form-group">
-        <div class="col-sm-5 col-sm-offset-2">
-            <ul id="treeType" class="ztree"></ul>
-        </div>
-    </div>
-    <div class="form-group">
-        <div class="col-sm-4 col-sm-offset-4" style="margin-bottom: 15px">
-            <input type="button" value="确认分配" class="btn btn-primary" id="postform"/>
-        </div>
-    </div>
-</div>
+
 
 {include file="public/footer" /}
-<link rel="stylesheet" href="/common/js/plugins/zTree/zTreeStyle.css">
-<script type="text/javascript" src="/common/js/plugins/zTree/jquery.ztree.core-3.5.js"></script>
-<script type="text/javascript" src="/common/js/plugins/zTree/jquery.ztree.excheck-3.5.js"></script>
-<script type="text/javascript" src="/common/js/plugins/zTree/jquery.ztree.exedit-3.5.js"></script>
+
 <script type="text/javascript">
 
     var vm = new Vue({
@@ -119,7 +104,7 @@
             //从服务器读取数据
             loadData(key, currentPage, pageSize){
                 vm.listLoading = true;
-                $.post('{:url("adminlist/role_list")}', {key:key,page:currentPage,rows:pageSize}, function(data){
+                $.post('{:url("adminlist/user_list")}', {key:key,page:currentPage,rows:pageSize}, function(data){
                     vm.tableData = [];
                     vm.totalCount = data.count;
                     for(var i=0;i<data.list.length;i++){
@@ -159,24 +144,15 @@
             },
             //添加
             add() {
-                window.location.href = "/admins/adminlist/add_role.html";
+                window.location.href = "/admins/adminlist/user_add.html";
             },
             //编辑
             edit(id) {
-                window.location.href = "/admins/adminlist/edit_role.html?id="+id;
-            },
-            save_access(id){
-                giveQx(id);
+                openEdit(id);
             },
             //状态
             state(id){
-                $.post("{:url('admins/adminlist/state_role')}",{id:id},function (re) {
-                    if(re.code == 1011){
-                        layer.msg(re.msg,{icon:1});
-                    }else{
-                        layer.msg(re.msg,{icon:2});
-                    }
-                });
+                lunhui.status(id,'{:url("state")}');
                 this.loadData(this.key, this.currentPage, this.pageSize);
             },
             //批量删除
@@ -196,12 +172,12 @@
                     type: 'warning'
                 }).then(() => {
                     $.ajax({
-                        url: '{:url("adminlist/del_role")}',
+                        url: '{:url("adminlist/user_del")}',
                         data:"id="+array,
                         type: "POST",
                         dataType:'json',
                         success:function(res){
-                            if(res.code == 1011){
+                            if(res.code == 1){
                                 vm.openMessage('success',res.msg);
                                 vm.loadData(vm.key, vm.currentPage, vm.pageSize);
                             }else{
@@ -223,77 +199,32 @@
     vm.loadData(vm.key, vm.currentPage, vm.pageSize);
 
 
-    zNodes = '';
-    var index = '';
-    var index2 = '';
-    //分配权限
-    function giveQx(id){
-        $("#nodeid").val(id);
-        //加载层
-        index2 = layer.load(0, {shade: false}); //0代表加载的风格，支持0-2
-        //获取权限信息
-        $.getJSON('./giveAccess', {'type' : 'get', 'id' : id}, function(res){
-            layer.close(index2);
-            if(res.code == 1){
-                zNodes = JSON.parse(res.data);  //将字符串转换成obj
-
-                //页面层
-                index = layer.open({
-                    type: 1,
-                    area:['350px', '80%'],
-                    title:'权限分配',
-                    skin: 'layui-layer-demo', //加上边框
-                    content: $('#role')
-                });
-
-                //设置zetree
-                var setting = {
-                    check:{
-                        enable:true
-                    },
-                    data: {
-                        simpleData: {
-                            enable: true
-                        }
-                    }
-                };
-
-                $.fn.zTree.init($("#treeType"), setting, zNodes);
-                var zTree = $.fn.zTree.getZTreeObj("treeType");
-                zTree.expandAll(true);
-
-            }else{
-                layer.alert(res.msg);
-            }
-
+    function openAdd(){
+        layer.open({
+            type: 2,
+            title: '添加',
+            shadeClose: false,
+            scrollbar: false,
+            maxmin: true,
+            shade: 0.2,
+            area: ['45%', '80%'],
+            content: '{:url("add")}',
         });
     }
 
-    //确认分配权限
-    $("#postform").click(function(){
-        var zTree = $.fn.zTree.getZTreeObj("treeType");
-        var nodes = zTree.getCheckedNodes(true);
-        var NodeString = '';
-        $.each(nodes, function (n, value) {
-            if(n>0){
-                NodeString += ',';
-            }
-            NodeString += value.id;
+    function openEdit(id){
+        layer.open({
+            type: 2,
+            title: '编辑',
+            shadeClose: false,
+            scrollbar: false,
+            maxmin: true,
+            shade: 0.2,
+            area: ['45%', '80%'],
+            content: './edit/id/'+id+'.html',
         });
-        var id = $("#nodeid").val();
-        //写入库
-        $.post('./giveAccess', {'type' : 'give', 'id' : id, 'rule' : NodeString}, function(res){
-            layer.close(index);
-            if(res.code == 1){
-                layer.msg(res.msg,{icon:1,time:1500,shade: 0.1}, function(){
-                    Ajaxpage(1,5)
-                });
-            }else{
-                layer.msg(res.msg);
-            }
+    }
 
-        }, 'json')
-    })
 </script>
 </body>
 </html>

@@ -66,14 +66,12 @@ class MenuModel extends Model
         try{
             $result =  $this->save($param, ['id' => $param['id']]);
             if(false === $result){
-                writelog(session('uid'),session('username'),'用户【'.session('username').'】编辑菜单失败',2);
-                return ['code' => 0, 'data' => '', 'msg' => $this->getError()];
+                return ['code' => 1012, 'data' => '', 'msg' => $this->getError()];
             }else{
-                writelog(session('uid'),session('username'),'用户【'.session('username').'】编辑菜单成功',1);
-                return ['code' => 1, 'data' => '', 'msg' => '编辑菜单成功'];
+                return ['code' => 1011, 'data' => '', 'msg' => '编辑菜单成功'];
             }
         }catch( PDOException $e){
-            return ['code' => 0, 'data' => '', 'msg' => $e->getMessage()];
+            return ['code' => 1012, 'data' => '', 'msg' => $e->getMessage()];
         }
     }
 
@@ -95,11 +93,28 @@ class MenuModel extends Model
     public function delMenu($id)
     {
         try{
-            $this->where('id', $id)->delete();
-            writelog(session('uid'),session('username'),'用户【'.session('username').'】删除菜单成功',1);
-            return ['code' => 1, 'data' => '', 'msg' => '删除菜单成功'];
+            $this->where(['id'=>['in',$id]])->delete();
+            return ['code' => 1011, 'data' => '', 'msg' => '删除菜单成功'];
         }catch( PDOException $e){
-            return ['code' => 0, 'data' => '', 'msg' => $e->getMessage()];
+            return ['code' => 1012, 'data' => '', 'msg' => $e->getMessage()];
+        }
+    }
+
+
+    /**
+     * [stateRole 修改菜单状态]
+     */
+    public function statusMenu($id){
+        try{
+            $state = $this->where('id',$id)->value('status');
+            if($state == 1){
+                $this->where('id',$id)->update(['status'=>0]);
+            }else{
+                $this->where('id',$id)->update(['status'=>1]);
+            }
+            return ['code' => 1011, 'data' => '', 'msg' => '菜单状态修改成功'];
+        }catch (\Exception $e){
+            return ['code' => 1012, 'data' => '', 'msg' => $e->getMessage()];
         }
     }
 
