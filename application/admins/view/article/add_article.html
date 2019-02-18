@@ -1,0 +1,233 @@
+{include file="public/header" /}
+<link rel="stylesheet" href="/common/layui/css/layui.css"  media="all">
+<body class="gray-bg">
+<div class="wrapper wrapper-content animated fadeInRight" style="background: #fff">
+    <div class="row">
+        <div class="col-sm-12">
+
+            <blockquote class="layui-elem-quote layui-text">
+                添加文章
+            </blockquote>
+            <form class="layui-form" action="" lay-filter="example">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">文章标题</label>
+                    <div class="layui-input-block">
+                        <input type="text" name="title" lay-verify="title" autocomplete="off" placeholder="请输入菜单名称" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">文章类型</label>
+                    <div class="layui-input-block">
+                        <select name="group_id" lay-filter="aihao">
+                            {foreach $group_list as $k=>$v}
+                            <option value="{$v.id}">{$v.title}</option>
+                            {/foreach}
+                        </select>
+                    </div>
+                </div>
+                <div class="layui-upload">
+                    <label class="layui-form-label">文章图片</label>
+                    <div class="layui-input-block">
+                    <button type="button" class="layui-btn" id="test1">上传图片</button>
+                    <div class="layui-upload-list">
+                        <img class="layui-upload-img" id="demo1" width="160px">
+                        <p id="demoText"></p>
+                        <input type="hidden" value="" name="img_path" id="img_path">
+                    </div>
+                    </div>
+                </div>
+                <div class="layui-form-item layui-form-text">
+                    <label class="layui-form-label">文章简介</label>
+                    <div class="layui-input-block">
+                        <textarea placeholder="请输入内容"  name="remark" class="layui-textarea"></textarea>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">文章状态</label>
+                    <div class="layui-input-block">
+                        <input type="radio" name="state" value="1" title="开启" checked="">
+                        <input type="radio" name="state" value="0" title="禁用">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">文章详情</label>
+                    <div class="layui-input-block">
+                        <script src="/common/ueditor/ueditor.config.js" type="text/javascript"></script>
+                        <script src="/common/ueditor/ueditor.all.js" type="text/javascript"></script>
+                        <textarea name="content" style="width:100%" id="myEditor"></textarea>
+                        <script type="text/javascript">
+                            var editor = new UE.ui.Editor();
+                            editor.render("myEditor");
+                        </script>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-input-block">
+                        <button class="layui-btn" lay-submit="" type="button" lay-filter="demo1">立即提交</button>
+                        <button class="layui-btn layui-btn-danger" type="button" onclick="javascript:history.back(-1);">返回</button>
+                    </div>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+<script src="/common/layui/layui.js" charset="utf-8"></script>
+<script type="text/javascript">
+    layui.use(['form', 'layedit', 'laydate'], function(){
+        var form = layui.form
+            ,layer = layui.layer
+            ,layedit = layui.layedit
+            ,laydate = layui.laydate;
+
+        //日期
+        laydate.render({
+            elem: '#date'
+        });
+        laydate.render({
+            elem: '#date1'
+        });
+
+        //创建一个编辑器
+        var editIndex = layedit.build('LAY_demo_editor');
+
+        //自定义验证规则
+        form.verify({
+            title: function(value){
+                if(value.length < 1){
+                    return '请输入分类名称';
+                }
+            }
+            ,pass: [
+                /^[\S]{6,12}$/
+                ,'密码必须6到12位，且不能出现空格'
+            ]
+            ,content: function(value){
+                layedit.sync(editIndex);
+            }
+        });
+
+        //监听提交
+        form.on('submit(demo1)', function(data){
+            var param = data.field;
+            layui.jquery.ajax({
+                url:"{:url('admins/article/edit_article')}",
+                type:'post',
+                dataType:'json',
+                data:JSON.stringify(param),
+                contentType: "application/json; charset=utf-8",
+                success:function(res){
+                    if(res.code==1011){
+                        layer.alert(res.msg,{icon:1},function () {
+                            var win = parent.layer.getFrameIndex(window.name);  //获取窗口索引
+                            parent.layer.close(win);     //关闭父页面
+                            window.parent.location.reload();
+                        });
+                    }else{
+                        layer.alert(res.msg,{icon: 5});
+                    }
+                }
+            });
+            return false;
+        });
+
+        //表单初始赋值
+        form.val('example', {
+            "sort": "20"
+        })
+
+    });
+</script>
+<script>
+    layui.use('upload', function(){
+        var $ = layui.jquery
+            ,upload = layui.upload;
+        //普通图片上传
+        var uploadInst = upload.render({
+            elem: '#test1'
+            ,url: '{:url("Uploads/article")}'
+            ,before: function(obj){
+                //预读本地文件示例，不支持ie8
+                obj.preview(function(index, file, result){
+                    $('#demo1').attr('src', result); //图片链接（base64）
+                });
+            }
+            ,done: function(res){
+                //如果上传失败
+                if(res.code == 1012){
+                    return layer.msg(res.msg);
+                }else{
+                    //上传成功
+                   $('#img_path').val(res.data);
+                }
+
+            }
+            ,error: function(){
+                //演示失败状态，并实现重传
+                var demoText = $('#demoText');
+                demoText.html('<span style="color: #FF5722;">上传失败</span> <a class="layui-btn layui-btn-xs demo-reload">重试</a>');
+                demoText.find('.demo-reload').on('click', function(){
+                    uploadInst.upload();
+                });
+            }
+        });
+
+        //指定允许上传的文件类型
+        upload.render({
+            elem: '#test3'
+            ,url: '/upload/'
+            ,accept: 'file' //普通文件
+            ,done: function(res){
+                console.log(res)
+            }
+        });
+        upload.render({ //允许上传的文件后缀
+            elem: '#test4'
+            ,url: '/upload/'
+            ,accept: 'file' //普通文件
+            ,exts: 'zip|rar|7z' //只允许上传压缩文件
+            ,done: function(res){
+                console.log(res)
+            }
+        });
+        upload.render({
+            elem: '#test5'
+            ,url: '/upload/'
+            ,accept: 'video' //视频
+            ,done: function(res){
+                console.log(res)
+            }
+        });
+        upload.render({
+            elem: '#test6'
+            ,url: '/upload/'
+            ,accept: 'audio' //音频
+            ,done: function(res){
+                console.log(res)
+            }
+        });
+
+        //设定文件大小限制
+        upload.render({
+            elem: '#test7'
+            ,url: '/upload/'
+            ,size: 60 //限制文件大小，单位 KB
+            ,done: function(res){
+                console.log(res)
+            }
+        });
+
+        //绑定原始文件域
+        upload.render({
+            elem: '#test20'
+            ,url: '/upload/'
+            ,done: function(res){
+                console.log(res)
+            }
+        });
+
+    });
+</script>
+
+</body>
+</html>
