@@ -2,19 +2,18 @@
 /**
  * Created by PhpStorm.
  * User: liubowei
- * Date: 2019/2/18
- * Time: 10:45
+ * Date: 2019/2/20
+ * Time: 10:42
  */
 
 namespace app\admins\model;
 
 
 use think\Model;
-
-class ArticleGroupModel extends Model
+use think\Db;
+class BannerGroupModel extends Model
 {
-    protected $name = 'article_group';
-
+    protected  $name='banner_group';
     /**
      * 获取一条信息
      */

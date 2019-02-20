@@ -120,9 +120,7 @@
                 success:function(res){
                     if(res.code==1011){
                         layer.alert(res.msg,{icon:1},function () {
-                            var win = parent.layer.getFrameIndex(window.name);  //获取窗口索引
-                            parent.layer.close(win);     //关闭父页面
-                            window.parent.location.reload();
+                            window.location.reload();
                         });
                     }else{
                         layer.alert(res.msg,{icon: 5});

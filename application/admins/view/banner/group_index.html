@@ -102,7 +102,7 @@
             //从服务器读取数据
             loadData(key, currentPage, pageSize){
                 vm.listLoading = true;
-                $.post('{:url("article/group_index")}', {key:key,page:currentPage,rows:pageSize}, function(data){
+                $.post('{:url("banner/group_index")}', {key:key,page:currentPage,rows:pageSize}, function(data){
                     vm.tableData = [];
                     vm.totalCount = data.count;
                     for(var i=0;i<data.list.length;i++){
@@ -150,7 +150,7 @@
             },
             //状态
             state(id){
-                $.post("{:url('admins/article/state_group')}",{id:id},function (re) {
+                $.post("{:url('admins/Banner/state_group')}",{id:id},function (re) {
                     if(re.code == 1011){
                         layer.msg(re.msg,{icon:1});
                     }else{

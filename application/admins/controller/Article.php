@@ -11,6 +11,7 @@ namespace app\admins\controller;
 
 use app\admins\model\ArticleGroupModel;
 use app\admins\model\ArticleModel;
+use app\admins\model\BannerGroupModel;
 use think\Db;
 
 class Article extends Base
@@ -82,7 +83,9 @@ class Article extends Base
     public function del_article(){
         $ArticleModel = new ArticleModel();
         if(request()->isPost()){
-
+            $id = input('post.id');
+            $res = $ArticleModel->getDelArticle($id);
+            return json($res);
         }
     }
     /*---------------------------------文章分类---------------------------------------------*/
@@ -164,4 +167,5 @@ class Article extends Base
             return json($res);
         }
     }
+
 }

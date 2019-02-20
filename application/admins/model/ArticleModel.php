@@ -78,4 +78,16 @@ class ArticleModel extends Model
             return ['code'=>1012,'msg'=>$e->getMessage(),'date'=>''];
         }
     }
+
+    /**
+     * 删除文章列表
+     */
+    public function getDelArticle($id){
+        try{
+            $this->where(['id'=>['in',$id]])->delete();
+            return ['code'=>1011,'msg'=>'删除分类成功'];
+        }catch (\Exception $e){
+            return ['code'=>1012,'msg'=>$e->getMessage(),'date'=>''];
+        }
+    }
 }

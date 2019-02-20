@@ -5,7 +5,7 @@
     <div class="ibox float-e-margins" id="app" v-cloak>
         <template>
             <div class="ibox-title">
-                <h5>文章列表</h5>
+                <h5>图片列表</h5>
             </div>
             <div class="ibox-content">
                 <!--工具条-->
@@ -33,14 +33,14 @@
                         <el-table :data="tableData" border highlight-current-row v-loading="listLoading" element-loading-text="拼命加载中..." @selection-change="handleSelectionChange" style="width: 100%">
                             <el-table-column type="selection" width="60" align="center"></el-table-column>
                             <!--<el-table-column prop="id" label="ID" width="80" align="center"></el-table-column>-->
-                            <el-table-column prop="title" label="文章标题" width="180" show-overflow-tooltip align="left"></el-table-column>
-                            <el-table-column prop="group_title" label="文章分类" width="180" show-overflow-tooltip align="left"></el-table-column>
-                            <el-table-column prop="img_path" label="文章图片" show-overflow-tooltip align="center">
+                            <el-table-column prop="title" label="图片简介" width="180" show-overflow-tooltip align="left"></el-table-column>
+                            <el-table-column prop="group_title" label="图片分类" width="180" show-overflow-tooltip align="left"></el-table-column>
+                            <el-table-column prop="path" label="图片详情" show-overflow-tooltip align="center">
                                 <template scope="scope">
-                                    <img :src="scope.row.img_path ? imgPath + scope.row.img_path:'/static/admin/images/no_img.jpg'" style="height: 50px;padding: 5px">
+                                    <img :src="scope.row.path ? imgPath + scope.row.path:'/static/admin/images/no_img.jpg'" style="height: 50px;padding: 5px">
                                 </template>
                             </el-table-column>
-                            <el-table-column prop="state" label="文章状态" align="center">
+                            <el-table-column prop="state" label="图片状态" align="center">
                                 <template scope="scope">
                                     <span v-if="scope.row.state==0"><button class="btn btn-danger" type="button" @click="state(scope.row.id)">禁用</button></span>
                                     <span v-if="scope.row.state==1"><button class="btn btn-primary" type="button" @click="state(scope.row.id)">启用</button></span>
@@ -108,7 +108,7 @@
             //从服务器读取数据
             loadData(key, currentPage, pageSize){
                 vm.listLoading = true;
-                $.post('{:url("article/index")}', {key:key,page:currentPage,rows:pageSize}, function(data){
+                $.post('{:url("banner/index")}', {key:key,page:currentPage,rows:pageSize}, function(data){
                     vm.tableData = [];
                     vm.totalCount = data.count;
                     for(var i=0;i<data.list.length;i++){
@@ -156,7 +156,7 @@
             },
             //状态
             state(id){
-                $.post("{:url('admins/article/state_article')}",{id:id},function (re) {
+                $.post("{:url('admins/banner/state_article')}",{id:id},function (re) {
                     if(re.code == 1011){
                         layer.msg(re.msg,{icon:1});
                     }else{
@@ -182,7 +182,7 @@
                     type: 'warning'
                 }).then(() => {
                     $.ajax({
-                        url: '{:url("article/del_article")}',
+                        url: '{:url("banner/del_article")}',
                         data:"id="+array,
                         type: "POST",
                         dataType:'json',
