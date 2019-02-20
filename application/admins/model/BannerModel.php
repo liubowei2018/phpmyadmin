@@ -24,8 +24,8 @@ class BannerModel extends Model
     /**
      * 获取图片列表
      */
-    public function getArticleList($map,$page,$row){
-        return $this->alias('a')->field('a.*,g.title as group_title')->where($map)->join('banner_group g','g.id = a.group_id')->page($page,$row)->order('group_id ASC,create_time DESC')->select();
+    public function getArticleList($map,$page,$row,$field="a.*,g.title as group_title"){
+        return $this->alias('a')->field($field)->where($map)->join('banner_group g','g.id = a.group_id')->page($page,$row)->order('group_id ASC,a.create_time DESC')->select();
     }
     /**
      * 添加图片

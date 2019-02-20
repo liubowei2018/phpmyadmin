@@ -18,9 +18,13 @@ class CommonValidate extends Validate
         ['token','require','令牌不能为空'],
         ['TimeStamp','require','时间不为空'],
         ['Sign','require','签名不能为空'],
+        /*分页*/
+        ['type','require','分类类型不能为空'],
+        ['page','require','列表分页不能为空'],
     ];
 
     protected $scene = [
         'common '=>['token','TimeStamp','Sign','uuid'],
+        'article_list '=>['token','TimeStamp','Sign','uuid','type','page'],
     ];
 }

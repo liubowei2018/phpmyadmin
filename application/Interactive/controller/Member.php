@@ -16,6 +16,15 @@ use think\Cache;
 class Member extends ApiBase
 {
     /**
+     * 用户个人信息
+     */
+    public function member_info(){
+
+    }
+
+
+    /*-----------------------------------修改信息----------------------------------------------*/
+    /**
      * 修改用户手机号
      */
     public function edit_mobile(){

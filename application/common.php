@@ -62,3 +62,10 @@ function curl_post_https($url,$data){ // 模拟提交数据函数
     curl_close($curl); // 关闭CURL会话
     return $tmpInfo; // 返回数据，json格式
 }
+
+/**
+ * 获取网站链接
+ */
+function web_url_str(){
+    return $str = 'http://'.$_SERVER['SERVER_NAME'];
+}

@@ -1,0 +1,436 @@
+<!--引入头部  开始-->
+{include file="public/header" /}
+<!--引入头部  结束-->
+
+<style type="text/css">
+    /* TAB */
+    .nav-tabs.nav>li>a {
+        padding: 10px 25px;
+        margin-right: 0;
+    }
+    .nav-tabs.nav>li>a:hover,
+    .nav-tabs.nav>li.active>a {
+        border-top: 3px solid #1ab394;
+        padding-top: 8px;
+        border-bottom: 1px solid #FFFFFF;
+    }
+    .nav-tabs>li>a {
+        color: #A7B1C2;
+        font-weight: 500;
+        margin-right: 2px;
+        line-height: 1.42857143;
+        border: 1px solid transparent;
+        border-radius: 0;
+    }
+</style>
+
+<body class="gray-bg">
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>网站配置</h5>
+                    <div class="ibox-tools">
+                        <a class="collapse-link">
+                            <i class="fa fa-chevron-up"></i>
+                        </a>
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="form_basic.html#">
+                            <i class="fa fa-wrench"></i>
+                        </a>
+                        <a class="close-link">
+                            <i class="fa fa-times"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="ibox-content">
+                    <div class="panel blank-panel">
+                        <div class="panel-heading">
+                            <div class="panel-options">
+                                <ul class="nav nav-tabs">
+                                    <li class="active"><a data-toggle="tab" href="#tab-1" aria-expanded="true">注册会员</a></li>
+                                    <li class=""><a data-toggle="tab" href="#tab-2" aria-expanded="false">VIP会员</a></li>
+                                    <li class=""><a data-toggle="tab" href="#tab-3" aria-expanded="false">合伙人</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="panel-body">
+                            <div class="tab-content">
+                                <div id="tab-1" class="tab-pane active">
+                                    <form action="{:url('privilege_save')}" method="post" class="form-horizontal">
+                                        <div class="hr-line-dashed"></div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">每日抢红包个数：</label>
+                                            <div class="input-group col-sm-4">
+                                                <input type="text" class="form-control" name="config[ordinary_today_hongbao_number]" value="{$config.ordinary_today_hongbao_number}">
+                                            </div>
+                                        </div>
+                                        <div class="hr-line-dashed"></div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">抢红包个数-发放：</label>
+                                            <div class="input-group col-sm-4">
+                                                <input type="text" class="form-control" name="config[ordinary_hair_hongbao_number]" value="{$config.ordinary_hair_hongbao_number}">
+                                                <span class="help-block m-b-none"><i class="fa fa-info-circle"></i> 发布一个红包广告增加抢红包次数（当天）</span>
+                                            </div>
+                                        </div>
+                                        <div class="hr-line-dashed"></div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">抢红包个数-朋友圈：</label>
+                                            <div class="input-group col-sm-4">
+                                                <input type="text" class="form-control" name="config[ordinary_quan_hongbao_number]" value="{$config.ordinary_quan_hongbao_number }">
+                                                <span class="help-block m-b-none"><i class="fa fa-info-circle"></i> 分享朋友圈增加抢红包次数 （当天）</span>
+                                            </div>
+                                        </div>
+                                        <div class="hr-line-dashed"></div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">抢红包个数-微信群：</label>
+                                            <div class="input-group col-sm-4">
+                                                <input type="text" class="form-control"  name="config[ordinary_qun_hongbao_number]" value="{$config.ordinary_qun_hongbao_number}">
+                                                <span class="help-block m-b-none"><i class="fa fa-info-circle"></i> 分享微信群增加抢红包次数 （当天）</span>
+                                            </div>
+                                        </div>
+                                        <div class="hr-line-dashed"></div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">抢红包个数-推广一人：</label>
+                                            <div class="input-group col-sm-4">
+                                                <input type="text" class="form-control" name="config[ordinary_pushone_hongbao_number]" value="{$config.ordinary_pushone_hongbao_number}">
+                                                <span class="help-block m-b-none"><i class="fa fa-info-circle"></i> 推广一名普通会员增加抢红包次数 （永久）</span>
+                                            </div>
+                                        </div>
+                                        <div class="hr-line-dashed"></div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">抢红包个数-推广五人：</label>
+                                            <div class="input-group col-sm-4">
+                                                <input type="text" class="form-control" name="config[ordinary_pushfive_hongbao_number]" value="{$config.ordinary_pushfive_hongbao_number}">
+                                                <span class="help-block m-b-none"><i class="fa fa-info-circle"></i> 推广五名普通会员增加抢红包次数 （永久）</span>
+                                            </div>
+                                        </div>
+                                        <div class="hr-line-dashed"></div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">抢红包个数-推广十人：</label>
+                                            <div class="input-group col-sm-4">
+                                                <input type="text" class="form-control" name="config[ordinary_pushTen_hongbao_number]" value="{$config.ordinary_pushTen_hongbao_number}">
+                                                <span class="help-block m-b-none"><i class="fa fa-info-circle"></i> 推广十名普通会员增加抢红包次数 （永久）</span>
+                                            </div>
+                                        </div>
+                                        <div class="hr-line-dashed"></div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">获得一代奖金：</label>
+                                            <div class="input-group col-sm-4">
+                                                <input type="text" class="form-control"  name="config[ordinary_one_hongbao_bonus]" value="{$config.ordinary_one_hongbao_bonus}">
+                                                <span class="help-block m-b-none"><i class="fa fa-info-circle"></i> 推广会员抢红包得一代会员和二代会员抢到红包金额</span>
+                                            </div>
+                                        </div>
+                                        <div class="hr-line-dashed"></div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">获得二代奖金：</label>
+                                            <div class="input-group col-sm-4">
+                                                <input type="text" class="form-control"  name="config[ordinary_two_hongbao_bonus]" value="{$config.ordinary_two_hongbao_bonus}">
+                                                <span class="help-block m-b-none"><i class="fa fa-info-circle"></i> 推广会员抢红包得一代会员和二代会员抢到红包金额</span>
+                                            </div>
+                                        </div>
+                                        <div class="hr-line-dashed"></div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">会员升级-一代奖金：</label>
+                                            <div class="input-group col-sm-4">
+                                                <input type="text" class="form-control"  name="config[ordinary_one_upgrade]" value="{$config.ordinary_one_upgrade}">
+                                                <span class="help-block m-b-none"><i class="fa fa-info-circle"></i> 会员升级VIP/合伙人  一代 奖励</span>
+                                            </div>
+                                        </div>
+                                        <div class="hr-line-dashed"></div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">会员升级-二代奖金：</label>
+                                            <div class="input-group col-sm-4">
+                                                <input type="text" class="form-control"  name="config[ordinary_two_upgrade]" value="{$config.ordinary_two_upgrade}">
+                                                <span class="help-block m-b-none"><i class="fa fa-info-circle"></i> 会员升级VIP/合伙人  二代 奖励</span>
+                                            </div>
+                                        </div>
+                                        <div class="hr-line-dashed"></div>
+                                        <div class="form-group">
+                                            <div class="col-sm-4 col-sm-offset-3">
+                                                <button class="btn btn-primary" type="submit"><i class="fa fa-save"></i> 保存信息</button>&nbsp;&nbsp;&nbsp;
+                                                <a class="btn btn-danger" href="javascript:history.go(-1);"><i class="fa fa-close"></i> 返回</a>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                                <div id="tab-2" class="tab-pane">
+                                    <form action="{:url('privilege_save')}" method="post" class="form-horizontal">
+
+                                        <div class="hr-line-dashed"></div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">是否允许升级：</label>
+                                            <div class="input-group col-sm-4">
+                                                <div class="radio ">
+                                                    <label class="radio-inline">
+                                                        <input type="radio" style="width: 17px;height: 17px;"  name='config[vip_state]' value="1" {if condition="$config['vip_state'] eq 1 "}checked{/if}/>开启&nbsp;&nbsp;
+                                                    </label>
+                                                    <label class="radio-inline">
+                                                        <input type="radio" style="width: 17px;height: 17px;"  name='config[vip_state]' value="0" {if condition="$config['vip_state'] eq 0 "}checked{/if}/>关闭
+                                                    </label>
+                                                </div>
+                                                <span class="help-block m-b-none"><i class="fa fa-info-circle"></i> 关闭则禁止app 升级当前等级</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="hr-line-dashed"></div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">升级金额：</label>
+                                            <div class="input-group col-sm-4">
+                                                <input type="text" class="form-control"  name="config[vip_money]" value="{$config.vip_money}">
+                                                <span class="help-block m-b-none"><i class="fa fa-info-circle"></i> 升级vip 需要的金额</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="hr-line-dashed"></div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">每日抢红包个数：</label>
+                                            <div class="input-group col-sm-4">
+                                                <input type="text" class="form-control"  name="config[vip_today_hongbao_number]" value="{$config.vip_today_hongbao_number}">
+                                            </div>
+                                        </div>
+                                        <div class="hr-line-dashed"></div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">抢红包个数-发放：</label>
+                                            <div class="input-group col-sm-4">
+                                                <input type="text" class="form-control"  name="config[vip_hair_hongbao_number]" value="{$config.vip_hair_hongbao_number}">
+                                                <span class="help-block m-b-none"><i class="fa fa-info-circle"></i> 发布一个红包广告增加抢红包次数（当天）</span>
+                                            </div>
+                                        </div>
+                                        <div class="hr-line-dashed"></div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">抢红包个数-朋友圈：</label>
+                                            <div class="input-group col-sm-4">
+                                                <input type="text" class="form-control" name="config[vip_quan_hongbao_number]" value="{$config.vip_quan_hongbao_number}">
+                                                <span class="help-block m-b-none"><i class="fa fa-info-circle"></i> 分享朋友圈增加抢红包次数 （当天）</span>
+                                            </div>
+                                        </div>
+                                        <div class="hr-line-dashed"></div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">抢红包个数-微信群：</label>
+                                            <div class="input-group col-sm-4">
+                                                <input type="text" class="form-control"  name="config[vip_qun_hongbao_number]" value="{$config.vip_qun_hongbao_number}">
+                                                <span class="help-block m-b-none"><i class="fa fa-info-circle"></i> 分享微信群增加抢红包次数 （当天）</span>
+                                            </div>
+                                        </div>
+                                        <div class="hr-line-dashed"></div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">抢红包个数-推广一人：</label>
+                                            <div class="input-group col-sm-4">
+                                                <input type="text" class="form-control"  name="config[vip_pushone_hongbao_number]" value="{$config.vip_pushone_hongbao_number}">
+                                                <span class="help-block m-b-none"><i class="fa fa-info-circle"></i> 推广一名普通会员增加抢红包次数 （永久）</span>
+                                            </div>
+                                        </div>
+                                        <div class="hr-line-dashed"></div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">抢红包个数-推广五人：</label>
+                                            <div class="input-group col-sm-4">
+                                                <input type="text" class="form-control"  name="config[vip_pushfive_hongbao_number]" value="{$config.vip_pushfive_hongbao_number}">
+                                                <span class="help-block m-b-none"><i class="fa fa-info-circle"></i> 推广五名普通会员增加抢红包次数 （永久）</span>
+                                            </div>
+                                        </div>
+                                        <div class="hr-line-dashed"></div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">抢红包个数-推广十人：</label>
+                                            <div class="input-group col-sm-4">
+                                                <input type="text" class="form-control"  name="config[vip_pushTen_hongbao_number]" value="{$config.vip_pushTen_hongbao_number}">
+                                                <span class="help-block m-b-none"><i class="fa fa-info-circle"></i> 推广十名普通会员增加抢红包次数 （永久）</span>
+                                            </div>
+                                        </div>
+                                        <div class="hr-line-dashed"></div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">获得一代奖金：</label>
+                                            <div class="input-group col-sm-4">
+                                                <input type="text" class="form-control"  name="config[vip_one_hongbao_bonus]" value="{$config.vip_one_hongbao_bonus}">
+                                                <span class="help-block m-b-none"><i class="fa fa-info-circle"></i> 推广会员抢红包得一代会员和二代会员抢到红包金额</span>
+                                            </div>
+                                        </div>
+                                        <div class="hr-line-dashed"></div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">获得二代奖金：</label>
+                                            <div class="input-group col-sm-4">
+                                                <input type="text" class="form-control"  name="config[vip_two_hongbao_bonus]" value="{$config.vip_two_hongbao_bonus}">
+                                                <span class="help-block m-b-none"><i class="fa fa-info-circle"></i> 推广会员抢红包得一代会员和二代会员抢到红包金额</span>
+                                            </div>
+                                        </div>
+                                        <div class="hr-line-dashed"></div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">会员升级-一代奖金：</label>
+                                            <div class="input-group col-sm-4">
+                                                <input type="text" class="form-control"  name="config[vip_one_upgrade]" value="{$config.vip_one_upgrade}">
+                                                <span class="help-block m-b-none"><i class="fa fa-info-circle"></i> 会员升级VIP/合伙人  一代 奖励</span>
+                                            </div>
+                                        </div>
+                                        <div class="hr-line-dashed"></div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">会员升级-二代奖金：</label>
+                                            <div class="input-group col-sm-4">
+                                                <input type="text" class="form-control"  name="config[vip_two_upgrade]" value="{$config.vip_two_upgrade}">
+                                                <span class="help-block m-b-none"><i class="fa fa-info-circle"></i> 会员升级VIP/合伙人  二代 奖励</span>
+                                            </div>
+                                        </div>
+
+
+
+
+                                        <div class="hr-line-dashed"></div>
+                                        <div class="form-group">
+                                            <div class="col-sm-4 col-sm-offset-3">
+                                                <button class="btn btn-primary" type="submit"><i class="fa fa-save"></i> 保存信息</button>&nbsp;&nbsp;&nbsp;
+                                                <a class="btn btn-danger" href="javascript:history.go(-1);"><i class="fa fa-close"></i> 返回</a>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                                <div id="tab-3" class="tab-pane">
+                                    <form action="{:url('privilege_save')}" method="post" class="form-horizontal">
+
+                                        <div class="hr-line-dashed"></div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">是否允许升级：</label>
+                                            <div class="input-group col-sm-4">
+                                                <div class="radio ">
+                                                    <label class="radio-inline">
+                                                        <input type="radio" style="width: 17px;height: 17px;"  name='config[partner_state]' value="1" {if condition="$config['partner_state'] eq 1 "}checked{/if}/>开启&nbsp;&nbsp;
+                                                    </label>
+                                                    <label class="radio-inline">
+                                                        <input type="radio" style="width: 17px;height: 17px;"  name='config[partner_state]' value="0" {if condition="$config['partner_state'] eq 0 "}checked{/if}/>关闭
+                                                    </label>
+                                                </div>
+                                                <span class="help-block m-b-none"><i class="fa fa-info-circle"></i> 关闭则禁止app 升级当前等级</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="hr-line-dashed"></div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">升级金额：</label>
+                                            <div class="input-group col-sm-4">
+                                                <input type="text" class="form-control"  name="config[partner_money]" value="{$config.partner_money}">
+                                                <span class="help-block m-b-none"><i class="fa fa-info-circle"></i> 升级合伙人 需要的金额（普通会员升级全额  vip 升级 补差价）</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="hr-line-dashed"></div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">每日抢红包个数：</label>
+                                            <div class="input-group col-sm-4">
+                                                <input type="text" class="form-control" name="config[partner_today_hongbao_number]" value="{$config.partner_today_hongbao_number}">
+                                            </div>
+                                        </div>
+                                        <div class="hr-line-dashed"></div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">抢红包个数-发放：</label>
+                                            <div class="input-group col-sm-4">
+                                                <input type="text" class="form-control"  name="config[partner_hair_hongbao_number]" value="{$config.partner_hair_hongbao_number}">
+                                                <span class="help-block m-b-none"><i class="fa fa-info-circle"></i> 发布一个红包广告增加抢红包次数（当天）</span>
+                                            </div>
+                                        </div>
+                                        <div class="hr-line-dashed"></div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">抢红包个数-朋友圈：</label>
+                                            <div class="input-group col-sm-4">
+                                                <input type="text" class="form-control"  name="config[partner_quan_hongbao_number]" value="{$config.partner_quan_hongbao_number}">
+                                                <span class="help-block m-b-none"><i class="fa fa-info-circle"></i> 分享朋友圈增加抢红包次数 （当天）</span>
+                                            </div>
+                                        </div>
+                                        <div class="hr-line-dashed"></div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">抢红包个数-微信群：</label>
+                                            <div class="input-group col-sm-4">
+                                                <input type="text" class="form-control"  name="config[partner_qun_hongbao_number]" value="{$config.partner_qun_hongbao_number}">
+                                                <span class="help-block m-b-none"><i class="fa fa-info-circle"></i> 分享微信群增加抢红包次数 （当天）</span>
+                                            </div>
+                                        </div>
+                                        <div class="hr-line-dashed"></div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">抢红包个数-推广一人：</label>
+                                            <div class="input-group col-sm-4">
+                                                <input type="text" class="form-control"  name="config[partner_pushone_hongbao_number]" value="{$config.partner_pushone_hongbao_number}">
+                                                <span class="help-block m-b-none"><i class="fa fa-info-circle"></i> 推广一名普通会员增加抢红包次数 （永久）</span>
+                                            </div>
+                                        </div>
+                                        <div class="hr-line-dashed"></div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">抢红包个数-推广五人：</label>
+                                            <div class="input-group col-sm-4">
+                                                <input type="text" class="form-control" name="config[partner_pushfive_hongbao_number]" value="{$config.partner_pushfive_hongbao_number}">
+                                                <span class="help-block m-b-none"><i class="fa fa-info-circle"></i> 推广五名普通会员增加抢红包次数 （永久）</span>
+                                            </div>
+                                        </div>
+                                        <div class="hr-line-dashed"></div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">抢红包个数-推广十人：</label>
+                                            <div class="input-group col-sm-4">
+                                                <input type="text" class="form-control"  name="config[partner_pushTen_hongbao_number]" value="{$config.partner_pushTen_hongbao_number}">
+                                                <span class="help-block m-b-none"><i class="fa fa-info-circle"></i> 推广十名普通会员增加抢红包次数 （永久）</span>
+                                            </div>
+                                        </div>
+                                        <div class="hr-line-dashed"></div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">获得一代奖金：</label>
+                                            <div class="input-group col-sm-4">
+                                                <input type="text" class="form-control" name="config[partner_one_hongbao_bonus]" value="{$config.partner_one_hongbao_bonus}">
+                                                <span class="help-block m-b-none"><i class="fa fa-info-circle"></i> 推广会员抢红包得一代会员和二代会员抢到红包金额</span>
+                                            </div>
+                                        </div>
+                                        <div class="hr-line-dashed"></div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">获得二代奖金：</label>
+                                            <div class="input-group col-sm-4">
+                                                <input type="text" class="form-control"  name="config[partner_two_hongbao_bonus]" value="{$config.partner_two_hongbao_bonus}">
+                                                <span class="help-block m-b-none"><i class="fa fa-info-circle"></i> 推广会员抢红包得一代会员和二代会员抢到红包金额</span>
+                                            </div>
+                                        </div>
+                                        <div class="hr-line-dashed"></div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">会员升级-一代奖金：</label>
+                                            <div class="input-group col-sm-4">
+                                                <input type="text" class="form-control"  name="config[partner_one_upgrade]"value="{$config.partner_one_upgrade}">
+                                                <span class="help-block m-b-none"><i class="fa fa-info-circle"></i> 会员升级VIP/合伙人  一代 奖励</span>
+                                            </div>
+                                        </div>
+                                        <div class="hr-line-dashed"></div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">会员升级-二代奖金：</label>
+                                            <div class="input-group col-sm-4">
+                                                <input type="text" class="form-control"  name="config[partner_two_upgrade]" value="{$config.partner_two_upgrade}">
+                                                <span class="help-block m-b-none"><i class="fa fa-info-circle"></i> 会员升级VIP/合伙人  二代 奖励</span>
+                                            </div>
+                                        </div>
+
+
+
+
+                                        <div class="hr-line-dashed"></div>
+                                        <div class="form-group">
+                                            <div class="col-sm-4 col-sm-offset-3">
+                                                <button class="btn btn-primary" type="submit"><i class="fa fa-save"></i> 保存信息</button>&nbsp;&nbsp;&nbsp;
+                                                <a class="btn btn-danger" href="javascript:history.go(-1);"><i class="fa fa-close"></i> 返回</a>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--引入尾部  开始-->
+{include file="public/footer" /}
+<script src="/common/js/plugins/chosen/chosen.jquery.js"></script>
+<!--引入尾部  结束-->
+
+<script type="text/javascript">
+    var config = {
+        '.chosen-select': {},
+    }
+    for (var selector in config) {
+        $(selector).chosen(config[selector]);
+    }
+</script>
+</body>
+</html>
