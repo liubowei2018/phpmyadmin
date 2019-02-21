@@ -2,8 +2,8 @@
 /**
  * Created by PhpStorm.
  * User: liubowei
- * Date: 2019/2/19
- * Time: 15:32
+ * Date: 2019/2/21
+ * Time: 11:30
  */
 
 namespace app\Interactive\validate;
@@ -11,7 +11,7 @@ namespace app\Interactive\validate;
 
 use think\Validate;
 
-class CommonValidate extends Validate
+class HomeValidate extends Validate
 {
     protected $rule = [
         ['uuid','require','uuid不能为空'],
@@ -24,8 +24,8 @@ class CommonValidate extends Validate
     ];
 
     protected $scene = [
-        'common '=>['token','TimeStamp','Sign','uuid'],
-        'article_list '=>['token','TimeStamp','Sign','uuid','type','page'],
-        'synopsis '=>['type'],
+        'synopsis'=>['type'],
+        'whole'=>['uuid','token','TimeStamp','Sign'],
+        'article'=>['uuid','token','TimeStamp','Sign','type','page'],
     ];
 }

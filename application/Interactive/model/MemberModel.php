@@ -48,13 +48,15 @@ class MemberModel extends Model
             Cache::set($data['uuid'].'_token',$token,3600);
             return ['code'=>1011,'msg'=>'登录成功','data'=>$array];
         }else{
-            $this->insert(['username'=>$data['username'],'user_img'=>$data['img_path'],'state'=>1,'uuid'=>$data['uuid'],'type'=>1,'create_time'=>time()]);
+            $MoneyModel = new MoneyModel();
+            $user_id = $this->insertGetId(['username'=>$data['username'],'user_img'=>$data['img_path'],'state'=>1,'uuid'=>$data['uuid'],'type'=>1,'create_time'=>time()]);
+            $MoneyModel->getAddInfo(['user_id' => $user_id]);
             $array['is_mobile'] = 0;
             $array['state'] = 1;
             $array['token'] = $token;
-            $array['uuid'] = $is_register['uuid'];
-            $array['username'] = $is_register['username'];
-            $array['user_img'] = $is_register['user_img'];
+            $array['uuid'] = $data['uuid'];
+            $array['username'] = $data['username'];
+            $array['user_img'] = $data['img_path'];
             Cache::set($data['uuid'].'_token',$token,3600);
             return ['code'=>1011,'msg'=>'登录成功','data'=>$array];
         }

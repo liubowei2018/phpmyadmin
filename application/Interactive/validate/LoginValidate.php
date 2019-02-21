@@ -20,6 +20,7 @@ class LoginValidate extends Validate
         ['img_path','require','用户头像不能为空'],
         ['uuid','require','用户微信uuid不能为空'],
         ['Sign','require','签名不能为空'],
+        ['type','require','分类不能为空'],
     ];
 
     protected $scene = [
@@ -28,5 +29,6 @@ class LoginValidate extends Validate
         'entry_sms'=>['phone','Sign'],
         'mobile_entry'=>['phone','sms_code','Sign'],
         'member_edit_mobile'=>['phone','uuid','sms_code','Sign'],
+        'synopsis'=>['type'],
     ];
 }

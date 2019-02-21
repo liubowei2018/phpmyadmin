@@ -19,7 +19,7 @@ class Index extends ApiBase
      */
     public function home_page(){
         $data = input('post.');
-        $validate_res = $this->validate($data,'CommonValidate.common');
+        $validate_res = $this->validate($data,'HomeValidate.whole');
         if($validate_res !== true){ return json(['code'=>1015,'msg'=>$validate_res]); } //数据认证
         if(getSign($data) != $data['Sign']){ return json(['code'=>1013,'msg'=>'签名错误']);} //签名认证
         if(Cache::get($data['uuid'].'_token') != $data['token']) return json(['code'=>1004,'msg'=>'用户未登录']);//登陆验证

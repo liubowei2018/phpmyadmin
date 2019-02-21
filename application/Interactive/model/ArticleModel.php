@@ -21,9 +21,15 @@ class ArticleModel extends Model
         return $this->field($field)->where($map)->page($page,$rows)->order('id DESC')->select();
     }
     /**
-     * 获取一条文章详情
+     * 根据ID 获取一条文章详情
      */
     public function getArticleInfo($id){
         return $this->where('id',$id)->find();
+    }
+    /**
+     * 根据条件 获取一条文章详情
+     */
+    public function getArticleDetail($map){
+        return $this->where($map)->find();
     }
 }
