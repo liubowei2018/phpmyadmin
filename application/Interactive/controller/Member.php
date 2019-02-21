@@ -14,6 +14,8 @@ use app\Interactive\model\MemberBankModel;
 use app\Interactive\model\MemberModel;
 use app\Interactive\model\MoneyModel;
 use think\Cache;
+use think\Db;
+
 class Member extends ApiBase
 {
     /**
@@ -28,16 +30,19 @@ class Member extends ApiBase
         //获取用户信息
         $MmemberModel = new MemberModel();
         $MoneyModel = new MoneyModel();
-        $member_info = $MmemberModel->getMemberInfo('id,mobile',['uuid'=>$data['uuid']]);
+        $member_info = $MmemberModel->getMemberInfo('id,mobile,pid',['uuid'=>$data['uuid']]);
         if($member_info){
             $money_info = $MoneyModel->getMemberMoney('*', ['user_id' => $member_info['id']]);
+            $bonus_close = $money_info['one_bonus_log'] + $money_info['one_bonus_log'];
+            $p_mobile = Db::name('member')->where('id',$member_info['pid'])->value('mobile');
             $array = [
                 'mobile' => $member_info['mobile'],
                 'balance' => $money_info['balance'],//余额
                 'bonus' => $money_info['balance'],//奖金余额
                 'one_bonus_log' => $money_info['one_bonus_log'],
                 'two_bonus_log' => $money_info['one_bonus_log'],
-                'bonus_close' => $money_info['one_bonus_log'] + $money_info['one_bonus_log'],
+                'bonus_close' => (string)$bonus_close,
+                'p_mobile' => $p_mobile?$p_mobile:'',
             ];
             return json(['code'=>1011,'msg'=>'查询成功','data'=>$array]);
         }else{
@@ -45,7 +50,7 @@ class Member extends ApiBase
         }
     }
     /**
-     * 我的一级推荐人
+     * 我的推荐人
      */
     public function recommend_list(){
         $data = input('post.');

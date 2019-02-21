@@ -24,3 +24,22 @@ function app_config_list(){
         return $config;
     }
 }
+
+/**
+ * think_privilege_config
+ * 升级信息
+ */
+function privilege_config_list(){
+    $app_config = Cache::get('privilege_config_list');
+    if($app_config){
+        return $app_config;
+    }else{
+        $app_config = Db::name('privilege_config')->select();
+        $config = [];
+        foreach ($app_config as $k => $v) {
+            $config[trim($v['name'])]=$v['value'];
+        }
+        Cache::set('privilege_config_list',$config,7200);
+        return $config;
+    }
+}
