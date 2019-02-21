@@ -29,4 +29,11 @@ class MoneyModel extends Model
             return false;
         }
     }
+
+    /**
+     * 获取用户资金
+     */
+    public function getMemberMoney($field,$map){
+        return $this->field($field)->where($map)->find();
+    }
 }

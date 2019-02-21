@@ -12,6 +12,7 @@ namespace app\Interactive\controller;
 use app\Interactive\model\BankListModel;
 use app\Interactive\model\MemberBankModel;
 use app\Interactive\model\MemberModel;
+use app\Interactive\model\MoneyModel;
 use think\Cache;
 class Member extends ApiBase
 {
@@ -24,7 +25,24 @@ class Member extends ApiBase
         if($validate_res !== true){ return json(['code'=>1015,'msg'=>$validate_res]); } //数据认证
         if(getSign($data) != $data['Sign']){ return json(['code'=>1013,'msg'=>'签名错误']);} //签名认证
         if(Cache::get($data['uuid'].'_token') != $data['token']) return json(['code'=>1004,'msg'=>'用户未登录']);//登陆验证
-
+        //获取用户信息
+        $MmemberModel = new MemberModel();
+        $MoneyModel = new MoneyModel();
+        $member_info = $MmemberModel->getMemberInfo('id,mobile',['uuid'=>$data['uuid']]);
+        if($member_info){
+            $money_info = $MoneyModel->getMemberMoney('*', ['user_id' => $member_info['id']]);
+            $array = [
+                'mobile' => $member_info['mobile'],
+                'balance' => $money_info['balance'],//余额
+                'bonus' => $money_info['balance'],//奖金余额
+                'one_bonus_log' => $money_info['one_bonus_log'],
+                'two_bonus_log' => $money_info['one_bonus_log'],
+                'bonus_close' => $money_info['one_bonus_log'] + $money_info['one_bonus_log'],
+            ];
+            return json(['code'=>1011,'msg'=>'查询成功','data'=>$array]);
+        }else{
+            return json(['code'=>1012,'msg'=>'用户不存在','data'=>""]);
+        }
     }
 
 

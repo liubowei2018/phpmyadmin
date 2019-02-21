@@ -17,14 +17,14 @@ class LoginValidate extends Validate
         ['username','require','用户姓名不能为空'],
         ['phone','require','手机号不能为空'],
         ['sms_code','require','短信验证码不能为空'],
-        ['img_path','require','用户头像不能为空'],
+        ['user_img','require','用户头像不能为空'],
         ['uuid','require','用户微信uuid不能为空'],
         ['Sign','require','签名不能为空'],
         ['type','require','分类不能为空'],
     ];
 
     protected $scene = [
-        'entry'=>['username','img_path','uuid','Sign'],
+        'entry'=>['username','user_img','uuid','Sign'],
         'edit_mobile'=>['phone','uuid','Sign'],
         'entry_sms'=>['phone','Sign'],
         'mobile_entry'=>['phone','sms_code','Sign'],

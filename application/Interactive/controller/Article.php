@@ -37,7 +37,7 @@ class Article extends ApiBase
         }
         $url = web_url_str();
         $web_url_info =$url.'/Interactive/Article/article_info.html?id=';
-        $list = $ArticleModel->getArticleList("title,remark,CONCAT('$url',img_path) as img_path,CONCAT('$web_url_info',id) as web_url",$map,$data['pages'],15);
+        $list = $ArticleModel->getArticleList("title,remark,CONCAT('$url',img_path) as img_path,CONCAT('$web_url_info',id) as web_url",$map,$data['page'],15);
         return json(['code'=>1011,'msg'=>'获取成功','data'=>$list]);
     }
     /**
