@@ -44,7 +44,31 @@ class Member extends ApiBase
             return json(['code'=>1012,'msg'=>'用户不存在','data'=>""]);
         }
     }
-
+    /**
+     * 我的一级推荐人
+     */
+    public function recommend_list(){
+        $data = input('post.');
+        $validate_res = $this->validate($data,'HomeValidate.article');
+        if($validate_res !== true){ return json(['code'=>1015,'msg'=>$validate_res]); } //数据认证
+        if(getSign($data) != $data['Sign']){ return json(['code'=>1013,'msg'=>'签名错误']);} //签名认证
+        if(Cache::get($data['uuid'].'_token') != $data['token']) return json(['code'=>1004,'msg'=>'用户未登录']);//登陆验证
+        $MemeberModel = new MemberModel();
+        $user_info = $MemeberModel->getMemberInfo('id',['uuid'=>$data['uuid']]);
+        $map = [];
+        switch ($data['type']){
+            case 1:
+                $map = ['pid'=>$user_info['id']];
+                break;
+            case 2:
+                $map = ['gid'=>$user_info['id']];
+                break;
+            default:
+                return json(['code'=>1015,'msg'=>'类型不存在']);
+        }
+        $list = $MemeberModel->getPushList('username,user_img,mobile',$map,$data['page'],15);
+        return json(['code'=>1011,'msg'=>'成功','data'=>$list]);
+    }
 
     /*-----------------------------------修改信息----------------------------------------------*/
     /**
@@ -104,5 +128,37 @@ class Member extends ApiBase
         ];
         $res = $MemberBank->getEditBank($user_info['id'],$array);
         return json($res);
+    }
+
+    /**
+     * 修改我的推荐人
+     */
+    public function edit_recommender(){
+        $data = input('post.');
+        $validate_res = $this->validate($data,'MemberValidate.edit_recommender');
+        if($validate_res !== true){ return json(['code'=>1015,'msg'=>$validate_res]); } //数据认证
+        if(getSign($data) != $data['Sign']){ return json(['code'=>1013,'msg'=>'签名错误']);} //签名认证
+        if(Cache::get($data['uuid'].'_token') != $data['token']) return json(['code'=>1004,'msg'=>'用户未登录']);//登陆验证
+        $MemberModel = new MemberModel();
+
+        $push_user_info = $MemberModel->getMemberInfo('id,pid',['mobile'=>$data['mobile']]);
+
+        if(!$push_user_info){
+            return json(['code'=>1012,'msg'=>'推荐人不存在','data'=>'']);
+        }
+
+        $user_info = $MemberModel->getMemberInfo('id,pid,gid',['uuid'=>$data['uuid']]);
+        if($user_info){
+            if($user_info['pid'] || $user_info['gid']){
+                return json(['code'=>1012,'msg'=>'已绑定推荐人，请勿重复提交','data'=>'']);
+            }else{
+                $param = ['pid'=>$push_user_info['id'],'gid'=>$push_user_info['pid']];
+
+                $res = $MemberModel->getEditInfo($param,['id'=>$user_info['id']],'');
+                return json($res);
+            }
+        }else{
+            return json(['code'=>1012,'msg'=>'用户不存在','data'=>'']);
+        }
     }
 }

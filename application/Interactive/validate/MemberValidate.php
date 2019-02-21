@@ -23,11 +23,12 @@ class MemberValidate extends Validate
         ['bankname','require','开户行不能为空'],
         ['bankcard','require','银行卡号不能为空'],
         ['username','require','姓名不能为空'],
-
+        /*手机号信息*/
+        ['mobile','require','手机号不能为空'],
     ];
 
     protected $scene = [
         'edit_member_bank'=>['uuid','token','TimeStamp','Sign','bankname','bankcard','username'],
-
+        'edit_recommender'=>['uuid','token','TimeStamp','Sign','mobile'],
     ];
 }

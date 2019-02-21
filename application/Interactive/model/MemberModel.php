@@ -83,4 +83,31 @@ class MemberModel extends Model
             return ['code'=>1012,'msg'=>'修改失败','data'=>''];
         }
     }
+
+    /**
+     * 查询推荐人列表
+     */
+    public function getPushList($field,$map,$page,$rows){
+        return $this->field($field)->where($map)->page($page,$rows)->select();
+    }
+
+    /**
+     * 修改会员信息
+     * @param $param
+     * @param $map
+     * @param $data
+     * @return array
+     * @throws \think\exception\PDOException
+     */
+    public function getEditInfo($param,$map,$data){
+        $this->startTrans();
+        try{
+            $this->save($param,$map);
+            $this->commit();
+            return ['code'=>1011,'msg'=>'修改推荐人成功','data'=>$data];
+        }catch (\Exception $exception){
+            $this->rollback();
+            return ['code'=>1012,'msg'=>'修改推荐人失败','data'=>$data];
+        }
+    }
 }
