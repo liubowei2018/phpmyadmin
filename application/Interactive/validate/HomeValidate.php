@@ -21,11 +21,14 @@ class HomeValidate extends Validate
         /*分页*/
         ['type','require','分类类型不能为空'],
         ['page','require','列表分页不能为空'],
+        /*资金*/
+        ['money','require','操作资金不能为空'],
     ];
 
     protected $scene = [
         'synopsis'=>['type'],
         'whole'=>['uuid','token','TimeStamp','Sign'],
         'article'=>['uuid','token','TimeStamp','Sign','type','page'],
+        'withdraw_cash'=>['uuid','token','TimeStamp','Sign','type','money'],
     ];
 }
