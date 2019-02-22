@@ -119,7 +119,7 @@ class Money extends ApiBase
         $user_info = $MemberModel->getMemberInfo('id',['uuid'=>$data['uuid']]);
         $page = input('post.page');
         $page = $page?$page:1;
-        $list = Db::name('money_log')->field('state,info,create_time')->where(['user_id'=>$user_info['id'],'type'=>1])->page($page,15)->order('create_time DESC')->select();
+        $list = Db::name('money_log')->field('state,money,info,create_time')->where(['user_id'=>$user_info['id'],'type'=>1])->page($page,15)->order('create_time DESC')->select();
         if(count($list) > 0) {
             foreach ($list as $k => $v) {
                 switch ($v['state']){
@@ -187,5 +187,58 @@ class Money extends ApiBase
         }else{
             return json(['code'=>1012,'msg'=>'账户奖励金不足','data'=>'']);
         }
+    }
+    /**
+     * 会员升级
+     */
+    public function upgrade_member(){
+        $data = input('post.');
+        $validate_res = $this->validate($data,'HomeValidate.whole');
+        if($validate_res !== true){ return json(['code'=>1015,'msg'=>$validate_res]); } //数据认证
+        if(getSign($data) != $data['Sign']){ return json(['code'=>1013,'msg'=>'签名错误']);} //签名认证
+        if(Cache::get($data['uuid'].'_token') != $data['token']) return json(['code'=>1004,'msg'=>'用户未登录']);//登陆验证
+        $MemberModel = new MemberModel();
+        $user_info = $MemberModel->getMemberInfo('id',['uuid'=>$data['uuid']]);
+        $type = input('post.type');
+        $config = privilege_config_list();
+        switch ($this){
+            case 2://vip
+                if($config['vip_state'] == 1){
+                    $order_number = $this->upgrade_add_order($user_info['id'],$config['vip_money'],2);
+                }else{
+                    return json(['code'=>1012,'msg'=>'升级vip暂未开放','data'=>'']);
+                }
+                break;
+            case 3://合伙人
+                if($config['vip_state'] == 1){
+                    if($user_info['type'] == 2){ //已经是VIP 升级 合伙人补差额
+                        $order_number = $this->upgrade_add_order($user_info['id'],$config['partner_money'],3);
+                    }else{  //普通会员升级
+                        $order_number = $this->upgrade_add_order($user_info['id'],$config['partner_money'] - $config['vip_money'],3);
+                    }
+                }else{
+                    return json(['code'=>1012,'msg'=>'升级合伙人暂未开放','data'=>'']);
+                }
+                break;
+            default:
+                return json(['code'=>1012,'msg'=>'请选择购买类型','data'=>'']);
+        }
+    }
+
+    /**
+     * @param $user_id
+     * @param $money
+     * @param $grade
+     */
+    private function upgrade_add_order($user_id,$money,$grade){
+              $array = [
+                  'order_number'=>'S'.time().rand(10000,99999).$user_id,
+                  'money'=>$money,
+                  'user_id'=>$user_id,
+                  'type'=>'0',
+                  'create_time'=>time(),
+                  'state'=>'0',
+                  'grade'=>$grade,
+              ];
     }
 }
