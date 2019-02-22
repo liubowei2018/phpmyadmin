@@ -55,7 +55,7 @@ class Money extends ApiBase
                 ];
                 Db::name('reflect_list')->insert($reflect_log);
                 Db::commit();
-                return json(['code'=>1012,'msg'=>'余额提现申请成功','data'=>'']);
+                return json(['code'=>1011,'msg'=>'余额提现申请成功','data'=>'']);
             }catch (\Exception $exception){
                 Db::rollback();
                 return json(['code'=>1012,'msg'=>'余额提现失败','data'=>'']);
