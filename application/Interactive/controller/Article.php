@@ -9,6 +9,7 @@
 namespace app\Interactive\controller;
 
 use app\Interactive\model\ArticleModel;
+use app\Interactive\model\MemberModel;
 use think\Cache;
 use think\Db;
 
@@ -115,6 +116,31 @@ class Article extends ApiBase
         }else{
             return json(['code'=>1012,'msg'=>'暂无数据','data'=>""]);
         }
+    }
 
+    /**
+     * 添加建议
+     */
+    public function proposal(){
+        $data = input('post.');
+        $validate_res = $this->validate($data,'HomeValidate.proposal');
+        if($validate_res !== true){ return json(['code'=>1015,'msg'=>$validate_res]); } //数据认证
+        if(getSign($data) != $data['Sign']){ return json(['code'=>1013,'msg'=>'签名错误']);} //签名认证
+        if(Cache::get($data['uuid'].'_token') != $data['token']) return json(['code'=>1004,'msg'=>'用户未登录']);//登陆验证
+        $MemberModel = new MemberModel();
+        $member_info = $MemberModel->getMemberInfo('id',['uuid'=>$data['uuid']]);
+        $array = [
+            'user_id'=>$member_info['id'],
+            'phone'=>$data['phone'],
+            'content'=>$data['content'],
+            'add_time'=>time(),
+            'state'=>0,
+        ];
+        try{
+            Db::name('proposal')->insert($array);
+            return json(['code'=>1011,'msg'=>'提交成功','data'=>'']);
+        }catch (\Exception $exception){
+            return json(['code'=>1012,'msg'=>'提交失败','data'=>'']);
+        }
     }
 }

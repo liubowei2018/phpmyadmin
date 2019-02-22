@@ -23,6 +23,9 @@ class HomeValidate extends Validate
         ['page','require','列表分页不能为空'],
         /*资金*/
         ['money','require','操作资金不能为空'],
+        /*信息*/
+        ['phone','require','联系电话不能为空'],
+        ['content','require','详情信息不能为空'],
     ];
 
     protected $scene = [
@@ -30,5 +33,6 @@ class HomeValidate extends Validate
         'whole'=>['uuid','token','TimeStamp','Sign'],
         'article'=>['uuid','token','TimeStamp','Sign','type','page'],
         'withdraw_cash'=>['uuid','token','TimeStamp','Sign','type','money'],
+        'proposal'=>['uuid','token','TimeStamp','Sign','phone','content'],
     ];
 }
