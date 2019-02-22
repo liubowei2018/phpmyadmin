@@ -43,6 +43,7 @@ class Member extends ApiBase
                 'two_bonus_log' => $money_info['one_bonus_log'],
                 'bonus_close' => (string)$bonus_close,
                 'p_mobile' => $p_mobile?$p_mobile:'',
+                'total_push' => Db::name('member')->where('pid',$member_info['id'])->count()
             ];
             return json(['code'=>1011,'msg'=>'查询成功','data'=>$array]);
         }else{
@@ -71,7 +72,13 @@ class Member extends ApiBase
             default:
                 return json(['code'=>1015,'msg'=>'类型不存在']);
         }
-        $list = $MemeberModel->getPushList('username,user_img,mobile',$map,$data['page'],15);
+        $list = $MemeberModel->getPushList('id,username,user_img,mobile',$map,$data['page'],15);
+        if(count($list) > 0){
+            foreach ($list as $k=>$v){
+                $list[$k]['unclaimed'] = "0.00";
+                $list[$k]['total_money'] = (string) Db::name('money_log')->where(['user_id'=>$v['id'],'state'=>1,'type'=>1,'trend'=>'1'])->sum('money');
+            }
+        }
         return json(['code'=>1011,'msg'=>'成功','data'=>$list]);
     }
 
