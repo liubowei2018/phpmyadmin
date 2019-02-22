@@ -39,7 +39,7 @@ class Article extends ApiBase
         }
         $url = web_url_str();
         $web_url_info =$url.'/Interactive/Article/article_info.html?id=';
-        $list = $ArticleModel->getArticleList("title,remark,CONCAT('$url',img_path) as img_path,CONCAT('$web_url_info',id) as web_url,FROM_UNIXTIME(create_time, '%Y-%m-%d') as create_time",$map,$data['page'],15);
+        $list = Db::name('article')->field("title,remark,CONCAT('$url',img_path) as img_path,CONCAT('$web_url_info',id) as web_url,FROM_UNIXTIME(create_time, '%Y-%m-%d') as create_time")->where($map)->page($data['page'],15)->order('create_time DESC')->select();
         return json(['code'=>1011,'msg'=>'获取成功','data'=>$list]);
     }
     /**
