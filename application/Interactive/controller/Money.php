@@ -152,7 +152,7 @@ class Money extends ApiBase
             Db::startTrans();
             try{
                 //增加用户余额
-                Db::name('money')->where(['user_id'=>$user_info['id']])->setDec('balance',$money_list['bonus']);
+                Db::name('money')->where(['user_id'=>$user_info['id']])->setInc('balance',$money_list['bonus']);
                 $money_log = [
                     'user_id'=>$user_info['id'],
                     'type'=>'1',
@@ -165,7 +165,7 @@ class Money extends ApiBase
                     'create_time'=>time(),
                 ];
                 Db::name('money_log')->insert($money_log);
-                Db::name('money')->where(['user_id'=>$user_info['id']])->setDec('bonus',0);
+                Db::name('money')->where(['user_id'=>$user_info['id']])->setDec('bonus',$money_list['bonus']);
                 $money_log = [
                     'user_id'=>$user_info['id'],
                     'type'=>'4',
