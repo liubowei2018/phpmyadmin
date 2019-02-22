@@ -124,10 +124,10 @@ class Money extends ApiBase
             foreach ($list as $k => $v) {
                 switch ($v['state']){
                     case 1:
-                        $list[$k]['state'] = '增加';
+                        $list[$k]['state'] = '+';
                         break;
                     case 2:
-                        $list[$k]['state'] = '减少';
+                        $list[$k]['state'] = '-';
                         break;
                 }
                 $list[$k]['create_time'] = date('Y-m-d H:i:s',$v['create_time']);
@@ -198,23 +198,33 @@ class Money extends ApiBase
         if(getSign($data) != $data['Sign']){ return json(['code'=>1013,'msg'=>'签名错误']);} //签名认证
         if(Cache::get($data['uuid'].'_token') != $data['token']) return json(['code'=>1004,'msg'=>'用户未登录']);//登陆验证
         $MemberModel = new MemberModel();
-        $user_info = $MemberModel->getMemberInfo('id',['uuid'=>$data['uuid']]);
+        $user_info = $MemberModel->getMemberInfo('id,type',['uuid'=>$data['uuid']]);
         $type = input('post.type');
+        $state = input('post.state');
         $config = privilege_config_list();
-        switch ($this){
+        switch ($type){
             case 2://vip
                 if($config['vip_state'] == 1){
+                    if($user_info['type'] == 2){
+                        return json(['code'=>1012,'msg'=>'您已经是VIP会员，请勿重复提交','data'=>'']);
+                    }
                     $order_number = $this->upgrade_add_order($user_info['id'],$config['vip_money'],2);
+                    $str = '升级VIP';
                 }else{
                     return json(['code'=>1012,'msg'=>'升级vip暂未开放','data'=>'']);
                 }
                 break;
             case 3://合伙人
                 if($config['vip_state'] == 1){
+                    if($user_info['type'] == 3){
+                        return json(['code'=>1012,'msg'=>'您已经是合伙人，请勿重复提交','data'=>'']);
+                    }
                     if($user_info['type'] == 2){ //已经是VIP 升级 合伙人补差额
-                        $order_number = $this->upgrade_add_order($user_info['id'],$config['partner_money'],3);
-                    }else{  //普通会员升级
                         $order_number = $this->upgrade_add_order($user_info['id'],$config['partner_money'] - $config['vip_money'],3);
+                        $str = '升级合伙人';
+                    }else{  //普通会员升级
+                        $order_number = $this->upgrade_add_order($user_info['id'],$config['partner_money'],3);
+                        $str = '升级合伙人';
                     }
                 }else{
                     return json(['code'=>1012,'msg'=>'升级合伙人暂未开放','data'=>'']);
@@ -223,22 +233,184 @@ class Money extends ApiBase
             default:
                 return json(['code'=>1012,'msg'=>'请选择购买类型','data'=>'']);
         }
+        if($order_number['code'] == 1011){ //预下单成功
+            switch ($state){
+                case 1://微信支付
+
+                    break;
+                case 2://余额支付
+                    $res = $this->upgrade_pay_balance($order_number['data'],$user_info['id'],$str);
+                    return json($res);
+                    break;
+                default:
+                    return json(['code'=>1012,'msg'=>'请选择支付类型','data'=>'']);
+            }
+        }else{
+            return json(['code'=>1012,'msg'=>'预下单失败，请稍后再试','data'=>'']);
+        }
     }
 
     /**
+     * 余额 升级 支付
+     * $order_number  订单号
+     * $user_id       用户id
+     * $str           备注信息
+     */
+    private function upgrade_pay_balance($order_number,$user_id,$str){
+
+        $MoneyModel = new MoneyModel();
+        $money_list =$MoneyModel->getMemberMoney('balance',['user_id'=>$user_id]);
+        $order_info = Db::name('upgrade_list')->where(['order_number'=>$order_number,'user_id'=>$user_id])->find();
+        if($order_info){
+            if($order_info['state'] != 1){
+                //验证资金是否充足
+                if($money_list['balance'] >= $order_info['money']){
+                    /*-----------------修改订单  更新用户等级-------------------*/
+                        Db::startTrans();
+                        try{
+                            //修改用户资金
+                            Db::name('money')->where('user_id',$user_id)->setDec('balance',$order_info['money']);
+                            $money_log = [
+                                'user_id'=>$user_id,
+                                'type'=>'1',
+                                'money'=>$order_info['money'],
+                                'original'=>$money_list['balance'],
+                                'now'=>$money_list['balance']-$order_info['money'],
+                                'state'=>'2',
+                                'info'=>$str,
+                                'trend'=>'2',
+                                'create_time'=>time(),
+                            ];
+                            Db::name('money_log')->insert($money_log);
+                            //修改订单状态
+                            Db::name('upgrade_list')->where('order_number',$order_number)->update(['state'=>1,'type'=>2]);
+                            //进行二级分润
+                            $this->two_level_award($user_id,$order_info['money']);
+                            //修改可以领取的红包个数
+                            $config = privilege_config_list();
+                            switch ($order_info['grade']){
+                                case 2:
+                                    Db::name('member')->where('id',$user_id)->update(['type'=>2]);
+                                    Db::name('money')->where('user_id',$user_id)->update(['red_number'=>$config['vip_today_hongbao_number']]);
+                                    break;
+                                case 3:
+                                    Db::name('member')->where('id',$user_id)->update(['type'=>3]);
+                                    Db::name('money')->where('user_id',$user_id)->update(['red_number'=>$config['partner_today_hongbao_number']]);
+                                    break;
+                            }
+                            Db::commit();
+                            return ['code'=>1011,'msg'=>'购买成功','data'=>''];
+                        }catch (\Exception $exception){
+                            Db::rollback();
+                            return ['code'=>1011,'msg'=>'购买失败','data'=>$exception->getMessage()];
+                        }
+                    /*-----------------修改订单  更新用户等级-------------------*/
+
+                }else{
+                    return ['code'=>1012,'msg'=>'账户余额不足','data'=>''];
+                }
+            }else{
+                return ['code'=>1012,'msg'=>'订单已支付，请勿重复提交','data'=>''];
+            }
+        }else{
+            return ['code'=>1012,'msg'=>'订单不存在','data'=>''];
+        }
+    }
+
+    /**
+     * 创建升级订单
      * @param $user_id
      * @param $money
      * @param $grade
+     * @return array
      */
     private function upgrade_add_order($user_id,$money,$grade){
-              $array = [
-                  'order_number'=>'S'.time().rand(10000,99999).$user_id,
-                  'money'=>$money,
-                  'user_id'=>$user_id,
-                  'type'=>'0',
-                  'create_time'=>time(),
-                  'state'=>'0',
-                  'grade'=>$grade,
-              ];
+        $array = [
+            'order_number'=>'S'.time().rand(10000,99999).$user_id,
+            'money'=>$money,
+            'user_id'=>$user_id,
+            'type'=>'0',
+            'create_time'=>time(),
+            'state'=>'0',
+            'grade'=>$grade,
+        ];
+        try{
+            Db::name('upgrade_list')->insert($array);
+            return ['code'=>1011,'data'=>$array['order_number']];
+        }catch (\Exception $exception){
+            return ['code'=>1012,'data'=>''];
+        }
     }
+
+    /**
+     * 会员升级二级分润
+     * $user_id 推荐人账号
+     * $money 分润金额
+     */
+    private function two_level_award($user_id,$money)
+    {
+        $config = privilege_config_list();
+        $user_info = Db::name('member')->where('id',$user_id)->find();
+        if($user_id['pid'] > 0){  //一级
+            $p_user_info = Db::name('member')->where('id',$user_info['pid'])->find();
+            $p_money_list = Db::name('money')->where('user_id',$p_user_info['id'])->find();
+            if($p_user_info){
+                switch ($p_user_info['type']){
+                    case 1: //普通会员
+                        $p_bonus = $money*$config['ordinary_one_upgrade'];
+                        break;
+                    case 2: //vip会员
+                        $p_bonus = $money*$config['vip_one_upgrade'];
+                        break;
+                    case 3: //合伙人
+                        $p_bonus = $money*$config['partner_one_upgrade'];
+                        break;
+                }
+            }
+            Db::name('money')->where('user_id',$p_user_info['id'])->setInc('bonus',$p_bonus);
+            $money_log = [
+                'user_id'=>$user_id,
+                'type'=>'4',
+                'money'=>$p_bonus,
+                'original'=>$p_money_list['bonus'],
+                'now'=>$p_money_list['bonus']+$p_bonus,
+                'state'=>'1',
+                'info'=>$user_info['mobile'].'升级奖励',
+                'trend'=>'2',
+                'create_time'=>time(),
+            ];
+            Db::name('money_log')->insert($money_log);
+        }
+        if($user_id['gid'] > 0){  //二级
+            $g_user_info = Db::name('member')->where('id',$user_info['gid'])->find();
+            $g_money_list = Db::name('money')->where('user_id',$g_user_info['id'])->find();
+            if($g_user_info){
+                switch ($g_user_info['type']){
+                    case 1: //普通会员
+                        $g_bonus = $money*$config['ordinary_two_upgrade'];
+                        break;
+                    case 2: //vip会员
+                        $g_bonus = $money*$config['vip_two_upgrade'];
+                        break;
+                    case 3: //合伙人
+                        $g_bonus = $money*$config['partner_two_upgrade'];
+                        break;
+                }
+                Db::name('money')->where('user_id',$g_user_info['id'])->setInc('bonus',$g_bonus);
+                $money_log = [
+                    'user_id'=>$user_id,
+                    'type'=>'4',
+                    'money'=>$g_bonus,
+                    'original'=>$g_money_list['bonus'],
+                    'now'=>$g_money_list['bonus']+$g_bonus,
+                    'state'=>'1',
+                    'info'=>$user_info['mobile'].'升级奖励',
+                    'trend'=>'2',
+                    'create_time'=>time(),
+                ];
+                Db::name('money_log')->insert($money_log);
+            }
+        }
+    }
+
 }

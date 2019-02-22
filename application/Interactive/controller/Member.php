@@ -38,7 +38,7 @@ class Member extends ApiBase
             $array = [
                 'mobile' => $member_info['mobile'],
                 'balance' => $money_info['balance'],//余额
-                'bonus' => $money_info['balance'],//奖金余额
+                'bonus' => $money_info['bonus'],//奖金余额
                 'one_bonus_log' => $money_info['one_bonus_log'],
                 'two_bonus_log' => $money_info['one_bonus_log'],
                 'bonus_close' => (string)$bonus_close,
