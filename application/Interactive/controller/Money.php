@@ -38,6 +38,9 @@ class Money extends ApiBase
                 $money_log = [
                     'user_id'=>$user_info['id'],
                     'type'=>'1',
+                    'money'=>$data['money'],
+                    'original'=>$money_list['balance'],
+                    'now'=>$money_list['balance']-$data['money'],
                     'state'=>'2',
                     'info'=>'用户资金提现',
                     'trend'=>'3',
@@ -131,5 +134,58 @@ class Money extends ApiBase
             }
         }
         return json(['code'=>1011,'msg'=>'成功','data'=>$list]);
+    }
+    /**
+     * 奖励金转余额
+     */
+    public function transformation(){
+        $data = input('post.');
+        $validate_res = $this->validate($data,'HomeValidate.whole');
+        if($validate_res !== true){ return json(['code'=>1015,'msg'=>$validate_res]); } //数据认证
+        if(getSign($data) != $data['Sign']){ return json(['code'=>1013,'msg'=>'签名错误']);} //签名认证
+        if(Cache::get($data['uuid'].'_token') != $data['token']) return json(['code'=>1004,'msg'=>'用户未登录']);//登陆验证
+        $MemberModel = new MemberModel();
+        $user_info = $MemberModel->getMemberInfo('id',['uuid'=>$data['uuid']]);
+        $MoneyModel = new MoneyModel();
+        $money_list =$MoneyModel->getMemberMoney('',['user_id'=>$user_info['id']]);
+        if($money_list['bonus'] > 0){
+            Db::startTrans();
+            try{
+                //增加用户余额
+                Db::name('money')->where(['user_id'=>$user_info['id']])->setDec('balance',$money_list['bonus']);
+                $money_log = [
+                    'user_id'=>$user_info['id'],
+                    'type'=>'1',
+                    'money'=>$money_list['bonus'],
+                    'original'=>$money_list['balance'],
+                    'now'=>$money_list['balance']+$money_list['bonus'],
+                    'state'=>'1',
+                    'info'=>'奖励金转入余额',
+                    'trend'=>'4',
+                    'create_time'=>time(),
+                ];
+                Db::name('money_log')->insert($money_log);
+                Db::name('money')->where(['user_id'=>$user_info['id']])->setDec('bonus',0);
+                $money_log = [
+                    'user_id'=>$user_info['id'],
+                    'type'=>'4',
+                    'money'=>$money_list['bonus'],
+                    'original'=>$money_list['bonus'],
+                    'now'=>0,
+                    'state'=>'2',
+                    'info'=>'奖励金转入余额',
+                    'trend'=>'4',
+                    'create_time'=>time(),
+                ];
+                Db::name('money_log')->insert($money_log);
+                Db::commit();
+                return json(['code'=>1011,'msg'=>'转入余额成功','data'=>'']);
+            }catch (\Exception $exception){
+                Db::rollback();
+                return json(['code'=>1012,'msg'=>'转入余额失败','data'=>'']);
+            }
+        }else{
+            return json(['code'=>1012,'msg'=>'账户奖励金不足','data'=>'']);
+        }
     }
 }
