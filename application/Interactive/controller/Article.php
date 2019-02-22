@@ -10,6 +10,8 @@ namespace app\Interactive\controller;
 
 use app\Interactive\model\ArticleModel;
 use think\Cache;
+use think\Db;
+
 class Article extends ApiBase
 {
     /**
@@ -37,7 +39,7 @@ class Article extends ApiBase
         }
         $url = web_url_str();
         $web_url_info =$url.'/Interactive/Article/article_info.html?id=';
-        $list = $ArticleModel->getArticleList("title,remark,CONCAT('$url',img_path) as img_path,CONCAT('$web_url_info',id) as web_url",$map,$data['page'],15);
+        $list = $ArticleModel->getArticleList("title,remark,CONCAT('$url',img_path) as img_path,CONCAT('$web_url_info',id) as web_url,FROM_UNIXTIME(create_time, '%Y-%m-%d') as create_time",$map,$data['page'],15);
         return json(['code'=>1011,'msg'=>'获取成功','data'=>$list]);
     }
     /**
@@ -79,5 +81,40 @@ class Article extends ApiBase
         $info = $ArticleModel->getArticleDetail($map);
         $this->assign('info',$info);
         return $this->fetch();
+    }
+    /**
+     * 帮助中心新闻列表
+     */
+    public function help_center(){
+        $data = input('post.');
+        $validate_res = $this->validate($data,'HomeValidate.whole');
+        if($validate_res !== true){ return json(['code'=>1015,'msg'=>$validate_res]); } //数据认证
+        if(getSign($data) != $data['Sign']){ return json(['code'=>1013,'msg'=>'签名错误']);} //签名认证
+        if(Cache::get($data['uuid'].'_token') != $data['token']) return json(['code'=>1004,'msg'=>'用户未登录']);//登陆验证
+        $page = input('post.page');
+        $page = $page?$page:1;
+        $url = web_url_str();
+        $web_url_info = $url.'/Interactive/Article/article_info.html?id=';
+        $map = [
+            'group_id'=>6,
+            'state'=>1
+        ];
+        $list = Db::name('article')->field("title,remark,CONCAT('$url',img_path) as img_path,CONCAT('$web_url_info',id) as web_url,FROM_UNIXTIME(create_time, '%Y-%m-%d') as create_time")->where($map)->page($page,15)->order('create_time DESC')->select();
+        $new_list = [];
+        $final_list = [];
+        if(count($list) > 0){
+            foreach ($list as $k=>$v){
+                $keys = $v['create_time'];
+                $new_list[$keys]['time'] = $v['create_time'];
+                $new_list[$keys]['value'][] = $v;
+            }
+            foreach ($new_list as $a => $b){
+                $final_list[]=$b;
+            }
+            return json(['code'=>1011,'msg'=>'成功','data'=>$final_list]);
+        }else{
+            return json(['code'=>1012,'msg'=>'暂无数据','data'=>""]);
+        }
+
     }
 }
