@@ -112,6 +112,14 @@ class Index extends ApiBase
      * 上传图片
      */
     public function upload_images(){
+        $data = input('post.');
+        $validate_res = $this->validate($data,'HomeValidate.whole');
+        if($validate_res !== true){ return json(['code'=>1015,'msg'=>$validate_res]); } //数据认证
+        if(getSign($data) != $data['Sign']){ return json(['code'=>1013,'msg'=>'签名错误']);} //签名认证
+        if(Cache::get($data['uuid'].'_token') != $data['token']) return json(['code'=>1004,'msg'=>'用户未登录']);//登陆验证
+        $MemberModel = new MemberModel();
+        $member_info = $MemberModel->getMemberInfo('id',['uuid'=>$data['uuid']]);
+        $member_info['id'] = 2;
         $files = request()->file('image');
         $array = [];
         if($files){
@@ -125,9 +133,51 @@ class Index extends ApiBase
                 }
             }
             $array_str = implode(',',$array);
-            return json(['code'=>1011,'msg'=>'上传成功','data'=>$array_str]);
+            $this->add_member_img($member_info['id'],$array);
+            return json(['code'=>1011,'msg'=>'上传成功','data'=>'']);
         }else{
             return json(['code'=>1012,'msg'=>'请选择图片','data'=>'']);
+        }
+    }
+
+    /**
+     * 保存用户图片
+     */
+    private function add_member_img($user_id,$array){
+        foreach ($array as $k=>$v){
+            Db::name('member_img')->insert(['user_id'=>$user_id,'img_path'=>$v,'add_time'=>time()]);
+        }
+    }
+
+    /**
+     * 获取会员图库
+     */
+    public function member_img_list(){
+        $data = input('post.');
+        $validate_res = $this->validate($data,'HomeValidate.whole');
+        if($validate_res !== true){ return json(['code'=>1015,'msg'=>$validate_res]); } //数据认证
+        if(getSign($data) != $data['Sign']){ return json(['code'=>1013,'msg'=>'签名错误']);} //签名认证
+        if(Cache::get($data['uuid'].'_token') != $data['token']) return json(['code'=>1004,'msg'=>'用户未登录']);//登陆验证
+        $MemberModel = new MemberModel();
+        $member_info = $MemberModel->getMemberInfo('id',['uuid'=>$data['uuid']]);
+        $page = input('post.page');
+        $page = $page?$page:1;
+        $url = web_url_str();
+        $list = Db::name('member_img')->field("CONCAT('$url',img_path) as img_path,FROM_UNIXTIME(add_time, '%Y-%m-%d') as add_time")->where('user_id',$member_info['id'])->page($page,15)->select();
+        $new_list = [];
+        $final_list = [];
+        if(count($list) > 0){
+            foreach ($list as $k=>$v){
+                $keys = $v['add_time'];
+                $new_list[$keys]['time'] =  $v['add_time'];
+                $new_list[$keys]['value'][] = $v;
+            }
+            foreach ($new_list as $a => $b){
+                $final_list[]=$b;
+            }
+            return json(['code'=>1011,'msg'=>'成功','data'=>$final_list]);
+        }else{
+            return json(['code'=>1012,'msg'=>'暂无数据','data'=>""]);
         }
     }
 }
