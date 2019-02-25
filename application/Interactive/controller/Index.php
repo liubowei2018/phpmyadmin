@@ -119,7 +119,6 @@ class Index extends ApiBase
         if(Cache::get($data['uuid'].'_token') != $data['token']) return json(['code'=>1004,'msg'=>'用户未登录']);//登陆验证
         $MemberModel = new MemberModel();
         $member_info = $MemberModel->getMemberInfo('id',['uuid'=>$data['uuid']]);
-        $member_info['id'] = 2;
         $files = request()->file('image');
         $array = [];
         if($files){
@@ -134,12 +133,11 @@ class Index extends ApiBase
             }
             $array_str = implode(',',$array);
             $this->add_member_img($member_info['id'],$array);
-            return json(['code'=>1011,'msg'=>'上传成功','data'=>'']);
+            return json(['code'=>1011,'msg'=>'上传成功','data'=>$array_str]);
         }else{
             return json(['code'=>1012,'msg'=>'请选择图片','data'=>'']);
         }
     }
-
     /**
      * 保存用户图片
      */
@@ -177,7 +175,7 @@ class Index extends ApiBase
             }
             return json(['code'=>1011,'msg'=>'成功','data'=>$final_list]);
         }else{
-            return json(['code'=>1012,'msg'=>'暂无数据','data'=>""]);
+            return json(['code'=>1012,'msg'=>'暂无数据','data'=>[]]);
         }
     }
 }

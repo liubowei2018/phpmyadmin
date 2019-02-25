@@ -49,7 +49,7 @@
                             <div class="panel-options">
                                 <ul class="nav nav-tabs">
                                     <li class="active"><a data-toggle="tab" href="#tab-1" aria-expanded="true">网站配置</a></li>
-                                    <li class=""><a data-toggle="tab" href="#tab-2" aria-expanded="false">内容配置</a></li>
+                                    <li class=""><a data-toggle="tab" href="#tab-2" aria-expanded="false">红包配置</a></li>
                                     <li class=""><a data-toggle="tab" href="#tab-3" aria-expanded="false">系统配置</a></li>
                                     <li class=""><a data-toggle="tab" href="#tab-4" aria-expanded="false">app配置</a></li>
                                 </ul>
@@ -101,7 +101,14 @@
                                 </div>
                                 <div id="tab-2" class="tab-pane">
                                     <form action="{:url('save')}" method="post" class="form-horizontal">
-
+                                        <div class="hr-line-dashed"></div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">创建红包比例：</label>
+                                            <div class="input-group col-sm-4">
+                                                <input type="text" class="form-control" name="config[app_hongbao]" value="{$config.app_hongbao}">
+                                                <span class="help-block m-b-none"><i class="fa fa-info-circle"></i> 用户创建红包的比例   /%</span>
+                                            </div>
+                                        </div>
                                         <div class="hr-line-dashed"></div>
                                         <div class="form-group">
                                             <div class="col-sm-4 col-sm-offset-3">
