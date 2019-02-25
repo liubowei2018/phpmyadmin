@@ -161,7 +161,7 @@ class Index extends ApiBase
         $page = input('post.page');
         $page = $page?$page:1;
         $url = web_url_str();
-        $list = Db::name('member_img')->field("CONCAT('$url',img_path) as img_path,FROM_UNIXTIME(add_time, '%Y-%m-%d') as add_time")->where('user_id',$member_info['id'])->page($page,15)->select();
+        $list = Db::name('member_img')->field("CONCAT('$url',img_path) as img_path,FROM_UNIXTIME(add_time, '%Y-%m-%d') as add_time")->where('user_id',$member_info['id'])->page($page,15)->order('add_time DESC')->select();
         $new_list = [];
         $final_list = [];
         if(count($list) > 0){
