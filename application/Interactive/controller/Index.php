@@ -161,6 +161,8 @@ class Index extends ApiBase
         $page = input('post.page');
         $page = $page?$page:1;
         $url = web_url_str();
+        $count = Db::name('member_img')->where('user_id',$member_info['id'])->count();
+        $count =(string) ceil($count/15);
         $list = Db::name('member_img')->field("CONCAT('$url',img_path) as img_path,FROM_UNIXTIME(add_time, '%Y-%m-%d') as add_time")->where('user_id',$member_info['id'])->page($page,15)->order('add_time DESC')->select();
         $new_list = [];
         $final_list = [];
@@ -173,9 +175,9 @@ class Index extends ApiBase
             foreach ($new_list as $a => $b){
                 $final_list[]=$b;
             }
-            return json(['code'=>1011,'msg'=>'成功','data'=>$final_list]);
+            return json(['code'=>1011,'msg'=>'成功','data'=>$final_list,'page_count'=>$count]);
         }else{
-            return json(['code'=>1012,'msg'=>'暂无数据','data'=>[]]);
+            return json(['code'=>1012,'msg'=>'暂无数据','data'=>[],'page_count'=>'0']);
         }
     }
 }
