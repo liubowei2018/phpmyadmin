@@ -37,6 +37,7 @@ class Member extends ApiBase
             $p_mobile = Db::name('member')->where('id',$member_info['pid'])->value('mobile');
             $array = [
                 'mobile' => $member_info['mobile'],
+                'synopsis' => $member_info['synopsis'],
                 'balance' => $money_info['balance'],//余额
                 'bonus' => $money_info['bonus'],//奖金余额
                 'one_bonus_log' => $money_info['one_bonus_log'],
@@ -172,5 +173,34 @@ class Member extends ApiBase
         }else{
             return json(['code'=>1012,'msg'=>'用户不存在','data'=>'']);
         }
+    }
+
+    /**
+     * 修改我的简介
+     */
+    public function edit_synopsis(){
+        $data = input('post.');
+        $validate_res = $this->validate($data,'HomeValidate.whole');
+        if($validate_res !== true){ return json(['code'=>1015,'msg'=>$validate_res]); } //数据认证
+        if(getSign($data) != $data['Sign']){ return json(['code'=>1013,'msg'=>'签名错误']);} //签名认证
+        if(Cache::get($data['uuid'].'_token') != $data['token']) return json(['code'=>1004,'msg'=>'用户未登录']);//登陆验证
+        $MemberModel = new MemberModel();
+        $member_info = $MemberModel->getMemberInfo('id',['uuid'=>$data['uuid']]);
+        $content = input('post.content');
+        $content_str = $this->match_chinese($content);
+        try{
+            Db::name('member')->where('id',$member_info['id'])->update(['synopsis'=>$content_str]);
+            return json(['code'=>1011,'msg'=>'编辑成功','data'=>'']);
+        }catch (\Exception $exception){
+            return json(['code'=>1012,'msg'=>'编辑失败','data'=>'']);
+        }
+
+    }
+    public function match_chinese($chars,$encoding='utf8')
+    {
+        $pattern =($encoding=='utf8')?'/[\x{4e00}-\x{9fa5}a-zA-Z0-9]/u':'/[\x80-\xFF]/';
+        preg_match_all($pattern,$chars,$result);
+        $temp =join('',$result[0]);
+        return $temp;
     }
 }
