@@ -30,20 +30,6 @@ class Hongbao extends ApiBase
         $type = input('post.type');
         Db::startTrans();
         try{
-            switch ($type){
-                case 1://详情红包
-
-                    break;
-                case 2://链接红包
-
-                    break;
-                default:
-                    Db::rollback();
-                    return json(['code'=>1012,'msg'=>'请选择红包类型','data'=>'']);
-            }
-            //减去红包支付金额
-            Db::name('money')->where('user_id',$member_info['id'])->setDec('balance',$data['money']);
-            //创建红包
             $order_number = "H".time().rand(10000,99999).$member_info['id'];
             $money = $data['money'] * $config['app_hongbao'];
             $order_data = [
@@ -54,12 +40,26 @@ class Hongbao extends ApiBase
                 'money'=>$money,
                 'number'=>$data['number'],
                 'type'=>$data['type'],
-                'content'=>$data['content'],
-                'img_path'=>$data['img_path'],
-                'web_url'=>$data['web_url'],
                 'add_time'=>time(),
                 'state'=>1,
             ];
+
+            switch ($type){
+                case 1://详情红包
+                    $order_data['content'] = $data['content'];
+                    $order_data['img_path'] = $data['img_path'];
+                    break;
+                case 2://链接红包
+                    $order_data['web_url'] = $data['web_url'];
+                    break;
+                default:
+                    Db::rollback();
+                    return json(['code'=>1012,'msg'=>'请选择红包类型','data'=>'']);
+            }
+            //减去红包支付金额
+            Db::name('money')->where('user_id',$member_info['id'])->setDec('balance',$data['money']);
+            //创建红包
+
             Db::name('red_order_list')->insert($order_data);
             //添加扣款记录
             $money_log = [
@@ -67,14 +67,19 @@ class Hongbao extends ApiBase
                 'money'=>$data['money'],
                 'original'=>$money_info['balance'],
                 'now'=>$money_info['balance']-$data['money'],
-                'type'=>'',
-                'state'=>'',
-                'info'=>'',
-                'source'=>'',
-                'trend'=>'',
-                'create_time'=>'',
-                'son_id'=>'',
+                'type'=>'1',
+                'state'=>2,
+                'info'=>'发放红包',
+                'source'=>$order_number,
+                'trend'=>'1',
+                'create_time'=>time()
             ];
+            Db::name('money_log')->insert($money_log);
+            $user_money = Db::name('money')->where('user_id',$member_info['id'])->value('balance');
+            if($user_money < 0){
+                Db::rollback();
+                return json(['code'=>1012,'msg'=>'账户余额不足，请充值','data'=>'']);
+            }
             Db::commit();
             return json(['code'=>1011,'msg'=>'红包发送成功','data'=>'']);
         }catch (\Exception $exception){
