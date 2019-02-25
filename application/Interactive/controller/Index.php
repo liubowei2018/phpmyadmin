@@ -125,7 +125,7 @@ class Index extends ApiBase
             foreach($files as $k=>$file){
                 $info = $file->validate(['size'=>10485760,'ext'=>'jpg,png'])->move(ROOT_PATH . 'public' . DS . 'uploads/user');
                 if($info){
-                    $str= str_replace("\\",'/','/uploads/user'.$info->getSaveName());
+                    $str= str_replace("\\",'/','/uploads/user/'.$info->getSaveName());
                     $array[] = $str;
                 }else{
                     return json(['code'=>1012,'msg'=>'第'.$k.'上传失败','data'=>$file->getError()]);
