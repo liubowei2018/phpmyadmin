@@ -23,7 +23,9 @@ class Hongbao extends ApiBase
         if(Cache::get($data['uuid'].'_token') != $data['token']) return json(['code'=>1004,'msg'=>'用户未登录']);//登陆验证
         $array = [
             array('id'=>1,'title'=>'一公里','number'=>1),
-            array('id'=>1,'title'=>'五公里','number'=>5),
+            array('id'=>2,'title'=>'五公里','number'=>5),
+            array('id'=>3,'title'=>'城市','number'=>0),
+            array('id'=>4,'title'=>'全国','number'=>0),
         ];
         return json(['code'=>1011,'msg'=>'获取成功','data'=>$array]);
     }
