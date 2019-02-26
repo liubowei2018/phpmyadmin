@@ -13,6 +13,21 @@ use think\Db;
 class Hongbao extends ApiBase
 {
     /**
+     * 红包发放距离
+     */
+    public function distance(){
+        $data = input('post.');
+        $validate_res = $this->validate($data,'HomeValidate.whole');
+        if($validate_res !== true){ return json(['code'=>1015,'msg'=>$validate_res]); } //数据认证
+        if(getSign($data) != $data['Sign']){ return json(['code'=>1013,'msg'=>'签名错误']);} //签名认证
+        if(Cache::get($data['uuid'].'_token') != $data['token']) return json(['code'=>1004,'msg'=>'用户未登录']);//登陆验证
+        $array = [
+            array('id'=>1,'title'=>'一公里','number'=>1),
+            array('id'=>1,'title'=>'五公里','number'=>5),
+        ];
+        return json(['code'=>1011,'msg'=>'获取成功','data'=>$array]);
+    }
+    /**
      * 添加红包
      */
     public function add_red(){
@@ -36,6 +51,7 @@ class Hongbao extends ApiBase
                 'order_number'=>$order_number,
                 'lng'=>$data['lng'],
                 'lat'=>$data['lat'],
+                'distance'=>$data['distance'],
                 'user_id'=>$member_info['id'],
                 'money'=>$money,
                 'number'=>$data['number'],
@@ -46,8 +62,25 @@ class Hongbao extends ApiBase
 
             switch ($type){
                 case 1://详情红包
+                    $files = request()->file('image');
+                    $array = [];
+                    $array_str = '';
+                    if($files){
+                        foreach($files as $k=>$file){
+                            $info = $file->validate(['size'=>10485760,'ext'=>'jpg,png'])->move(ROOT_PATH . 'public' . DS . 'uploads/user');
+                            if($info){
+                                $str= str_replace("\\",'/','/uploads/user/'.$info->getSaveName());
+                                $array[] = $str;
+                            }else{
+                                Db::rollback();
+                                return json(['code'=>1012,'msg'=>'第'.$k.'上传失败','data'=>$file->getError()]);
+                            }
+                        }
+                        $array_str = implode(',',$array);
+                        $this->add_member_img($member_info['id'],$array);
+                    }
                     $order_data['content'] = $data['content'];
-                    $order_data['img_path'] = $data['img_path'];
+                    $order_data['img_path'] = $array_str;
                     break;
                 case 2://链接红包
                     $order_data['web_url'] = $data['web_url'];
@@ -103,8 +136,9 @@ class Hongbao extends ApiBase
         $page = $page?$page:1;
         $map = [];
         $distance = $this->getAround($lat,$lng,10000);
-        dump($distance);
+        dump($distance );
         $list = Db::name('red_order_list')->where($map)->select();
+        return json(['code'=>1011,'msg'=>'红包发送成功','data'=>'']);
     }
 
     /**
@@ -137,6 +171,57 @@ class Hongbao extends ApiBase
         if($validate_res !== true){ return json(['code'=>1015,'msg'=>$validate_res]); } //数据认证
         if(getSign($data) != $data['Sign']){ return json(['code'=>1013,'msg'=>'签名错误']);} //签名认证
         if(Cache::get($data['uuid'].'_token') != $data['token']) return json(['code'=>1004,'msg'=>'用户未登录']);//登陆验证
+        $order_number = input('post.order_number');
+        $order_info = Db::name('red_order_list')->where(['order_number'=>$order_number])->find();
+        if(!$order_info){
+            return json(['code'=>1012,'msg'=>'红包不存在','data'=>'']);
+        }elseif ($order_info['number'] <= 0){
+            return json(['code'=>1012,'msg'=>'红包已抢完','data'=>'']);
+        }else{
+            Db::startTrans();
+            try{
+
+
+                Db::commit();
+                return json(['code'=>1012,'msg'=>'红包领取成功','data'=>'']);
+            }catch (\Exception $exception){
+                Db::rollback();
+                return json(['code'=>1012,'msg'=>'红包领取失败','data'=>'']);
+            }
+        }
+    }
+
+    /**
+     * 红包领取规则
+     */
+    private function rules_collection(){
+
+    }
+    /**
+     * 保存用户图片
+     */
+    private function add_member_img($user_id,$array){
+        foreach ($array as $k=>$v){
+            Db::name('member_img')->insert(['user_id'=>$user_id,'img_path'=>$v,'add_time'=>time()]);
+        }
+    }
+
+    /**
+     * 发放红包列表
+     */
+    public function issue_red_packets(){
+
+    }
+    /**
+     * 领取红包列表
+     */
+    public function receive_red_packets(){
+
+    }
+    /**
+     * 红包详情
+     */
+    public function red_packets_info(){
 
     }
 }
