@@ -122,9 +122,23 @@ class Member extends ApiBase
     }
 
     /**
-     * 修改用户银行卡
+     * 会员银行卡列表
      */
-    public function edit_member_bank(){
+    public function member_bank_list(){
+        $data = input('post.');
+        $validate_res = $this->validate($data,'HomeValidate.whole');
+        if($validate_res !== true){ return json(['code'=>1015,'msg'=>$validate_res]); } //数据认证
+        if(getSign($data) != $data['Sign']){ return json(['code'=>1013,'msg'=>'签名错误']);} //签名认证
+        if(Cache::get($data['uuid'].'_token') != $data['token']) return json(['code'=>1004,'msg'=>'用户未登录']);//登陆验证
+        $MemberModel = new MemberModel();
+        $user_info = $MemberModel->getMemberInfo('*',['uuid'=>$data['uuid']]);
+        $list = Db::name('member_bank')->field('id,bank_name,bankcard,username')->where("user_id",$user_info['id'])->select();
+        return json(['code'=>1011,'msg'=>'成功','data'=>$list]);
+    }
+    /**
+     * 添加用户银行卡
+     */
+    public function add_member_bank(){
         $data = input('post.');
         $validate_res = $this->validate($data,'MemberValidate.edit_member_bank');
         if($validate_res !== true){ return json(['code'=>1015,'msg'=>$validate_res]); } //数据认证
@@ -135,14 +149,48 @@ class Member extends ApiBase
         $MemberBank = new MemberBankModel();
         $array = [
             'user_id'=>$user_info['id'],
-            'bank_name'=>$data['bank_name'],
+            'bank_name'=>$data['bankname'],
             'bankcard'=>$data['bankcard'],
             'username'=>$data['username'],
         ];
-        $res = $MemberBank->getEditBank($user_info['id'],$array);
+        $res = $MemberBank->getAddBank($array);
         return json($res);
     }
-
+    /**
+     * 修改用户银行卡
+     */
+    public function edit_member_bank(){
+        $data = input('post.');
+        $validate_res = $this->validate($data,'MemberValidate.edit_member_bank');
+        if($validate_res !== true){ return json(['code'=>1015,'msg'=>$validate_res]); } //数据认证
+        if(getSign($data) != $data['Sign']){ return json(['code'=>1013,'msg'=>'签名错误']);} //签名认证
+        if(Cache::get($data['uuid'].'_token') != $data['token']) return json(['code'=>1004,'msg'=>'用户未登录']);//登陆验证
+        $MemberBank = new MemberBankModel();
+        $array = [
+            'bank_name'=>$data['bankname'],
+            'bankcard'=>$data['bankcard'],
+            'username'=>$data['username'],
+        ];
+        $res = $MemberBank->getEditBank($data['id'],$array);
+        return json($res);
+    }
+    /**
+     * 删除银行卡信息
+     */
+    public function del_member_del(){
+        $data = input('post.');
+        $validate_res = $this->validate($data,'HomeValidate.whole');
+        if($validate_res !== true){ return json(['code'=>1015,'msg'=>$validate_res]); } //数据认证
+        if(getSign($data) != $data['Sign']){ return json(['code'=>1013,'msg'=>'签名错误']);} //签名认证
+        if(Cache::get($data['uuid'].'_token') != $data['token']) return json(['code'=>1004,'msg'=>'用户未登录']);//登陆验证
+        $count = Db::name('member_bank')->where('id',$data['id'])->count();
+        if($count > 0 ){
+            Db::name('member_bank')->where('id',$data['id'])->delete();
+            return json(['code'=>1011,'msg'=>'信息删除成功','data'=>'']);
+        }else{
+            return json(['code'=>1012,'msg'=>'信息已删除，或不存在','data'=>'']);
+        }
+    }
     /**
      * 修改我的推荐人
      */

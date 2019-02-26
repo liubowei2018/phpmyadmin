@@ -16,17 +16,41 @@ class MemberBankModel extends Model
     protected $name = "member_bank";
 
     /**
-     * 修改用户银行卡
+     * 添加银行卡
      */
-    public function getEditBank($user_id,$data){
-        $user_bank = $this->where('user_id',$user_id)->find();
+    public function getAddBank($data){
         $this->startTrans();
         try{
-            if($user_bank){
-                $this->insert($data);
-            }else{
-                $this->where('user_id',$user_id)->find();
-            }
+            $this->insert($data);
+            $this->commit();
+            return ['code'=>1011,'msg'=>'添加成功','data'=>''];
+        }catch (\Exception $exception){
+            $this->rollback();
+            return ['code'=>1012,'msg'=>'添加失败','data'=>''];
+        }
+    }
+    /**
+     * 修改用户银行卡
+     */
+    public function getEditBank($id,$data){
+        $this->startTrans();
+        try{
+            $this->save($data,['id'=>$id]);
+            $this->commit();
+            return ['code'=>1011,'msg'=>'修改成功','data'=>''];
+        }catch (\Exception $exception){
+            $this->rollback();
+            return ['code'=>1012,'msg'=>'修改失败','data'=>''];
+        }
+    }
+
+    /**
+     * 删除银行卡
+     */
+    public function getDelBank($id){
+        $this->startTrans();
+        try{
+            $this->where("id",$id)->delete();
             $this->commit();
             return ['code'=>1011,'msg'=>'修改成功','data'=>''];
         }catch (\Exception $exception){
