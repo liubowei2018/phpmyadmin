@@ -22,6 +22,7 @@ class MemberModel extends Model
     public function getMemberLogin($data,$state){
         //创建token
         $token = md5($data['uuid'].time().config('auth_key'));
+        $config = privilege_config_list();
         //验证用户是否存在
         if($state == 1){
             $is_register = $this->where('uuid',$data['uuid'])->find();
@@ -51,7 +52,7 @@ class MemberModel extends Model
         }else{
             $MoneyModel = new MoneyModel();
             $user_id = $this->insertGetId(['username'=>$data['username'],'user_img'=>$data['user_img'],'state'=>1,'uuid'=>$data['uuid'],'type'=>1,'create_time'=>time()]);
-            $MoneyModel->getAddInfo(['user_id' => $user_id]);
+            $MoneyModel->getAddInfo(['user_id' => $user_id,'red_number'=>$config['ordinary_today_hongbao_number']]);
             $array['is_mobile'] = 0;
             $array['state'] = 1;
             $array['token'] = $token;

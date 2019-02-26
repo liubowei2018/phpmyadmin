@@ -202,7 +202,7 @@ class Member extends ApiBase
         if(Cache::get($data['uuid'].'_token') != $data['token']) return json(['code'=>1004,'msg'=>'用户未登录']);//登陆验证
         $MemberModel = new MemberModel();
 
-        $push_user_info = $MemberModel->getMemberInfo('id,pid',['mobile'=>$data['mobile']]);
+        $push_user_info = $MemberModel->getMemberInfo('id,pid,type',['mobile'=>$data['mobile']]);
 
         if(!$push_user_info){
             return json(['code'=>1012,'msg'=>'推荐人不存在','data'=>'']);
@@ -214,8 +214,54 @@ class Member extends ApiBase
                 return json(['code'=>1012,'msg'=>'已绑定推荐人，请勿重复提交','data'=>'']);
             }else{
                 $param = ['pid'=>$push_user_info['id'],'gid'=>$push_user_info['pid']];
-
                 $res = $MemberModel->getEditInfo($param,['id'=>$user_info['id']],'');
+                $config = privilege_config_list();
+                $count = Db::name('member')->where('pid',$push_user_info['id'])->count();
+                $number = 0;
+                switch ($push_user_info['type']){
+                    case 1://注册会员
+                        switch ($count){
+                            case 1:
+                                $number = $config['ordinary_pushone_hongbao_number'];
+                                break;
+                            case 5:
+                                $number = $config['ordinary_pushfive_hongbao_number'];
+                                break;
+                            case 10:
+                                $number = $config['ordinary_pushfive_hongbao_number'];
+                                break;
+                        }
+                        break;
+                    case 2://VIP会员
+                        switch ($count){
+                            case 1:
+                                $number = $config['vip_pushone_hongbao_number'];
+                                break;
+                            case 5:
+                                $number = $config['vip_pushfive_hongbao_number'];
+                                break;
+                            case 10:
+                                $number = $config['vip_pushTen_hongbao_number'];
+                                break;
+                        }
+                        break;
+                    case 3://合伙人
+                        switch ($count){
+                            case 1:
+                                $number = $config['partner_pushone_hongbao_number'];
+                                break;
+                            case 5:
+                                $number = $config['partner_pushfive_hongbao_number'];
+                                break;
+                            case 10:
+                                $number = $config['partner_pushTen_hongbao_number'];
+                                break;
+                        }
+                        break;
+                }
+                if($number > 0){
+                    Db::name('money')->where('user_id',$push_user_info['id'])->setInc('red_push_number',$number);
+                }
                 return json($res);
             }
         }else{
