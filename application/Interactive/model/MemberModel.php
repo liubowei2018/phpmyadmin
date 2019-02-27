@@ -46,6 +46,7 @@ class MemberModel extends Model
             $array['uuid'] = $data['uuid'];
             $array['username'] = $data['username'];
             $array['user_img'] = $data['user_img'];
+            $array['sex'] = $data['sex'];
             $this->save(['username'=>$data['username'],'user_img'=>$data['user_img']],['uuid'=>$data['uuid']]);
             Cache::set($data['uuid'].'_token',$token,3600);
             return ['code'=>1011,'msg'=>'登录成功','data'=>$array];
@@ -59,6 +60,7 @@ class MemberModel extends Model
             $array['uuid'] = $data['uuid'];
             $array['username'] = $data['username'];
             $array['user_img'] = $data['user_img'];
+            $array['sex'] = $data['sex'];
             Cache::set($data['uuid'].'_token',$token,3600);
             return ['code'=>1011,'msg'=>'登录成功','data'=>$array];
         }
