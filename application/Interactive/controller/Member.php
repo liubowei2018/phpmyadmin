@@ -30,13 +30,16 @@ class Member extends ApiBase
         //获取用户信息
         $MmemberModel = new MemberModel();
         $MoneyModel = new MoneyModel();
-        $member_info = $MmemberModel->getMemberInfo('id,mobile,pid,synopsis',['uuid'=>$data['uuid']]);
+        $member_info = $MmemberModel->getMemberInfo('id,mobile,username,sex,user_img,pid,synopsis',['uuid'=>$data['uuid']]);
         if($member_info){
             $money_info = $MoneyModel->getMemberMoney('*', ['user_id' => $member_info['id']]);
             $bonus_close = $money_info['one_bonus_log'] + $money_info['one_bonus_log'];
             $p_mobile = Db::name('member')->where('id',$member_info['pid'])->value('mobile');
             $array = [
                 'mobile' => $member_info['mobile'],
+                'username' => $member_info['username'],
+                'sex' => $member_info['sex'],
+                'user_img' => $member_info['user_img'],
                 'synopsis' => $member_info['synopsis'],
                 'balance' => $money_info['balance'],//余额
                 'bonus' => $money_info['bonus'],//奖金余额
