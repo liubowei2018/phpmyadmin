@@ -286,7 +286,7 @@ class Hongbao extends ApiBase
     }
 
     /**
-     * 发放红包列表
+     * 领取红包列表
      */
     public function receive_red_packets(){
         $data = input('post.');
@@ -297,9 +297,12 @@ class Hongbao extends ApiBase
         $MemberModel = new MemberModel();
         $member_info = $MemberModel->getMemberInfo('id',['uuid'=>$data['uuid']]);
         $page = input('post.page')?input('post.page'):1;
-        $total_money = Db::name('red_order_list')->where(['user_id'=>$member_info['id']])->sum('money');
-        $today_money = Db::name('red_order_list')->where(['user_id'=>$member_info['id']])->whereTime('add_time','d')->sum('money');
-        $list = Db::name('red_order_list')->field('id,img_path,content,add_time')->where(['user_id'=>$member_info['id']])->page($page,15)->order('add_time DESC')->select();
+        $total_money = Db::name('red_order_info')->where(['member_id'=>$member_info['id'],'state'=>1])->sum('money');
+        $total_count = Db::name('red_order_info')->where(['member_id'=>$member_info['id'],'state'=>1])->count();
+        $today_money = Db::name('red_order_info')->where(['member_id'=>$member_info['id'],'state'=>1])->whereTime('add_time','d')->sum('money');
+        $today_count = Db::name('red_order_info')->where(['member_id'=>$member_info['id'],'state'=>1])->whereTime('add_time','d')->count();
+        $list = Db::name('red_order_list')->alias('l')->field('l.id,l.img_path,l.content,l.add_time')
+            ->where(['i.member_id'=>$member_info['id'],'i.state'=>1])->join('red_order_info i','i.order_id = l.id')->page($page,15)->order('add_time DESC')->select();
         if(count($list) > 0){
             foreach ($list as $k=>$v){
                 $img_path = explode(",", $v['img_path']);
@@ -312,11 +315,11 @@ class Hongbao extends ApiBase
                 $list[$k]['add_time'] = date('Y-m-d H:i:s',$v['add_time']);
             }
         }
-        return json(['code'=>1011,'msg'=>'成功','data'=>$list,'total_money'=>(string)$total_money,'today_money'=>(string)$today_money]);
+        return json(['code'=>1011,'msg'=>'成功','data'=>$list,'total_money'=>(string)$total_money,'total_count'=>(string)$total_count,'today_money'=>(string)$today_money,'today_count'=>(string)$today_count]);
     }
     /**
      * issue_red_packets
-     * 领取红包列表
+     * 发放红包列表
      */
     public function issue_red_packets(){
         $data = input('post.');
