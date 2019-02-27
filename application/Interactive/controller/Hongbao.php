@@ -8,6 +8,7 @@
 
 namespace app\Interactive\controller;
 
+use app\Interactive\model\MemberModel;
 use think\Cache;
 use think\Db;
 class Hongbao extends ApiBase
@@ -171,13 +172,28 @@ class Hongbao extends ApiBase
             }
         }
     }
-
     public function test(){
-        $res = $this->getAround1('113.706225','34.723301');
-        dump($res);
-        $result = $this->sendHB('10','100');
-        dump($result);
+        $slat = '113.703929';
+        $slng = '34.719809';
+
+        $sql = "SELECT *, ROUND(6378.138*2*ASIN(SQRT(POW(SIN(($slat*PI()/180-lat*PI()/180)/2),2)+COS($slat*PI()/180)*COS(lat*PI()/180)*POW(SIN(($slng*PI()/180-lng*PI()/180)/2),2)))) AS juli  
+        FROM think_red_order_info where state=0 GROUP BY HAVING juli <= 1,order_id ";
+        $red_list = Db::query($sql);
+        dump($red_list);
     }
+
+    public function getdistance($lng1 ='34.719809', $lat1='113.703929', $lng2='34.719809', $lat2='113.703929') {
+        // 将角度转为狐度
+        $radLat1 = deg2rad($lat1); //deg2rad()函数将角度转换为弧度
+        $radLat2 = deg2rad($lat2);
+        $radLng1 = deg2rad($lng1);
+        $radLng2 = deg2rad($lng2);
+        $a = $radLat1 - $radLat2;
+        $b = $radLng1 - $radLng2;
+        $s = 2 * asin(sqrt(pow(sin($a / 2), 2) + cos($radLat1) * cos($radLat2) * pow(sin($b / 2), 2))) * 6378.137 * 1000;
+        return $s;
+    }
+
     /**
      * 红包列表
      * lng  lat
@@ -188,15 +204,24 @@ class Hongbao extends ApiBase
         if($validate_res !== true){ return json(['code'=>1015,'msg'=>$validate_res]); } //数据认证
         if(getSign($data) != $data['Sign']){ return json(['code'=>1013,'msg'=>'签名错误']);} //签名认证
         if(Cache::get($data['uuid'].'_token') != $data['token']) return json(['code'=>1004,'msg'=>'用户未登录']);//登陆验证
+        $MemberModel = new MemberModel();
+        $member_info = $MemberModel->getMemberInfo('id',['uuid'=>$data['uuid']]);
         $lng = $data['lng'];
         $lat = $data['lat'];
+        $citycode = current_city($lng,$lat,$member_info['id']);
         $page = input('post.page');
         $page = $page?$page:1;
         $map = [];
-        $distance = $this->getAround($lat,$lng,10000);
+        $distance = $this->getAround($lat,$lng,5000);
         dump($distance );
-        $list = Db::name('red_order_list')->where($map)->select();
-        return json(['code'=>1011,'msg'=>'红包发送成功','data'=>'']);
+        //先查询区域红包
+        $max_lng = $distance['maxLng'];
+        $min_lng = $distance['minLng'];
+        $max_lat = $distance['maxLat'];
+        $min_lat = $distance['minLat'];
+        $quyu_red_list = Db::query("SELECT * FROM think_red_order_info WHERE state = 0 AND citycode = $citycode AND lng > $min_lng AND lng < $max_lng AND lat < $max_lat AND lat > $min_lat GROUP BY order_id");
+        dump($quyu_red_list);
+        return json(['code'=>1011,'msg'=>'成功','data'=>'']);
     }
 
     /**
@@ -205,7 +230,7 @@ class Hongbao extends ApiBase
      * @param $raidus    半径范围(单位：米)
      * @return array
      */
-    public function getAround($latitude,$longitude,$raidus){
+    private function getAround($latitude,$longitude,$raidus){
         $PI = 3.14159265;
         $degree = (24901*1609)/360.0;
         $dpmLat = 1/$degree;
@@ -217,7 +242,7 @@ class Hongbao extends ApiBase
         $radiusLng = $dpmLng*$raidus;
         $minLng = $longitude - $radiusLng;
         $maxLng = $longitude + $radiusLng;
-        return ['minLat'=>$minLat, 'maxLat'=>$maxLat, 'minLng'=>$minLng, 'maxLng'=>$maxLng];
+        return ['minLat'=>sprintf("%.6f",$minLat), 'maxLat'=>sprintf("%.6f",$maxLat), 'minLng'=>sprintf("%.6f",$minLng), 'maxLng'=>sprintf("%.6f",$maxLng)];
     }
 
     /**
@@ -249,12 +274,7 @@ class Hongbao extends ApiBase
         }
     }
 
-    /**
-     * 红包领取规则
-     */
-    private function rules_collection(){
 
-    }
     /**
      * 保存用户图片
      */
@@ -268,7 +288,30 @@ class Hongbao extends ApiBase
      * 发放红包列表
      */
     public function issue_red_packets(){
-
+        $data = input('post.');
+        $validate_res = $this->validate($data,'HomeValidate.whole');
+        if($validate_res !== true){ return json(['code'=>1015,'msg'=>$validate_res]); } //数据认证
+        if(getSign($data) != $data['Sign']){ return json(['code'=>1013,'msg'=>'签名错误']);} //签名认证
+        if(Cache::get($data['uuid'].'_token') != $data['token']) return json(['code'=>1004,'msg'=>'用户未登录']);//登陆验证
+        $MemberModel = new MemberModel();
+        $member_info = $MemberModel->getMemberInfo('id',['uuid'=>$data['uuid']]);
+        $page = input('post.page')?input('post.page'):1;
+        $total_money = Db::name('red_order_list')->where(['user_id'=>$member_info['id']])->sum('money');
+        $today_money = Db::name('red_order_list')->where(['user_id'=>$member_info['id']])->whereTime('add_time','d')->sum('money');
+        $list = Db::name('red_order_list')->field('id,img_path,content,add_time')->where(['user_id'=>$member_info['id']])->page($page,15)->order('add_time DESC')->select();
+        if(count($list) > 0){
+            foreach ($list as $k=>$v){
+                $img_path = explode(",", $v['img_path']);
+                if(count($img_path) > 0){
+                    $url = web_url_str();
+                    if(!empty($img_path['0'])){
+                        $list[$k]['img_path'] = $url.$img_path['0'];
+                    }
+                }
+                $list[$k]['add_time'] = date('Y-m-d H:i:s',$v['add_time']);
+            }
+        }
+        return json(['code'=>1011,'msg'=>'成功','data'=>$list,'total_money'=>(string)$total_money,'today_money'=>(string)$today_money]);
     }
     /**
      * 领取红包列表
