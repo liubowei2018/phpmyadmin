@@ -62,7 +62,10 @@ class Hongbao extends ApiBase
                 'state'=>1,
                 'citycode'=>current_city($data['lng'],$data['lat'],$member_info['id'])
             ];
-
+            if($money * 100 < $data['number'] ){
+                Db::rollback();
+                return json(['code'=>1012,'msg'=>'红包领取数量不能大于'.$money*100,'data'=>'']);
+            }
             switch ($type){
                 case 1://详情红包
                     $files = request()->file('image');
@@ -110,6 +113,10 @@ class Hongbao extends ApiBase
                 'create_time'=>time()
             ];
             Db::name('money_log')->insert($money_log);
+            //拆分红包
+
+            $this->splitting_red_packets($order_id);
+
             $user_money = Db::name('money')->where('user_id',$member_info['id'])->value('balance');
             if($user_money < 0){
                 Db::rollback();
@@ -126,16 +133,51 @@ class Hongbao extends ApiBase
     /**
      * 创建子红包
      */
-    public function splitting_red_packets($order_id){
+    private function splitting_red_packets($order_id){
         $order_list_info = Db::name('red_order_list')->where('id',$order_id)->find();
         if($order_list_info){
             $count = Db::name('red_order_info')->where('order_id',$order_list_info['id'])->count();
             if($count < 1){
-                $res = hongbao_group($order_list_info['money'],600);
+                $list = $this->sendHB($order_list_info['money'],$order_list_info['number']);
+                foreach ($list as $k=>$v){
+                    $array = [];
+                    switch ($order_list_info['distance']){
+                        case 1: //一公里
+                            $position = $this->getAround1($order_list_info['lat'],$order_list_info['lng'],10000);
+                            $array['lat'] = $position['lat'];
+                            $array['lng'] = $position['lng'];
+                            break;
+                        case 2://五公里
+                            $position = $this->getAround1($order_list_info['lat'],$order_list_info['lng'],50000);
+                            $array['lat'] = $position['lat'];
+                            $array['lng'] = $position['lng'];
+                            break;
+                        case 3://市
+
+                            break;
+                        case 4://全国
+
+                            break;
+                    }
+                    $array['order_id'] = $order_list_info['id'];
+                    $array['money'] = $v;
+                    $array['citycode'] = $order_list_info['citycode'];
+                    $array['state'] = 0;
+                    $array['type'] = $order_list_info['distance'];
+                    $array['add_time'] = time();
+                    Db::name('red_order_info')->insert($array);
+                }
+
             }
         }
     }
 
+    public function test(){
+        $res = $this->getAround1('113.706225','34.723301');
+        dump($res);
+        $result = $this->sendHB('10','100');
+        dump($result);
+    }
     /**
      * 红包列表
      * lng  lat
@@ -239,5 +281,106 @@ class Hongbao extends ApiBase
      */
     public function red_packets_info(){
 
+    }
+
+    public function getAround1($lat,$lon,$raidus = 990){
+        $PI = PI();
+
+        $latitude = $lat;
+        $longitude = $lon;
+        $degree = (24901 * 1609) / 360.0;
+        $raidusMile = $raidus;
+
+        $dpmLat = 1 / $degree;
+        $radiusLat = $dpmLat * $raidusMile;
+        $minLat = $latitude - $radiusLat;
+        $maxLat = $latitude + $radiusLat;
+
+        $mpdLng = $degree * cos($latitude * ($PI / 180));
+        $dpmLng = 1 / $mpdLng;
+        $radiusLng = $dpmLng * $raidusMile;
+        $minLng = $longitude - $radiusLng;
+        $maxLng = $longitude + $radiusLng;
+        $a = 1000000000000;
+        $c = bcsub($maxLat, $minLat, 12);
+        $d = $c*$a;
+        $sj = mt_rand(0, (int)uint32val($d));
+        $sj = $sj*10;
+        $sj = bcdiv($sj, $a, 12);
+        $f = mt_rand(0,1);
+        if($f)
+        {
+            $sj = '-'.$sj;
+        }
+        $newlat = $lat+$sj;
+        $cc = bcsub($maxLng, $minLng, 12);
+        $dd = $cc*$a;
+        $sjsj = mt_rand(0, (int)uint32val($dd));
+        $sjsj = $sjsj*16;
+        $sjsj = bcdiv($sjsj, $a, 12);
+        $ff = mt_rand(0,1);
+        if($ff)
+        {
+            $sjsj = '-'.$sjsj;
+        }
+        $newlng = $lon+$sjsj;
+
+        $data = [
+            'lat' => sprintf("%.6f",$newlat),
+            'lng' => sprintf("%.6f",$newlng),
+        ];
+        return $data;
+    }
+
+    /**
+     * 拼手气红包实现
+     * 生成num个随机数，每个随机数占随机数总和的比例*money_total的值即为每个红包的钱额
+     * 考虑到精度问题，最后重置最大的那个红包的钱额为money_total-其他红包的总额
+     * 浮点数比较大小,使用number_format,精确到2位小数
+     *
+     * @param double $money_total  总钱额， 每人最少0.01,精确到2位小数
+     * @param int $num 发送给几个人
+     * @return array num个元素的一维数组，值是随机钱额
+     */
+    public function sendHB($money_total, $num) {
+        if($money_total < $num*0.01) {
+            exit('钱太少');
+        }
+
+        $rand_arr = array();
+        for($i=0; $i<$num; $i++) {
+            $rand = rand(1, 100);
+            $rand_arr[] = $rand;
+        }
+
+        $rand_sum = array_sum($rand_arr);
+        $rand_money_arr = array();
+        $rand_money_arr = array_pad($rand_money_arr, $num, 0.01);  //保证每个红包至少0.01
+
+        foreach ($rand_arr as $key => $r) {
+            $rand_money = number_format($money_total*$r/$rand_sum, 2);
+
+            if($rand_money <= 0.01 || number_format(array_sum($rand_money_arr), 2) >= number_format($money_total, 2)) {
+                $rand_money_arr[$key] = 0.01;
+            } else {
+                $rand_money_arr[$key] = $rand_money;
+            }
+
+        }
+
+        $max_index = $max_rand = 0;
+        foreach ($rand_money_arr as $key => $rm) {
+            if($rm > $max_rand) {
+                $max_rand = $rm;
+                $max_index = $key;
+            }
+        }
+
+        unset($rand_money_arr[$max_index]);
+        //这里的array_sum($rand_money_arr)一定是小于$money_total的
+        $rand_money_arr[$max_index] = number_format($money_total - array_sum($rand_money_arr), 2);
+
+        ksort($rand_money_arr);
+        return $rand_money_arr;
     }
 }

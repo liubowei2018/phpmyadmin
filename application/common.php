@@ -113,20 +113,28 @@ function current_city($lng,$lat,$user_id){
     }
 }
 
-/**
- * 创建小红包
- * @param $total
- * @param $num
- * @param float $min
- */
-function hongbao_group($total,$num,$min=0.01){
 
-    for ($i=1;$i<$num;$i++)
-    {
-        $safe_total=($total-($num-$i)*$min)/($num-$i);//随机安全上限
-        $money=mt_rand($min*100,$safe_total*100)/100;
-        $total=$total-$money;
-        echo '第'.$i.'个红包：'.$money.' 元，余额：'.$total.' 元 '.'<br>';
+/**
+ * 强制转换为32位整数
+ * @param $var
+ * @return float|int|string
+ */
+function uint32val($var) {
+    if (is_string($var)) {
+        if (PHP_INT_MAX > 2147483647) {
+            $var = intval($var);
+        } else {
+            $var = floatval($var);
+        }
     }
-    echo '第'.$num.'个红包：'.$total.' 元，余额：0 元';
+    if (!is_int($var)) {
+        $var = intval($var);
+    }
+    if ((0 > $var) || ($var > 4294967295)) {
+        $var &= 4294967295;
+        if (0 > $var) {
+            $var = sprintf('%u', $var);
+        }
+    }
+    return $var;
 }
