@@ -346,7 +346,55 @@ class Hongbao extends ApiBase
      * 红包详情
      */
     public function red_packets_info(){
-
+        $data = input('post.');
+        $validate_res = $this->validate($data,'HomeValidate.whole');
+        if($validate_res !== true){ return json(['code'=>1015,'msg'=>$validate_res]); } //数据认证
+        if(getSign($data) != $data['Sign']){ return json(['code'=>1013,'msg'=>'签名错误']);} //签名认证
+        if(Cache::get($data['uuid'].'_token') != $data['token']) return json(['code'=>1004,'msg'=>'用户未登录']);//登陆验证
+        $MemberModel = new MemberModel();
+        $member_info = $MemberModel->getMemberInfo('id',['uuid'=>$data['uuid']]);
+        $id = input('post.id');
+        $info = Db::name('red_order_list')->where('id',$id)->find();
+        $money = '';
+        if($info['user_id'] == $member_info['id']){
+            //查看自己的红包
+            $money = Db::name('red_order_info')->where(['order_id'=>$info['id'],'state'=>0])->sum('money');
+        }else{
+            //查看领取的红包
+            $money = Db::name('red_order_info')->where(['order_id'=>$info['id'],'member_id'=>$member_info['id'],'state'=>1])->value('money');
+        }
+        switch ($info['type']){
+            case 1:
+                $str = '一公里可领';
+                break;
+            case 2:
+                $str = '五公里可领';
+                break;
+            case 3:
+                $str = '全市可领';
+                break;
+            case 4:
+                $str = '全国可领';
+                break;
+        }
+        $red_member_list = Db::name('red_order_info')->alias('i')->field('m.user_img')->where(['i.state'=>1,'i.order_id'=>$info['id']])->join('member m','m.id=i.member_id')->limit(10)->select();
+        $array = [
+            'content'=>$info['content'],
+            'money'=>$money,
+            'type'=>$str,
+        ];
+        $img_path = explode(",", $info['img_path']);
+        $img_array = [];
+        if(count($img_path) > 0){
+            if(!empty($img_path[0])){
+                foreach ($img_path as $a=>$b){
+                    $img_array[]['value']=web_url_str().$b;
+                }
+            }else{
+                $img_array = [];
+            }
+        }
+        return json(['code'=>1011,'msg'=>'成功','data'=>$array,'img_path'=>$img_array,'member_list'=>$red_member_list]);
     }
 
     public function getAround1($lat,$lon,$raidus = 990){
