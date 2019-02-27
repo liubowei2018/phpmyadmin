@@ -29,7 +29,7 @@ class Sms extends Controller
             'mobile'=>$data['phone']
         ];
         $member_info = $MemberModel->getMemberInfo('*',$map);
-        if($member_info){
+        if(!$member_info){
             $number = rand(100000,999999);
             $number = 123456;
             $sms_str =  "【红包】短信验证码为：$number ,短信有效期为5分钟，如非本人操作请忽略此条信息";
@@ -37,7 +37,7 @@ class Sms extends Controller
             $res = $this->Sending_SMS($data['phone'],$sms_str,'');
             return json($res);
         }else{
-            return json(['code'=>1012,'msg'=>'请微信注册后在进行短信登录','data'=>'']);
+            return json(['code'=>1012,'msg'=>'手机号已绑定微信','data'=>'']);
         }
     }
 
