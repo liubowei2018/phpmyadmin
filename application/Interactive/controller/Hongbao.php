@@ -397,6 +397,21 @@ class Hongbao extends ApiBase
         return json(['code'=>1011,'msg'=>'成功','data'=>$array,'img_path'=>$img_array,'member_list'=>$red_member_list]);
     }
 
+    /**
+     * 红包领取人数列表
+     */
+    public function hongbao_info(){
+        $data = input('post.');
+        $validate_res = $this->validate($data,'HomeValidate.whole');
+        if($validate_res !== true){ return json(['code'=>1015,'msg'=>$validate_res]); } //数据认证
+        if(getSign($data) != $data['Sign']){ return json(['code'=>1013,'msg'=>'签名错误']);} //签名认证
+        if(Cache::get($data['uuid'].'_token') != $data['token']) return json(['code'=>1004,'msg'=>'用户未登录']);//登陆验证
+        $MemberModel = new MemberModel();
+        $member_info = $MemberModel->getMemberInfo('id，username,user_img',['uuid'=>$data['uuid']]);
+        $id = input('post.id');
+        $ling_qu = Db::name('red_order_info')->alias('i')->field('')->where(['order_id'=>$id,'state'=>1])->select();
+
+    }
     public function getAround1($lat,$lon,$raidus = 990){
         $PI = PI();
 
