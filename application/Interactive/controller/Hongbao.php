@@ -328,14 +328,16 @@ class Hongbao extends ApiBase
         $member_info = $MemberModel->getMemberInfo('id',['uuid'=>$data['uuid']]);
         $page = input('post.page')?input('post.page'):1;
         $total_money = Db::name('red_order_list')->where(['user_id'=>$member_info['id']])->sum('original_money');
+        $total_count = Db::name('red_order_list')->where(['user_id'=>$member_info['id']])->count();
         $today_money = Db::name('red_order_list')->where(['user_id'=>$member_info['id']])->whereTime('add_time','d')->sum('original_money');
+        $today_count = Db::name('red_order_list')->where(['user_id'=>$member_info['id']])->whereTime('add_time','d')->count();
         $list = Db::name('red_order_list')->field('id,original_money,add_time')->where(['user_id'=>$member_info['id']])->page($page,15)->order('add_time DESC')->select();
         if(count($list) > 0){
             foreach ($list as $k=>$v){
                 $list[$k]['add_time'] = date('Y-m-d H:i:s',$v['add_time']);
             }
         }
-        return json(['code'=>1011,'msg'=>'成功','data'=>$list,'total_money'=>(string)$total_money,'today_money'=>(string)$today_money]);
+        return json(['code'=>1011,'msg'=>'成功','data'=>$list,'total_money'=>(string)$total_money,'total_count'=>(string)$total_count,'today_money'=>(string)$today_money,'today_count'=>(string)$today_count]);
     }
     /**
      * 红包详情
