@@ -8,7 +8,7 @@
 // +----------------------------------------------------------------------
 // | Author: 流年 <liu21st@gmail.com>
 // +----------------------------------------------------------------------
-
+use think\Cache;
 // 应用公共文件
 function getSign($arr)
 {
@@ -64,8 +64,69 @@ function curl_post_https($url,$data){ // 模拟提交数据函数
 }
 
 /**
+ * get https请求
+ * @param $url
+ * @return bool|string
+ */
+function curl_get_https($url){
+    $curl = curl_init(); // 启动一个CURL会话
+    curl_setopt($curl, CURLOPT_URL, $url);
+    curl_setopt($curl, CURLOPT_HEADER, 0);
+    curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+    curl_setopt($curl, CURLOPT_SSL_VERIFYPEER, false); // 跳过证书检查
+    curl_setopt($curl, CURLOPT_SSL_VERIFYHOST, 2);  // 从证书中检查SSL加密算法是否存在
+    $tmpInfo = curl_exec($curl);     //返回api的json对象
+    //关闭URL请求
+    curl_close($curl);
+    return $tmpInfo;    //返回json对象
+}
+
+
+/**
  * 获取网站链接
  */
 function web_url_str(){
     return $str = 'http://'.$_SERVER['SERVER_NAME'];
+}
+
+/**
+ * 逆地理编码
+ * @param $lng 纬度
+ * @param $lat 经度
+ * @param $user_id 用户id
+ */
+function current_city($lng,$lat,$user_id){
+    $key = "b15d61df8800f59bc986419017d018d0";
+    $location = $lat.','.$lng;
+    $url = "https://restapi.amap.com/v3/geocode/regeo?key=$key&location=$location";
+    $citycode = Cache::get("current_city_$user_id");
+    if($citycode){
+        return $citycode;
+    }else{
+        $res = curl_get_https($url);
+        $res = json_decode($res,true);
+        if($res['info'] == 'OK'){
+            $citycode = $res['regeocode']['addressComponent']['citycode'];
+            Cache::set("current_city_$user_id",$citycode,3600);
+        }
+        return $citycode;
+    }
+}
+
+/**
+ * 创建小红包
+ * @param $total
+ * @param $num
+ * @param float $min
+ */
+function hongbao_group($total,$num,$min=0.01){
+
+    for ($i=1;$i<$num;$i++)
+    {
+        $safe_total=($total-($num-$i)*$min)/($num-$i);//随机安全上限
+        $money=mt_rand($min*100,$safe_total*100)/100;
+        $total=$total-$money;
+        echo '第'.$i.'个红包：'.$money.' 元，余额：'.$total.' 元 '.'<br>';
+    }
+    echo '第'.$num.'个红包：'.$total.' 元，余额：0 元';
 }

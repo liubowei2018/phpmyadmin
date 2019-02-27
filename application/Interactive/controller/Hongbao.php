@@ -60,6 +60,7 @@ class Hongbao extends ApiBase
                 'type'=>$data['type'],
                 'add_time'=>time(),
                 'state'=>1,
+                'citycode'=>current_city($data['lng'],$data['lat'],$member_info['id'])
             ];
 
             switch ($type){
@@ -94,7 +95,7 @@ class Hongbao extends ApiBase
             //减去红包支付金额
             Db::name('money')->where('user_id',$member_info['id'])->setDec('balance',$data['money']);
             //创建红包
-            Db::name('red_order_list')->insert($order_data);
+            $order_id = Db::name('red_order_list')->insertGetId($order_data);
             //添加扣款记录
             $money_log = [
                 'user_id'=>$member_info['id'],
@@ -119,6 +120,19 @@ class Hongbao extends ApiBase
         }catch (\Exception $exception){
             Db::rollback();
             return json(['code'=>1012,'msg'=>'红包发放失败','data'=>$exception->getMessage()]);
+        }
+    }
+
+    /**
+     * 创建子红包
+     */
+    public function splitting_red_packets($order_id){
+        $order_list_info = Db::name('red_order_list')->where('id',$order_id)->find();
+        if($order_list_info){
+            $count = Db::name('red_order_info')->where('order_id',$order_list_info['id'])->count();
+            if($count < 1){
+                $res = hongbao_group($order_list_info['money'],600);
+            }
         }
     }
 

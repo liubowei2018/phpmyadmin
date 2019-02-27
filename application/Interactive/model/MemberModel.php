@@ -43,11 +43,18 @@ class MemberModel extends Model
                 $array['state'] = 0;
             }
             $array['token'] = $token;
-            $array['uuid'] = $data['uuid'];
-            $array['username'] = $data['username'];
-            $array['user_img'] = $data['user_img'];
-            $array['sex'] = $data['sex'];
-            $this->save(['username'=>$data['username'],'user_img'=>$data['user_img']],['uuid'=>$data['uuid']]);
+            if($state == 1){
+                $array['uuid'] = $data['uuid'];
+                $array['username'] = $data['username'];
+                $array['user_img'] = $data['user_img'];
+                $array['sex'] = $data['sex'];
+                $this->save(['username'=>$data['username'],'user_img'=>$data['user_img'],'sex'=>$is_register['sex']],['uuid'=>$data['uuid']]);
+            }else{
+                $array['uuid'] = $is_register['uuid'];
+                $array['username'] = $is_register['username'];
+                $array['user_img'] = $is_register['user_img'];
+                $array['sex'] = $is_register['sex'];
+            }
             Cache::set($data['uuid'].'_token',$token,3600);
             return ['code'=>1011,'msg'=>'登录成功','data'=>$array];
         }else{
