@@ -57,6 +57,7 @@ class Hongbao extends ApiBase
                 'distance'=>$data['distance'],
                 'user_id'=>$member_info['id'],
                 'money'=>$money,
+                'original_money'=>$data['money'],
                 'number'=>$data['number'],
                 'type'=>$data['type'],
                 'add_time'=>time(),
@@ -287,7 +288,7 @@ class Hongbao extends ApiBase
     /**
      * 发放红包列表
      */
-    public function issue_red_packets(){
+    public function receive_red_packets(){
         $data = input('post.');
         $validate_res = $this->validate($data,'HomeValidate.whole');
         if($validate_res !== true){ return json(['code'=>1015,'msg'=>$validate_res]); } //数据认证
@@ -314,10 +315,27 @@ class Hongbao extends ApiBase
         return json(['code'=>1011,'msg'=>'成功','data'=>$list,'total_money'=>(string)$total_money,'today_money'=>(string)$today_money]);
     }
     /**
+     * issue_red_packets
      * 领取红包列表
      */
-    public function receive_red_packets(){
-
+    public function issue_red_packets(){
+        $data = input('post.');
+        $validate_res = $this->validate($data,'HomeValidate.whole');
+        if($validate_res !== true){ return json(['code'=>1015,'msg'=>$validate_res]); } //数据认证
+        if(getSign($data) != $data['Sign']){ return json(['code'=>1013,'msg'=>'签名错误']);} //签名认证
+        if(Cache::get($data['uuid'].'_token') != $data['token']) return json(['code'=>1004,'msg'=>'用户未登录']);//登陆验证
+        $MemberModel = new MemberModel();
+        $member_info = $MemberModel->getMemberInfo('id',['uuid'=>$data['uuid']]);
+        $page = input('post.page')?input('post.page'):1;
+        $total_money = Db::name('red_order_list')->where(['user_id'=>$member_info['id']])->sum('original_money');
+        $today_money = Db::name('red_order_list')->where(['user_id'=>$member_info['id']])->whereTime('add_time','d')->sum('original_money');
+        $list = Db::name('red_order_list')->field('id,original_money,add_time')->where(['user_id'=>$member_info['id']])->page($page,15)->order('add_time DESC')->select();
+        if(count($list) > 0){
+            foreach ($list as $k=>$v){
+                $list[$k]['add_time'] = date('Y-m-d H:i:s',$v['add_time']);
+            }
+        }
+        return json(['code'=>1011,'msg'=>'成功','data'=>$list,'total_money'=>(string)$total_money,'today_money'=>(string)$today_money]);
     }
     /**
      * 红包详情
