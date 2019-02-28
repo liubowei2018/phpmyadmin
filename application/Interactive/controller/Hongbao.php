@@ -365,12 +365,15 @@ class Hongbao extends ApiBase
                 break;
         }
         $red_member_list = Db::name('red_order_info')->alias('i')->field('m.user_img')->where(['i.state'=>1,'i.order_id'=>$info['id']])->join('member m','m.id=i.member_id')->limit(10)->select();
+        $hongbao = Db::name('banner')->field("CONCAT('$url',path) as path,web_url")->where(['group_id'=>4])->order('id DESC')->find();
+        $hongbao = $hongbao?$hongbao:'';
         $array = [
             'user_img'=>$member_info['user_img'],
             'content'=>$info['content'],
             'money'=>$money,
             'type'=>$str,
             'add_time'=>$time,
+            'banner_img'=>$hongbao
         ];
         $img_path = explode(",", $info['img_path']);
         $img_array = [];
