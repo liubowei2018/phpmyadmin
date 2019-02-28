@@ -209,20 +209,13 @@ class Hongbao extends ApiBase
         $member_info = $MemberModel->getMemberInfo('id',['uuid'=>$data['uuid']]);
         $lng = $data['lng'];
         $lat = $data['lat'];
+        $user_id = $member_info['id'];
         $citycode = current_city($lng,$lat,$member_info['id']);
         $page = input('post.page');
         $page = $page?$page:1;
         $map = [];
-        $distance = $this->getAround($lat,$lng,5000);
-        dump($distance );
-        //先查询区域红包
-        $max_lng = $distance['maxLng'];
-        $min_lng = $distance['minLng'];
-        $max_lat = $distance['maxLat'];
-        $min_lat = $distance['minLat'];
-        $quyu_red_list = Db::query("SELECT * FROM think_red_order_info WHERE state = 0 AND citycode = $citycode AND lng > $min_lng AND lng < $max_lng AND lat < $max_lat AND lat > $min_lat GROUP BY order_id");
-        dump($quyu_red_list);
-        return json(['code'=>1011,'msg'=>'成功','data'=>'']);
+        $city_list = Db::query("CALL QueryRedEnvelopes($lat,$lng,$user_id,3,$citycode)");
+        return json(['code'=>1011,'msg'=>'成功','data'=>$city_list[0]]);
     }
 
     /**
@@ -409,6 +402,7 @@ class Hongbao extends ApiBase
         $MemberModel = new MemberModel();
         $member_info = $MemberModel->getMemberInfo('id，username,user_img',['uuid'=>$data['uuid']]);
         $id = input('post.id');
+        $order_info =
         $ling_qu = Db::name('red_order_info')->alias('i')->field('')->where(['order_id'=>$id,'state'=>1])->select();
 
     }

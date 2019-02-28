@@ -97,9 +97,10 @@ function web_url_str(){
  */
 function current_city($lng,$lat,$user_id){
     $key = "b15d61df8800f59bc986419017d018d0";
-    $location = $lat.','.$lng;
+    $location = $lng.','.$lat;
     $url = "https://restapi.amap.com/v3/geocode/regeo?key=$key&location=$location";
     $citycode = Cache::get("current_city_$user_id");
+
     if($citycode){
         return $citycode;
     }else{
