@@ -248,19 +248,30 @@ class Hongbao extends ApiBase
         if($validate_res !== true){ return json(['code'=>1015,'msg'=>$validate_res]); } //数据认证
         if(getSign($data) != $data['Sign']){ return json(['code'=>1013,'msg'=>'签名错误']);} //签名认证
         if(Cache::get($data['uuid'].'_token') != $data['token']) return json(['code'=>1004,'msg'=>'用户未登录']);//登陆验证
-        $order_number = input('post.order_number');
-        $order_info = Db::name('red_order_list')->where(['order_number'=>$order_number])->find();
+        $MemberModel = new MemberModel();
+        $member_info = $MemberModel->getMemberInfo('id',['uuid'=>$data['uuid']]);
+        $order_id = input('post.order_id');
+        $order_list = Db::name('red_order_list')->where('id',$order_id)->find();
+        $order_info = Db::name('red_order_info')->where(['id'=>$order_id])->find();
         if(!$order_info){
             return json(['code'=>1012,'msg'=>'红包不存在','data'=>'']);
-        }elseif ($order_info['number'] <= 0){
-            return json(['code'=>1012,'msg'=>'红包已抢完','data'=>'']);
+        } elseif($order_info['state'] == 1){
+            return json(['code'=>1012,'msg'=>'红包已领取','data'=>'']);
         }else{
             Db::startTrans();
             try{
-
-
+                //修改红包信息
+                Db::name('red_order_info')->where('id',$order_info['id'])->update(['member_id'=>$member_info['id'],'state'=>1]);
+                //给用户增加金额
+                $user_money = Db::name('money')->where('user_id',$member_info['id'])->find();
+                $money = $order_info['money'];
+                Db::name('money')->where('user_id',$member_info['id'])->setInc('balance',$money);
+                //添加记录
+                getAddMoneyLog($member_info['id'],$money,$user_money['balance'],$user_money['balance']+$money,1,1,'领取红包',$order_list['order_number'],'1',time(),'');
+                //分润上级
+                $this->two_level_award($member_info['id'],$money);
                 Db::commit();
-                return json(['code'=>1012,'msg'=>'红包领取成功','data'=>'']);
+                return json(['code'=>1011,'msg'=>'红包领取成功','data'=>'']);
             }catch (\Exception $exception){
                 Db::rollback();
                 return json(['code'=>1012,'msg'=>'红包领取失败','data'=>'']);
@@ -506,4 +517,77 @@ class Hongbao extends ApiBase
         ksort($rand_money_arr);
         return $rand_money_arr;
     }
+
+    /**
+     * 会员升级二级分润
+     * $user_id 推荐人账号
+     * $money 分润金额
+     */
+    private function two_level_award($user_id,$money)
+    {
+        $config = privilege_config_list();
+        $user_info = Db::name('member')->where('id',$user_id)->find();
+        if($user_id['pid'] > 0){  //一级
+            $p_user_info = Db::name('member')->where('id',$user_info['pid'])->find();
+            $p_money_list = Db::name('money')->where('user_id',$p_user_info['id'])->find();
+            if($p_user_info){
+                switch ($p_user_info['type']){
+                    case 1: //普通会员
+                        $p_bonus = $money*$config['ordinary_one_hongbao_bonus']/100;
+                        break;
+                    case 2: //vip会员
+                        $p_bonus = $money*$config['vip_one_hongbao_bonus']/100;
+                        break;
+                    case 3: //合伙人
+                        $p_bonus = $money*$config['partner_one_hongbao_bonus']/100;
+                        break;
+                }
+            }
+            Db::name('money')->where('user_id',$p_user_info['id'])->setInc('bonus',$p_bonus);
+            $money_log = [
+                'user_id'=>$user_id,
+                'type'=>'4',
+                'money'=>$p_bonus,
+                'original'=>$p_money_list['bonus'],
+                'now'=>$p_money_list['bonus']+$p_bonus,
+                'state'=>'1',
+                'info'=>$user_info['mobile'].'领取红包获得',
+                'trend'=>'2',
+                'create_time'=>time(),
+            ];
+            Db::name('money_log')->insert($money_log);
+        }
+        if($user_id['gid'] > 0){  //二级
+            $g_user_info = Db::name('member')->where('id',$user_info['gid'])->find();
+            $g_money_list = Db::name('money')->where('user_id',$g_user_info['id'])->find();
+            if($g_user_info){
+                switch ($g_user_info['type']){
+                    case 1: //普通会员
+                        $g_bonus = $money*$config['ordinary_two_hongbao_bonus']/100;
+                        break;
+                    case 2: //vip会员
+                        $g_bonus = $money*$config['vip_two_hongbao_bonus']/100;
+                        break;
+                    case 3: //合伙人
+                        $g_bonus = $money*$config['partner_two_hongbao_bonus']/100;
+                        break;
+                }
+                Db::name('money')->where('user_id',$g_user_info['id'])->setInc('bonus',$g_bonus);
+                $money_log = [
+                    'user_id'=>$user_id,
+                    'type'=>'4',
+                    'money'=>$g_bonus,
+                    'original'=>$g_money_list['bonus'],
+                    'now'=>$g_money_list['bonus']+$g_bonus,
+                    'state'=>'1',
+                    'info'=>$user_info['mobile'].'领取红包获得',
+                    'trend'=>'2',
+                    'create_time'=>time(),
+                ];
+                Db::name('money_log')->insert($money_log);
+            }
+        }
+    }
+
+
 }

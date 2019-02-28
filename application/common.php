@@ -139,3 +139,33 @@ function uint32val($var) {
     }
     return $var;
 }
+
+/**
+ * @param $user_id  用户id
+ * @param $money    操作数量
+ * @param $original 原始数量
+ * @param $now      现有数量
+ * @param $type     类型   1 余额 2 积分 3 微信 4奖金
+ * @param $state    状态   1 增加 2 减少
+ * @param $info     详情
+ * @param $source   来源订单号
+ * @param $trend    作用
+ * @param $create_time  时间
+ * @param $son_id   子级id
+ */
+function getAddMoneyLog($user_id,$money,$original,$now,$type,$state,$info,$source,$trend,$create_time,$son_id){
+    $data = [
+        'user_id'=>$user_id,
+        'money'=>$money,
+        'original'=>$original,
+        'now'=>$now,
+        'type'=>$type,
+        'state'=>$state,
+        'info'=>$info,
+        'source'=>$source,
+        'trend'=>$trend,
+        'create_time'=>$create_time,
+        'son_id'=>$son_id,
+    ];
+    \think\Db::name('money_log')->insert($data);
+}

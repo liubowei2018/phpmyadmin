@@ -357,13 +357,13 @@ class Money extends ApiBase
             if($p_user_info){
                 switch ($p_user_info['type']){
                     case 1: //普通会员
-                        $p_bonus = $money*$config['ordinary_one_upgrade'];
+                        $p_bonus = $money*$config['ordinary_one_upgrade']/100;
                         break;
                     case 2: //vip会员
-                        $p_bonus = $money*$config['vip_one_upgrade'];
+                        $p_bonus = $money*$config['vip_one_upgrade']/100;
                         break;
                     case 3: //合伙人
-                        $p_bonus = $money*$config['partner_one_upgrade'];
+                        $p_bonus = $money*$config['partner_one_upgrade']/100;
                         break;
                 }
             }
@@ -387,13 +387,13 @@ class Money extends ApiBase
             if($g_user_info){
                 switch ($g_user_info['type']){
                     case 1: //普通会员
-                        $g_bonus = $money*$config['ordinary_two_upgrade'];
+                        $g_bonus = $money*$config['ordinary_two_upgrade']/100;
                         break;
                     case 2: //vip会员
-                        $g_bonus = $money*$config['vip_two_upgrade'];
+                        $g_bonus = $money*$config['vip_two_upgrade']/100;
                         break;
                     case 3: //合伙人
-                        $g_bonus = $money*$config['partner_two_upgrade'];
+                        $g_bonus = $money*$config['partner_two_upgrade']/100;
                         break;
                 }
                 Db::name('money')->where('user_id',$g_user_info['id'])->setInc('bonus',$g_bonus);
