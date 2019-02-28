@@ -367,14 +367,13 @@ class Hongbao extends ApiBase
         $red_member_list = Db::name('red_order_info')->alias('i')->field('m.user_img')->where(['i.state'=>1,'i.order_id'=>$info['id']])->join('member m','m.id=i.member_id')->limit(10)->select();
         $url = web_url_str();
         $hongbao = Db::name('banner')->field("CONCAT('$url',path) as path,web_url")->where(['group_id'=>4])->order('id DESC')->find();
-        $hongbao = $hongbao?$hongbao:'';
+        $hongbao = $hongbao?$hongbao:"";
         $array = [
             'user_img'=>$member_info['user_img'],
             'content'=>$info['content'],
             'money'=>$money,
             'type'=>$str,
             'add_time'=>$time,
-            'banner_img'=>$hongbao
         ];
         $img_path = explode(",", $info['img_path']);
         $img_array = [];
@@ -387,7 +386,7 @@ class Hongbao extends ApiBase
                 $img_array = [];
             }
         }
-        return json(['code'=>1011,'msg'=>'成功','data'=>$array,'img_path'=>$img_array,'member_list'=>$red_member_list]);
+        return json(['code'=>1011,'msg'=>'成功','data'=>$array,'img_path'=>$img_array,'member_list'=>$red_member_list,'banner_img'=>$hongbao]);
     }
 
     /**
