@@ -173,27 +173,7 @@ class Hongbao extends ApiBase
             }
         }
     }
-    public function test(){
-        $slat = '113.703929';
-        $slng = '34.719809';
 
-        $sql = "SELECT *, ROUND(6378.138*2*ASIN(SQRT(POW(SIN(($slat*PI()/180-lat*PI()/180)/2),2)+COS($slat*PI()/180)*COS(lat*PI()/180)*POW(SIN(($slng*PI()/180-lng*PI()/180)/2),2)))) AS juli  
-        FROM think_red_order_info where state=0 GROUP BY HAVING juli <= 1,order_id ";
-        $red_list = Db::query($sql);
-        dump($red_list);
-    }
-
-    public function getdistance($lng1 ='34.719809', $lat1='113.703929', $lng2='34.719809', $lat2='113.703929') {
-        // 将角度转为狐度
-        $radLat1 = deg2rad($lat1); //deg2rad()函数将角度转换为弧度
-        $radLat2 = deg2rad($lat2);
-        $radLng1 = deg2rad($lng1);
-        $radLng2 = deg2rad($lng2);
-        $a = $radLat1 - $radLat2;
-        $b = $radLng1 - $radLng2;
-        $s = 2 * asin(sqrt(pow(sin($a / 2), 2) + cos($radLat1) * cos($radLat2) * pow(sin($b / 2), 2))) * 6378.137 * 1000;
-        return $s;
-    }
 
     /**
      * 红包列表
@@ -250,7 +230,7 @@ class Hongbao extends ApiBase
         if(Cache::get($data['uuid'].'_token') != $data['token']) return json(['code'=>1004,'msg'=>'用户未登录']);//登陆验证
         $MemberModel = new MemberModel();
         $member_info = $MemberModel->getMemberInfo('id',['uuid'=>$data['uuid']]);
-        $order_id = input('post.order_id');
+        $order_id = input('post.id');
         $order_list = Db::name('red_order_list')->where('id',$order_id)->find();
         $order_info = Db::name('red_order_info')->where(['id'=>$order_id])->find();
         if(!$order_info){
@@ -356,16 +336,19 @@ class Hongbao extends ApiBase
         if(getSign($data) != $data['Sign']){ return json(['code'=>1013,'msg'=>'签名错误']);} //签名认证
         if(Cache::get($data['uuid'].'_token') != $data['token']) return json(['code'=>1004,'msg'=>'用户未登录']);//登陆验证
         $MemberModel = new MemberModel();
-        $member_info = $MemberModel->getMemberInfo('id',['uuid'=>$data['uuid']]);
+        $member_info = $MemberModel->getMemberInfo('id,user_img',['uuid'=>$data['uuid']]);
         $id = input('post.id');
         $info = Db::name('red_order_list')->where('id',$id)->find();
         $money = '';
         if($info['user_id'] == $member_info['id']){
             //查看自己的红包
             $money = Db::name('red_order_info')->where(['order_id'=>$info['id'],'state'=>0])->sum('money');
+            $time = date('Y-m-d H:i:s',$info['add_time']);
         }else{
             //查看领取的红包
-            $money = Db::name('red_order_info')->where(['order_id'=>$info['id'],'member_id'=>$member_info['id'],'state'=>1])->value('money');
+            $order_info = Db::name('red_order_info')->field("money,FROM_UNIXTIME(add_time, '%Y-%m-%d') as add_time")->where(['order_id'=>$info['id'],'member_id'=>$member_info['id'],'state'=>1])->find();
+            $money = $order_info['money'];
+            $time = $order_info['add_time'];
         }
         switch ($info['type']){
             case 1:
@@ -383,9 +366,11 @@ class Hongbao extends ApiBase
         }
         $red_member_list = Db::name('red_order_info')->alias('i')->field('m.user_img')->where(['i.state'=>1,'i.order_id'=>$info['id']])->join('member m','m.id=i.member_id')->limit(10)->select();
         $array = [
+            'user_img'=>$member_info['user_img'],
             'content'=>$info['content'],
             'money'=>$money,
             'type'=>$str,
+            'add_time'=>$time,
         ];
         $img_path = explode(",", $info['img_path']);
         $img_array = [];
@@ -411,11 +396,22 @@ class Hongbao extends ApiBase
         if(getSign($data) != $data['Sign']){ return json(['code'=>1013,'msg'=>'签名错误']);} //签名认证
         if(Cache::get($data['uuid'].'_token') != $data['token']) return json(['code'=>1004,'msg'=>'用户未登录']);//登陆验证
         $MemberModel = new MemberModel();
-        $member_info = $MemberModel->getMemberInfo('id，username,user_img',['uuid'=>$data['uuid']]);
+        $member_info = $MemberModel->getMemberInfo('id,username,user_img',['uuid'=>$data['uuid']]);
         $id = input('post.id');
-        $order_info =
-        $ling_qu = Db::name('red_order_info')->alias('i')->field('')->where(['order_id'=>$id,'state'=>1])->select();
-
+        $page = input('post.page')?input('post.page'):1;
+        $order_info =  Db::name('red_order_list')->where('id',$id)->find();
+        $ling_qu = Db::name('red_order_info')->alias('i')->field("m.username,m.user_img,i.money,FROM_UNIXTIME(i.add_time, '%Y-%m-%d') as add_time")->where(['i.order_id'=>$id,'i.state'=>1])->join('member m','m.id = i.member_id')->page($page,10)->select();
+        if($member_info['id'] == $order_info['user_id']){
+            $money = Db::name('red_order_info')->where(['order_id'=>$id,'state'=>0])->sum('money');
+        }else{
+            $money = Db::name('red_order_info')->where(['member_id'=>$member_info['id']])->value('money');
+        }
+        $array = [
+            'username'=>$member_info['username'],
+            'user_img'=>$member_info['user_img'],
+            'money'=>(string)$money,
+        ];
+        return json(['code'=>1011,'msg'=>'成功','data'=>$array,'lingqu'=>$ling_qu]);
     }
     public function getAround1($lat,$lon,$raidus = 990){
         $PI = PI();
