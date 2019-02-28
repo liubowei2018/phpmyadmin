@@ -416,7 +416,7 @@ class Hongbao extends ApiBase
             'username'=>$member_info['username'],
             'user_img'=>$member_info['user_img'],
             'money'=>(string)$money,
-            'number'=>$order_info['number'].'/'.$info_count
+            'number'=>$info_count
         ];
         return json(['code'=>1011,'msg'=>'成功','data'=>$array,'lingqu'=>$ling_qu]);
     }
