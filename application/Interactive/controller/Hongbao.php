@@ -363,6 +363,8 @@ class Hongbao extends ApiBase
             case 4:
                 $str = '全国可领';
                 break;
+            default:
+                $str = '暂无类型';
         }
         $red_member_list = Db::name('red_order_info')->alias('i')->field('m.user_img')->where(['i.state'=>1,'i.order_id'=>$info['id']])->join('member m','m.id=i.member_id')->limit(10)->select();
         $url = web_url_str();
