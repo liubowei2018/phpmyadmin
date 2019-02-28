@@ -411,10 +411,12 @@ class Hongbao extends ApiBase
         }else{
             $money = Db::name('red_order_info')->where(['member_id'=>$member_info['id']])->value('money');
         }
+        $info_count = Db::name('red_order_info')->where(['order_id'=>$id,'state'=>1])->count();
         $array = [
             'username'=>$member_info['username'],
             'user_img'=>$member_info['user_img'],
             'money'=>(string)$money,
+            'number'=>$order_info['number'].'/'.$info_count
         ];
         return json(['code'=>1011,'msg'=>'成功','data'=>$array,'lingqu'=>$ling_qu]);
     }
