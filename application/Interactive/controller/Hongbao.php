@@ -203,10 +203,38 @@ class Hongbao extends ApiBase
         }
         //城市红包  距离不足查询城市
         if(count($city_list) < 10){
-            $num = count($city_list);
-            $city_list_2 = Db::query("");
+            $num = 10 - count($city_list);
+            $sql_2 = "SELECT i.* FROM think_red_order_info as i INNER JOIN think_red_order_list as l ON l.id = i.order_id WHERE i.state = 0 AND i.type = 3 AND  order_id NOT IN (SELECT order_id FROM think_red_order_info WHERE member_id = $user_id AND state = 1 ) AND l.user_id <> $user_id  group by order_id limit $num;";
+            $city_list_2 = Db::query($sql_2);
+            $array = [];
+            foreach ($city_list_2 as $a=>$b) {
+                $location = $this->getAround1($lat,$lng,1000);
+                $array = [
+                    'id'=>$b['id'],
+                    'order_id'=>$b['order_id'],
+                    'lng'=>$location['lng'],
+                    'lat'=>$location['lat'],
+                ];
+                $city_list[]=$array;
+            }
         }
-
+        //城市红包  距离不足查询城市
+        if(count($city_list) < 10){
+            $num = 10 - count($city_list);
+            $sql_2 = "SELECT i.* FROM think_red_order_info as i INNER JOIN think_red_order_list as l ON l.id = i.order_id WHERE i.state = 0 AND i.type = 4 AND  order_id NOT IN (SELECT order_id FROM think_red_order_info WHERE member_id = $user_id AND state = 1 ) AND l.user_id <> $user_id  group by order_id limit $num;";
+            $city_list_2 = Db::query($sql_2);
+            $array = [];
+            foreach ($city_list_2 as $a=>$b) {
+                $location = $this->getAround1($lat,$lng,1000);
+                $array = [
+                    'id'=>$b['id'],
+                    'order_id'=>$b['order_id'],
+                    'lng'=>$location['lng'],
+                    'lat'=>$location['lat'],
+                ];
+                $city_list[]=$array;
+            }
+        }
         //全国红包  城市的也不足
         return json(['code'=>1011,'msg'=>'成功','data'=>$city_list]);
     }
