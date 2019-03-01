@@ -167,7 +167,8 @@ function getAddMoneyLog($user_id,$money,$original,$now,$type,$state,$info,$sourc
         'create_time'=>$create_time,
         'son_id'=>$son_id,
     ];
-    \think\Db::name('money_log')->insert($data);
+   $res =  \think\Db::name('money_log')->insert($data);
+   return $res;
 }
 
 /**
@@ -187,7 +188,8 @@ function getAddAdminOrderLog($user_id,$info,$order_number,$admin_id,$admin_name)
         'admin_name'=>$admin_name,
         'add_time'=>time(),
     ];
-    \think\Db::name('admin_order')->insert($data);
+   $res =  \think\Db::name('admin_order')->insert($data);
+    return $res;
 }
 function getAddAdminMoneyLog($user_id,$money,$type,$state,$info,$admin_id,$admin_name){
     $data = [
@@ -200,5 +202,6 @@ function getAddAdminMoneyLog($user_id,$money,$type,$state,$info,$admin_id,$admin
         'admin_name'=>$admin_name,
         'add_time'=>time(),
     ];
-    \think\Db::name('admin_money')->insert($data);
+    $res = \think\Db::name('admin_money')->insert($data);
+    return $res;
 }

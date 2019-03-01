@@ -36,4 +36,61 @@ class Member extends Base
         $res = $MemberModel->getMemberState($id);
         return json($res);
     }
+
+    /**
+     * 会员详情信息
+     */
+    public function member_info(){
+        $id = input('get.id');
+        $member_info = Db::name('member')->where('id',$id)->find();
+        $money_info =  Db::name('money')->where('user_id',$id)->find();
+        $this->assign('info',$member_info);
+        $this->assign('money',$money_info);
+        return $this->fetch();
+    }
+    /**
+     * 修改用户资金
+     */
+    public function save_money(){
+        $data = input('post.');
+        $result = $this->validate($data,'MemberValidate.save_money');
+        if($result !== true){
+            $this->error($result);
+        }
+        $money = Db::name('money')->where('user_id',$data['user_id'])->find();
+        switch ($data['state']){
+            case 1://增加
+                Db::startTrans();
+                try{
+                    Db::name('money')->where('user_id',$data['user_id'])->setInc('balance',$data['save_money']);
+                    getAddMoneyLog($data['user_id'],$data['save_money'],$money['balance'],$money['balance'] + $data['save_money'],1,1,$data['info'],'','',time(),'');
+                    getAddAdminMoneyLog($data['user_id'],$data['save_money'],1,1,$data['info'],$this->admin_uid,$this->admin_name);
+                    Db::commit();
+                    return json(['code'=>1011,'msg'=>'增加余额成功']);
+                }catch (\Exception $exception){
+                    Db::rollback();
+                    return json(['code'=>1012,'msg'=>'增加余额失败，请稍后再试']);
+                }
+                break;
+            case 2://减少
+                if($money['balance'] < $data['save_money']){
+                    $this->error('用户余额不足');
+                }else {
+                    Db::startTrans();
+                    try {
+                        Db::name('money')->where('user_id', $data['user_id'])->setDec('balance', $data['save_money']);
+                        getAddMoneyLog($data['user_id'], $data['save_money'], $money['balance'], $money['balance'] - $data['save_money'], 1, 2, $data['info'], '', '', time(), '');
+                        getAddAdminMoneyLog($data['user_id'], $data['save_money'], 1, 2, $data['info'], $this->admin_uid, $this->admin_name);
+                        Db::commit();
+                        return json(['code'=>1011,'msg'=>'减少余额成功']);
+                    } catch (\Exception $exception) {
+                        Db::rollback();
+                        return json(['code'=>1012,'msg'=>'减少余额失败，请稍后再试']);
+                    }
+                }
+                break;
+            default:
+                $this->error('操作类型异常');
+        }
+    }
 }

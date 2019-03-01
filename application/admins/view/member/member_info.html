@@ -1,0 +1,257 @@
+<!--引入头部  开始-->
+{include file="public/header" /}
+<!--引入头部  结束-->
+
+<style type="text/css">
+    /* TAB */
+    .nav-tabs.nav>li>a {
+        padding: 10px 25px;
+        margin-right: 0;
+    }
+    .nav-tabs.nav>li>a:hover,
+    .nav-tabs.nav>li.active>a {
+        border-top: 3px solid #1ab394;
+        padding-top: 8px;
+        border-bottom: 1px solid #FFFFFF;
+    }
+    .nav-tabs>li>a {
+        color: #A7B1C2;
+        font-weight: 500;
+        margin-right: 2px;
+        line-height: 1.42857143;
+        border: 1px solid transparent;
+        border-radius: 0;
+    }
+</style>
+
+<body class="gray-bg">
+<div class="wrapper wrapper-content animated fadeInRight">
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="ibox float-e-margins">
+                <div class="ibox-title">
+                    <h5>{$info.username} -- 个人信息</h5>
+                    <div class="ibox-tools">
+                        <a class="collapse-link">
+                            <i class="fa fa-chevron-up"></i>
+                        </a>
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="form_basic.html#">
+                            <i class="fa fa-wrench"></i>
+                        </a>
+                        <a class="close-link">
+                            <i class="fa fa-times"></i>
+                        </a>
+                    </div>
+                </div>
+                <div class="ibox-content">
+                    <div class="panel blank-panel">
+                        <div class="panel-heading">
+                            <div class="panel-options">
+                                <ul class="nav nav-tabs">
+                                    <li class="active"><a data-toggle="tab" href="#tab-1" aria-expanded="true">个人信息</a></li>
+                                    <li class=""><a data-toggle="tab" href="#tab-2" aria-expanded="false">资金管理</a></li>
+                                    <li class=""><a data-toggle="tab" href="#tab-3" aria-expanded="false">一级推荐</a></li>
+                                    <li class=""><a data-toggle="tab" href="#tab-4" aria-expanded="false">二级推荐</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="panel-body">
+                            <div class="tab-content">
+                                <div id="tab-1" class="tab-pane active">
+                                    <form action="{:url('save')}" method="post" class="form-horizontal">
+                                        <div class="hr-line-dashed"></div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">用户名称：</label>
+                                            <div class="input-group col-sm-4">
+                                                <input type="text" class="form-control" name="username" value="{$info.username}"readonly>
+                                            </div>
+                                        </div>
+                                        <div class="hr-line-dashed"></div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">联系电话：</label>
+                                            <div class="input-group col-sm-4">
+                                                <input type="text" class="form-control" name="mobile" value="{$info.mobile}"readonly>
+                                            </div>
+                                        </div>
+                                        <div class="hr-line-dashed"></div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">用户等级：</label>
+                                            <div class="input-group col-sm-4">
+                                                <select name="type" class="form-control">
+                                                    <option value="1" {if condition="$info.type == 1"} selected{/if}>注册会员</option>
+                                                    <option value="2" {if condition="$info.type == 2"} selected {/if}>VIP会员</option>
+                                                    <option value="3" {if condition="$info.type == 3"} selected{/if}>合伙人</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="hr-line-dashed"></div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">会员状态：</label>
+                                            <div class="input-group col-sm-4">
+                                                <div class="radio ">
+                                                    <label class="radio-inline">
+                                                        <input type="radio" style="width: 17px;height: 17px;"  name='state' value="1" {if condition="$info.state eq 1 "}checked{/if}/>开启&nbsp;&nbsp;
+                                                    </label>
+                                                    <label class="radio-inline">
+                                                        <input type="radio" style="width: 17px;height: 17px;"  name='state' value="0" {if condition="$info.state eq 0 "}checked{/if}/>关闭
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="hr-line-dashed"></div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">推广奖金：</label>
+                                            <div class="input-group col-sm-4">
+                                                <input type="text" class="form-control" name="bonus" value="{$money.bonus}"readonly>
+                                            </div>
+                                        </div>
+                                        <div class="hr-line-dashed"></div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">起始领取：</label>
+                                            <div class="input-group col-sm-4">
+                                                <input type="text" class="form-control" name="red_number" value="{$money.red_number}"readonly>
+                                                <span class="help-block m-b-none"><i class="fa fa-info-circle"></i> 每天领取红包起始数量</span>
+                                            </div>
+
+                                        </div>
+                                        <div class="hr-line-dashed"></div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">分享领取：</label>
+                                            <div class="input-group col-sm-4">
+                                                <input type="text" class="form-control" name="red_today_number" value="{$money.red_today_number}"readonly>
+                                                <span class="help-block m-b-none"><i class="fa fa-info-circle"></i> 今日 分享群/朋友圈 获得红包领取次数 </span>
+                                            </div>
+                                        </div>
+                                        <div class="hr-line-dashed"></div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">推广领取：</label>
+                                            <div class="input-group col-sm-4">
+                                                <input type="text" class="form-control" name="red_push_number" value="{$money.red_push_number}"readonly>
+                                                <span class="help-block m-b-none"><i class="fa fa-info-circle"></i> 用户推荐新用户 获得红包领取次数 </span>
+                                            </div>
+                                        </div>
+<!--                                        <div class="hr-line-dashed"></div>
+                                        <div class="form-group">
+                                            <div class="col-sm-4 col-sm-offset-3">
+                                                <button class="btn btn-primary" type="submit"><i class="fa fa-save"></i> 保存信息</button>&nbsp;&nbsp;&nbsp;
+                                                <a class="btn btn-danger" href="javascript:history.go(-1);"><i class="fa fa-close"></i> 返回</a>
+                                            </div>
+                                        </div>-->
+                                    </form>
+                                </div>
+                                <div id="tab-2" class="tab-pane">
+                                    <form action="{:url('save_money')}" method="post" id="save_money_from" class="form-horizontal">
+                                        <div class="hr-line-dashed"></div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">余   额：</label>
+                                            <div class="input-group col-sm-4">
+                                                <input type="hidden" name="user_id" value="{$info.id}">
+                                                <input type="text" class="form-control" name="balance" value="{$money.balance}"readonly>
+                                            </div>
+                                        </div>
+                                        <div class="hr-line-dashed"></div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">操   作：</label>
+                                            <div class="input-group col-sm-4">
+                                                <div class="radio ">
+                                                    <label class="radio-inline">
+                                                        <input type="radio" style="width: 17px;height: 17px;"  name='state' value="1" />增加&nbsp;&nbsp;
+                                                    </label>
+                                                    <label class="radio-inline">
+                                                        <input type="radio" style="width: 17px;height: 17px;"  name='state' value="2" />减少
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="hr-line-dashed"></div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">数   量：</label>
+                                            <div class="input-group col-sm-4">
+                                                <input type="text" class="form-control" name="save_money" value="">
+                                            </div>
+                                        </div>
+                                        <div class="hr-line-dashed"></div>
+                                        <div class="form-group">
+                                            <label class="col-sm-2 control-label">详   情：</label>
+                                            <div class="input-group col-sm-4">
+                                                <textarea class="form-control" type="text" rows="3" name="info" placeholder="请输入修改详情"></textarea>
+                                            </div>
+                                        </div>
+                                        <div class="hr-line-dashed"></div>
+                                        <div class="form-group">
+                                            <div class="col-sm-4 col-sm-offset-3">
+                                                <button class="btn btn-primary" type="button" id="save_money"><i class="fa fa-save"></i> 保存</button>&nbsp;&nbsp;&nbsp;
+                                                <a class="btn btn-danger" href="javascript:history.go(-1);"><i class="fa fa-close"></i> 返回</a>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                                <div id="tab-3" class="tab-pane">
+                                    <table class="table table-striped">
+                                        <thead>
+                                        <tr>
+                                            <th>Student-ID</th>
+                                            <th>First Name</th>
+                                            <th>Last Name</th>
+                                            <th>Grade</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        <tr>
+                                            <td>001</td>
+                                            <td>Rammohan </td>
+                                            <td>Reddy</td>
+                                            <td>A+</td>
+                                        </tr>
+                                        <tr>
+                                            <td>002</td>
+                                            <td>Smita</td>
+                                            <td>Pallod</td>
+                                            <td>A</td>
+                                        </tr>
+                                        <tr>
+                                            <td>003</td>
+                                            <td>Rabindranath</td>
+                                            <td>Sen</td>
+                                            <td>A+</td>
+                                        </tr>
+                                        </tbody>
+                                    </table>
+
+                                </div>
+                                <div id="tab-4" class="tab-pane">
+
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!--引入尾部  开始-->
+{include file="public/footer" /}
+<script src="/common/js/plugins/chosen/chosen.jquery.js"></script>
+<!--引入尾部  结束-->
+
+<script type="text/javascript">
+    $('#save_money').click(function () {
+        var form = $('#save_money_from').serializeArray();
+        $.post("{:url('save_money')}",form,function (re) {
+            if(re.code == 1011){
+                layer.msg(re.msg,{time:1500},function () {
+                    window.location.reload();
+                });
+            }else{
+                layer.msg(re.msg,{time:1500},function () {
+
+                });
+            }
+        });
+    });
+</script>
+</body>
+</html>

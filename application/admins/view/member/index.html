@@ -9,14 +9,35 @@
             </div>
             <div class="ibox-content">
                 <!--工具条-->
-                <el-form :inline="true" class="demo-form-inline">
+                <el-form  class="demo-form-inline">
                     <el-form-item>
-                        <div class="col-sm-3" style="padding-left: 0px;">
-                            <div class="input-group">
-                                <input type="text" class="form-control" v-model="key" placeholder="请输入管理员名称" />
-                                <span class="input-group-btn">
-                                    <a type="button" class="btn btn-primary" @click="search"><i class="fa fa-search"></i> 搜索</a>
-                                </span>
+                        <div class="row">
+                            <div class="col-md-2">
+                                <input type="text" class="form-control" v-model="key" placeholder="用户手机号或姓名" />
+                            </div>
+                            <div class="col-md-1">
+                                <select name="type" id="type" v-model="type"  class="form-control">
+                                    <option value="">会员类型</option>
+                                    <option value="1">注册会员</option>
+                                    <option value="3">VIP会员</option>
+                                    <option value="4">合伙人</option>
+                                </select>
+                            </div>
+                            <div class="col-md-1">
+                                <select name="member_state" id="state" v-model="member_state"  class="form-control">
+                                    <option value="">会员状态</option>
+                                    <option value="1">启用</option>
+                                    <option value="2">禁止</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <input type="date"  class="form-control layer-date"  v-model="stare_time" placeholder="开始时间" />
+                            </div>
+                            <div class="col-md-2">
+                                <input type="date"   class="form-control layer-date"  v-model="end_time" placeholder="结束时间" />
+                            </div>
+                            <div class="col-md-1">
+                                <a type="button" class="btn btn-primary" @click="search"><i class="fa fa-search"></i> 搜索</a>
                             </div>
                         </div>
                     </el-form-item>
@@ -52,7 +73,7 @@
                             <el-table-column prop="pid" label="推荐人" show-overflow-tooltip align="center"></el-table-column>
                             <el-table-column align="center" width="120" label="操作">
                                 <template scope="scope">
-                                    <el-button size="small" type="text" @click="edit(scope.row.id)" > <el-button size="small" type="text" @click="edit(scope.row.id)"><button type="button" class="btn btn-success">编辑</button></el-button></el-button>
+                                    <el-button size="small" type="text" @click="edit(scope.row.id)" > <el-button size="small" type="text" @click="edit(scope.row.id)"><button type="button" class="btn btn-success">查看</button></el-button></el-button>
                                 </template>
                             </el-table-column>
                         </el-table>
@@ -90,6 +111,10 @@
             multipleSelection: [],
             //搜索条件
             key: '',
+            type: '',
+            member_state: '',
+            stare_time: '',
+            end_time: '',
             //默认每页数据量
             pageSize: 10,
             //当前页码
@@ -109,9 +134,9 @@
         },
         methods: {
             //从服务器读取数据
-            loadData(key, currentPage, pageSize){
+            loadData(key, currentPage, pageSize,type,member_state,stare_time,end_time){
                 vm.listLoading = true;
-                $.post('{:url("member/index")}', {key:key,page:currentPage,rows:pageSize}, function(data){
+                $.post('{:url("member/index")}', {key:key,page:currentPage,rows:pageSize,type:type,state:member_state,stare_time:stare_time,end_time:end_time}, function(data){
                     vm.tableData = [];
                     vm.totalCount = data.count;
                     for(var i=0;i<data.list.length;i++){
@@ -133,12 +158,12 @@
             //每页显示数据量变更
             handleSizeChange(val) {
                 this.pageSize = val;
-                this.loadData(this.key, this.currentPage, this.pageSize);
+                this.loadData(this.key, this.currentPage, this.pageSize,this.type,this.member_state,this.stare_time,this.end_time);
             },
             //页码变更
             handleCurrentChange(val) {
                 this.currentPage = val;
-                this.loadData(this.key, this.currentPage, this.pageSize);
+                this.loadData(this.key, this.currentPage, this.pageSize,this.type,this.member_state,this.stare_time,this.end_time);
             },
             //多选响应
             handleSelectionChange(val) {
@@ -146,16 +171,16 @@
             },
             //搜索
             search(){
-                this.loadData(this.key, this.currentPage, this.pageSize);
+                this.loadData(this.key, this.currentPage, this.pageSize,this.type,this.member_state,this.stare_time,this.end_time);
                 vm.listLoading = false;
             },
             //添加
             add() {
-                window.location.href = "/admins/adminlist/user_add.html";
+
             },
             //编辑
             edit(id) {
-                openEdit(id);
+                window.location.href = "/admins/member/member_info.html?id="+id;
             },
             //状态
             state(id){
