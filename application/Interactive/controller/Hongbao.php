@@ -461,6 +461,42 @@ class Hongbao extends ApiBase
         ];
         return json(['code'=>1011,'msg'=>'成功','data'=>$array,'lingqu'=>$ling_qu]);
     }
+
+    public function member_red_list(){
+        $data = input('post.');
+        $validate_res = $this->validate($data,'HomeValidate.whole');
+        if($validate_res !== true){ return json(['code'=>1015,'msg'=>$validate_res]); } //数据认证
+        if(getSign($data) != $data['Sign']){ return json(['code'=>1013,'msg'=>'签名错误']);} //签名认证
+        if(Cache::get($data['uuid'].'_token') != $data['token']) return json(['code'=>1004,'msg'=>'用户未登录']);//登陆验证
+        $MemberModel = new MemberModel();
+        $member_info = $MemberModel->getMemberInfo('id,user_img',['uuid'=>$data['uuid']]);
+        $page = input('post.page')?input('post.page'):1;
+        $list = Db::name('red_order_list')->field("id,content,img_path,FROM_UNIXTIME(add_time, '%Y-%m-%d') as add_time")->where('user_id',$member_info['id'])->page($page,15)->order('add_time DESC')->select();
+        if(count($list) > 0){
+            foreach ($list as $k=>$v){
+                $keys = $v['add_time'];
+                $new_list[$keys]['time'] = $v['add_time'];
+                $img_path = explode(",", $v['img_path']);
+                if(count($img_path) > 0){
+                    $url = web_url_str();
+                    if(!empty($img_path['0'])){
+                        $v['img_path'] = $url.$img_path['0'];
+                    }
+                }
+                $new_list[$keys]['value'][] = $v;
+            }
+            foreach ($new_list as $a => $b){
+                $final_list[]=$b;
+            }
+            $place_money = Db::name('red_order_list')->where('user_id',$member_info['id'])->sum('money');
+            $enter_money = Db::name('red_order_info')->where('member_id',$member_info['id'])->sum('money');
+            return json(['code'=>1011,'msg'=>'成功','data'=>$final_list,'place_money'=>(string)$place_money,'enter_money'=>(string)$enter_money]);
+        }else{
+            return json(['code'=>1012,'msg'=>'暂无数据','data'=>"","place_money"=>'0.00','enter_money'=>'0.00']);
+        }
+    }
+
+
     public function getAround1($lat,$lon,$raidus = 990){
         $PI = PI();
 
