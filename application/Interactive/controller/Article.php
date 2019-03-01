@@ -65,19 +65,19 @@ class Article extends ApiBase
         $map = [];
         switch ($data['type']){
             case 'vip': //升级vip
-                $map = ['state'=>1,'id'=>7];
+                $map = ['state'=>1,'id'=>3];
                 break;
             case 'partner': //升级 合伙人
-                $map = ['state'=>1,'id'=>7];
+                $map = ['state'=>1,'id'=>4];
                 break;
             case 'task': //任务简介
-                $map = ['state'=>1,'id'=>7];
+                $map = ['state'=>1,'id'=>14];
                 break;
             case 'company': //公司协议
-                $map = ['state'=>1,'id'=>7];
+                $map = ['state'=>1,'id'=>15];
                 break;
             case 'rongdian': //关于荣点
-                $map = ['state'=>1,'id'=>7];
+                $map = ['state'=>1,'id'=>16];
                 break;
             default:
                 return json(['code'=>1013,'msg'=>'参数异常']);
