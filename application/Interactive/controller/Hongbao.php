@@ -194,12 +194,20 @@ class Hongbao extends ApiBase
         $page = input('post.page');
         $page = $page?$page:1;
         $map = [];
-        $city_list = Db::query("CALL QueryRedEnvelopes($lat,$lng,$user_id,3,$citycode)");
+        //距离红包
+        $city_list = Db::query("CALL QueryRedEnvelopes($lat,$lng,$user_id,1,$citycode)");
         if(count($city_list) > 0){
             $city_list = $city_list[0];
         }else{
             $city_list = [];
         }
+        //城市红包  距离不足查询城市
+        if(count($city_list) < 10){
+            $num = count($city_list);
+            $city_list_2 = Db::query("");
+        }
+
+        //全国红包  城市的也不足
         return json(['code'=>1011,'msg'=>'成功','data'=>$city_list]);
     }
 

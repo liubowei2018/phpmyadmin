@@ -28,6 +28,12 @@ class Money extends ApiBase
         $user_info = $MemberModel->getMemberInfo('id',['uuid'=>$data['uuid']]);
         $MoneyModel = new MoneyModel();
         $money_list =$MoneyModel->getMemberMoney('',['user_id'=>$user_info['id']]);
+        $bank_list = Db::name('member_bank')->where(['user_id'=>$user_info['id'],'id'=>$data['bank_id']])->find();
+        if($data['type'] == 2){
+            if(!$bank_list){
+                return json(['code'=>1012,'msg'=>'银行卡不存在','data'=>'']);
+            }
+        }
         if($money_list['balance'] < $data['money']){
             return json(['code'=>1012,'msg'=>'账户余额不足','data'=>'']);
         }else{
@@ -56,6 +62,11 @@ class Money extends ApiBase
                     'create_time'=>time(),
                     'state'=>0,
                 ];
+                if($data['type'] == 2){
+                    $reflect_log['bank_name'] = $bank_list['bank_name'];
+                    $reflect_log['bank_card'] = $bank_list['bankcard'];
+                    $reflect_log['bank_user'] = $bank_list['username'];
+                }
                 Db::name('reflect_list')->insert($reflect_log);
                 Db::commit();
                 return json(['code'=>1011,'msg'=>'余额提现申请成功','data'=>'']);
