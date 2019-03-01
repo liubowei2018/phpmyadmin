@@ -488,11 +488,12 @@ class Hongbao extends ApiBase
             foreach ($new_list as $a => $b){
                 $final_list[]=$b;
             }
+            $number = Db::name('red_order_list')->where('user_id',$member_info['id'])->count();
             $place_money = Db::name('red_order_list')->where('user_id',$member_info['id'])->sum('money');
             $enter_money = Db::name('red_order_info')->where('member_id',$member_info['id'])->sum('money');
-            return json(['code'=>1011,'msg'=>'成功','data'=>$final_list,'place_money'=>(string)$place_money,'enter_money'=>(string)$enter_money]);
+            return json(['code'=>1011,'msg'=>'成功','data'=>$final_list,'place_money'=>(string)$place_money,'enter_money'=>(string)$enter_money,'number'=>(string)$number]);
         }else{
-            return json(['code'=>1012,'msg'=>'暂无数据','data'=>"","place_money"=>'0.00','enter_money'=>'0.00']);
+            return json(['code'=>1012,'msg'=>'暂无数据','data'=>"","place_money"=>'0.00','enter_money'=>'0.00','number'=>'0.00']);
         }
     }
 
