@@ -169,3 +169,36 @@ function getAddMoneyLog($user_id,$money,$original,$now,$type,$state,$info,$sourc
     ];
     \think\Db::name('money_log')->insert($data);
 }
+
+/**
+ * 管理修改订单记录
+ * @param $user_id
+ * @param $info
+ * @param $order_number
+ * @param $admin_id
+ * @param $admin_name
+ */
+function getAddAdminOrderLog($user_id,$info,$order_number,$admin_id,$admin_name){
+    $data = [
+        'user_id'=>$user_id,
+        'info'=>$info,
+        'order_number'=>$order_number,
+        'admin_id'=>$admin_id,
+        'admin_name'=>$admin_name,
+        'add_time'=>time(),
+    ];
+    \think\Db::name('admin_order')->insert($data);
+}
+function getAddAdminMoneyLog($user_id,$money,$type,$state,$info,$admin_id,$admin_name){
+    $data = [
+        'user_id'=>$user_id,
+        'money'=>$money,
+        'type'=>$type,
+        'state'=>$state,
+        'info'=>$info,
+        'admin_id'=>$admin_id,
+        'admin_name'=>$admin_name,
+        'add_time'=>time(),
+    ];
+    \think\Db::name('admin_money')->insert($data);
+}

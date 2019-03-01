@@ -35,8 +35,14 @@ class Member extends ApiBase
             $money_info = $MoneyModel->getMemberMoney('*', ['user_id' => $member_info['id']]);
             $bonus_close = $money_info['one_bonus_log'] + $money_info['one_bonus_log'];
             $p_mobile = Db::name('member')->where('id',$member_info['pid'])->value('mobile');
+            if($member_info['type'] == 3){
+                $group = '0';
+            }else{
+                $group = '1';
+            }
             $array = [
                 'mobile' => $member_info['mobile'],
+                'group' => $group,
                 'username' => $member_info['username'],
                 'sex' => $member_info['sex'],
                 'user_img' => $member_info['user_img'],
