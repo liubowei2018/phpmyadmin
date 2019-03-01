@@ -195,7 +195,12 @@ class Hongbao extends ApiBase
         $page = $page?$page:1;
         $map = [];
         $city_list = Db::query("CALL QueryRedEnvelopes($lat,$lng,$user_id,3,$citycode)");
-        return json(['code'=>1011,'msg'=>'成功','data'=>$city_list[0]]);
+        if(count($city_list) > 0){
+            $city_list = $city_list[0];
+        }else{
+            $city_list = [];
+        }
+        return json(['code'=>1011,'msg'=>'成功','data'=>$city_list]);
     }
 
     /**
