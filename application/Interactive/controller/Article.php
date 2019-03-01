@@ -76,6 +76,9 @@ class Article extends ApiBase
             case 'company': //公司协议
                 $map = ['state'=>1,'id'=>7];
                 break;
+            case 'rongdian': //关于荣点
+                $map = ['state'=>1,'id'=>7];
+                break;
             default:
                 return json(['code'=>1013,'msg'=>'参数异常']);
         }
