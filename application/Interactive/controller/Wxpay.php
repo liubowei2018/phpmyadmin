@@ -99,10 +99,9 @@ class Wxpay extends Controller
         }
         //签名步骤一：按字典序排序参数
         ksort($Parameters);
-        $String = $this->formatBizQueryParaMap($Parameters, false);
-        //echo "【string】 =".$String."</br>";
+
         //签名步骤二：在string后加入KEY
-        $String = $String."&key=".$this->config['api_key'];
+        $String = urldecode($Parameters)."&key=".$this->config['api_key'];
 //        echo "<textarea style='width: 50%; height: 150px;'>$String</textarea> <br />";
         //签名步骤三：MD5加密
         $result_ = strtoupper(md5($String));
