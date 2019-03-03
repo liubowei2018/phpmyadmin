@@ -11,7 +11,7 @@ namespace app\Interactive\controller;
 
 use think\Controller;
 
-class WxPay extends Controller
+class Wxpay extends Controller
 {
     /*
    配置参数
@@ -23,7 +23,7 @@ class WxPay extends Controller
     );
 
     /**
-     * 测试支付
+     * 测试支付 212121
      */
     public function order_pay(){
         $body = 'APP支付测试';
