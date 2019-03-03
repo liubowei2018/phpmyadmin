@@ -29,7 +29,7 @@ class WxPay extends Controller
         $body = 'APP支付测试';
         $out_trade_no = "C".rand(1000,9999).time();
         $total_fee = 0.01 *100;
-        $notify_url = "htttp://app.hnrongzhong.com/Interactive/WxPay/pay_notify";
+        $notify_url = "http://app.hnrongzhong.com/Interactive/WxPay/pay_notify";
         $res = $this->getPrePayOrder($body,$out_trade_no,$total_fee,$notify_url);
         dump($res);
     }
