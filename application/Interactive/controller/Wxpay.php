@@ -32,7 +32,7 @@ class Wxpay extends Controller
         $notify_url = "http://app.hnrongzhong.com/Interactive/Wxpay/pay_notify";
         $res = $this->getPrePayOrder($body,$out_trade_no,$total_fee,$notify_url);
         $result = $this->getOrder($res['prepay_id']);
-        dump($result);
+        return json($result);
     }
 
     /**
