@@ -91,21 +91,29 @@ class Wxpay extends Controller
     /*
         生成签名
     */
-    function getSign($Obj)
+    function getSign($arr)
     {
-        foreach ($Obj as $k => $v)
-        {
-            $Parameters[strtolower($k)] = $v;
-        }
-        //签名步骤一：按字典序排序参数
-        ksort($Parameters);
 
-        //签名步骤二：在string后加入KEY
-        $String = urldecode($Parameters)."&key=".$this->config['api_key'];
-//        echo "<textarea style='width: 50%; height: 150px;'>$String</textarea> <br />";
-        //签名步骤三：MD5加密
-        $result_ = strtoupper(md5($String));
-        return $result_;
+        //去除数组中的空值
+        foreach ($arr as $k=>$v){
+            if($v == ''){
+                unset($arr[$k]);
+            }
+        }
+        //如果数组中有签名删除签名
+        if(isset($arr['Sign']))
+        {
+            unset($arr['Sign']);
+        }
+        //按照键名字典排序
+        ksort($arr);
+        //生成URL格式的字符串
+        //http_build_query()中文自动转码需要处理下
+        $str1 = http_build_query($arr);
+
+        $str1 = urldecode($str1).'&key='.$this->config['api_key'];
+        return  strtoupper(md5($str1));
+
     }
 
     //获取指定长度的随机字符串
