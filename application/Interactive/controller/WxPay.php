@@ -17,9 +17,9 @@ class WxPay extends Controller
    配置参数
    */
     private $config = array(
-        'appid' => "",//"wxcf1dded808489e2c",    /*微信开放平台上的应用id*/
-        'mch_id' => "",//"1440493402",   /*微信申请成功之后邮件中的商户id*/
-        'api_key' => ""    /*在微信商户平台上自己设定的api密钥 32位*/
+        'appid' => "wx079a58a46b9a86d0",//"wxcf1dded808489e2c",    /*微信开放平台上的应用id*/
+        'mch_id' => "1527012021",//"1440493402",   /*微信申请成功之后邮件中的商户id*/
+        'api_key' => "81088e1bf6cea3512eebdb249cff730c"    /*在微信商户平台上自己设定的api密钥 32位*/
     );
 
 
