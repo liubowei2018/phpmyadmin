@@ -70,7 +70,7 @@ class Wxpay extends Controller
 
         //将微信返回的结果xml转成数组
 //        return $this->xmlstr_to_array($response);
-        return xmlToArray($response);
+        return $this->xmlToArray($response);
     }
 
     //执行第二次签名，才能返回给客户端使用
@@ -218,11 +218,13 @@ class Wxpay extends Controller
     /**
     xml转成数组
      */
-//    function xmlstr_to_array($xmlstr) {
-//        $doc = new DOMDocument();
-//        $doc->loadXML($xmlstr);
-//        return $this->domnode_to_array($doc->documentElement);
-//    }
+    function xmlToArray($xml)
+    {
+        //禁止引用外部xml实体
+        libxml_disable_entity_loader(true);
+        $values = json_decode(json_encode(simplexml_load_string($xml, 'SimpleXMLElement', LIBXML_NOCDATA)), true);
+        return $values;
+    }
     function domnode_to_array($node) {
         $output = array();
         switch ($node->nodeType) {
