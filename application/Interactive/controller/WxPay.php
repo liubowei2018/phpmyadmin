@@ -22,9 +22,33 @@ class WxPay extends Controller
         'api_key' => "81088e1bf6cea3512eebdb249cff730c"    /*在微信商户平台上自己设定的api密钥 32位*/
     );
 
+    /**
+     * 测试支付
+     */
+    public function order_pay(){
+        $body = 'APP支付测试';
+        $out_trade_no = "C".rand(1000,9999).time();
+        $total_fee = 0.01 *100;
+        $notify_url = "htttp://app.hnrongzhong.com/Interactive/WxPay/pay_notify";
+        $res = $this->getPrePayOrder($body,$out_trade_no,$total_fee,$notify_url);
+        dump($res);
+    }
 
-    //获取预支付订单
-    public function getPrePayOrder($body, $out_trade_no, $total_fee, $notify_url){
+    /**
+     * 支付回调地址
+     */
+    public function pay_notify(){
+
+    }
+    /**
+     * 获取预支付订单
+     * @param $body 标题信息
+     * @param $out_trade_no  订单号
+     * @param $total_fee     订单金额
+     * @param $notify_url    回调地址
+     * @return mixed
+     */
+    private function getPrePayOrder($body, $out_trade_no, $total_fee, $notify_url){
         $url = "https://api.mch.weixin.qq.com/pay/unifiedorder";
 
         $onoce_str = $this->getRandChar(32);
