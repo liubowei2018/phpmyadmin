@@ -31,7 +31,8 @@ class Wxpay extends Controller
         $total_fee = 0.01 *100;
         $notify_url = "http://app.hnrongzhong.com/Interactive/Wxpay/pay_notify";
         $res = $this->getPrePayOrder($body,$out_trade_no,$total_fee,$notify_url);
-        dump($res);
+        $result = $this->getOrder($res);
+        dump($result);
     }
 
     /**
