@@ -249,7 +249,7 @@ class Money extends ApiBase
                 case 1://微信支付
                     $Wxpay = new Wxpay();
                     $url = web_url_str().'/Interactive/money/pay_notify';
-                    $wx_pay_one = $Wxpay->getPrePayOrder('购买会员',$order_number['data'],$order_number['money']*100,$url);
+                    $wx_pay_one = $Wxpay->getPrePayOrder('购买会员',$order_number['data'],0.01*100,$url);
                     $res = $Wxpay->getOrder($wx_pay_one['prepay_id']);
                     return json(['code'=>1011,'msg'=>'成功','data'=>$res]);
                     break;

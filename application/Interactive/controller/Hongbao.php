@@ -258,7 +258,6 @@ class Hongbao extends ApiBase
                     $array['add_time'] = time();
                     Db::name('red_order_info')->insert($array);
                 }
-
             }
         }
     }
