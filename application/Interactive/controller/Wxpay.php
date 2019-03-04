@@ -12,9 +12,9 @@ namespace app\Interactive\controller;
 
 class Wxpay extends ApiBase
 {
-    /*
-   配置参数
-   */
+    /**
+     * @var array 配置参数
+     */
     private $config = array(
         'appid' => "wx079a58a46b9a86d0",//"wxcf1dded808489e2c",    /*微信开放平台上的应用id*/
         'mch_id' => "1527012021",//"1440493402",   /*微信申请成功之后邮件中的商户id*/
@@ -81,9 +81,11 @@ class Wxpay extends ApiBase
         return $data;
     }
 
-    /*
-        生成签名
-    */
+    /***
+     *  生成签名
+     * @param $arr
+     * @return string
+     */
     function getSign($arr)
     {
 
@@ -178,9 +180,10 @@ class Wxpay extends ApiBase
         }
     }
 
-    /*
-        获取当前服务器的IP
-    */
+    /**
+     * 获取当前服务器的IP
+     * @return array|false|string
+     */
     function get_client_ip()
     {
         if ($_SERVER['REMOTE_ADDR']) {
@@ -217,7 +220,9 @@ class Wxpay extends ApiBase
     }
 
     /**
-    xml转成数组
+     *  xml转成数组
+     * @param $xml
+     * @return mixed
      */
     function xmlToArray($xml)
     {
