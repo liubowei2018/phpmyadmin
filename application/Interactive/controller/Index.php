@@ -180,4 +180,18 @@ class Index extends ApiBase
             return json(['code'=>1012,'msg'=>'暂无数据','data'=>[],'page_count'=>'0']);
         }
     }
+
+    public function edition(){
+        //app版本信息
+        $android_edition = Db::name('edition')->field('number,edition,info,url')->where('type','1')->order('id DESC')->find();
+        $android_edition['info'] = explode(' ',$android_edition['info']);
+        $android_edition['url'] = web_url_str().'/uploads/app/'.$android_edition['url'];
+        $ios_edition = Db::name('edition')->where('type','2')->order('id DESC')->find();
+        $result['code']=1011;
+        $result['msg']="获取信息成功";
+        $result['android']= $android_edition;
+        $result['ios']=['edition'=>$ios_edition['edition']];
+        return json($result);
+    }
+
 }
