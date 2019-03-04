@@ -269,6 +269,13 @@ class Money extends ApiBase
      * 支付回调地址
      */
     public function pay_notify(){
+        //获取返回的xml
+        $testxml = file_get_contents("php://input");
+        //将xml转化为json格式
+        $jsonxml = json_encode(simplexml_load_string($testxml, 'SimpleXMLElement', LIBXML_NOCDATA));
+        //转成数组
+        $result = json_decode($jsonxml, true);
+        $res = Db::name('admin_order')->insert(['info'=>json_encode($result)]);
 
     }
 
