@@ -1,51 +1,63 @@
 {include file="public/header" /}
-
+<link rel="stylesheet" href="/common/layui/css/layui.css">
 <body class="gray-bg">
 <div class="wrapper wrapper-content animated fadeInRight">
     <div class="ibox float-e-margins" id="app" v-cloak>
         <template>
             <div class="ibox-title">
-                <h5>角色列表</h5>
+                <h5>资金流动记录</h5>
             </div>
             <div class="ibox-content">
                 <!--工具条-->
-                <el-form :inline="true" class="demo-form-inline">
+                <!--工具条-->
+                <el-form  class="demo-form-inline">
                     <el-form-item>
-                        <div class="col-sm-3" style="padding-left: 0px;">
-                            <div class="input-group">
-                                <input type="text" class="form-control" v-model="key" placeholder="请输入管理员名称" />
-                                <span class="input-group-btn">
-                                    <a type="button" class="btn btn-primary" @click="search"><i class="fa fa-search"></i> 搜索</a>
-                                </span>
+                        <div class="row">
+                            <div class="col-md-2">
+                                <input type="text" class="form-control" v-model="key" placeholder="用户手机号或姓名" />
+                            </div>
+                            <div class="col-md-1">
+                                <select name="state" id="state" v-model="state"  class="form-control">
+                                    <option value="">是否查阅</option>
+                                    <option value="0">未查阅</option>
+                                    <option value="1">已查阅</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <input type="date"  class="form-control layer-date"  v-model="stare_time" placeholder="开始时间" />
+                            </div>
+                            <div class="col-md-2">
+                                <input type="date"   class="form-control layer-date"  v-model="end_time" placeholder="结束时间" />
+                            </div>
+                            <div class="col-md-1">
+                                <a type="button" class="btn btn-primary" @click="search"><i class="fa fa-search"></i> 搜索</a>
                             </div>
                         </div>
-                        <a @click="add" type="button" class="btn btn-primary" >
-                            <i class="fa fa-plus"></i> 添加
-                        </a>
-                        <a type="button" class="btn btn-danger" @click="del">
-                            <i class="fa fa-trash-o"></i> 删除
-                        </a>
                     </el-form-item>
                 </el-form>
 
                 <div class="example-wrap">
                     <div class="example" >
                         <el-table :data="tableData" border highlight-current-row v-loading="listLoading" element-loading-text="拼命加载中..." @selection-change="handleSelectionChange" style="width: 100%">
-                            <el-table-column type="selection" width="60" align="center"></el-table-column>
-                            <!--<el-table-column prop="id" label="ID" width="80" align="center"></el-table-column>-->
-                            <el-table-column prop="title" label="菜单名称" width="180" show-overflow-tooltip align="left"></el-table-column>
-                            <el-table-column prop="name" label="菜单地址" show-overflow-tooltip align="center"></el-table-column>
-                            <el-table-column prop="status" label="菜单状态" align="center">
+                            <!--<el-table-column type="selection" width="60" align="center"></el-table-column>-->
+                            <el-table-column prop="id" label="ID" width="80" align="center"></el-table-column>
+                            <el-table-column prop="username" label="用户昵称" width="180" show-overflow-tooltip align="left"></el-table-column>
+                            <el-table-column prop="phone" label="联系电话" width="180" show-overflow-tooltip align="left"></el-table-column>
+                            <el-table-column prop="admin_name" label="管理名称" width="180" show-overflow-tooltip align="left"></el-table-column>
+                            <el-table-column prop="state" label="是否查阅" align="center">
                                 <template scope="scope">
-                                    <span v-if="scope.row.status==0"><button class="btn btn-danger" type="button" @click="state(scope.row.id)">禁用</button></span>
-                                    <span v-if="scope.row.status==1"><button class="btn btn-primary" type="button" @click="state(scope.row.id)">启用</button></span>
+                                    <span v-if="scope.row.state===0"><button class="btn btn-danger" type="button">未查阅</button></span>
+                                    <span v-if="scope.row.state==1"><button class="btn btn-primary" type="button" >已查阅</button></span>
                                 </template>
                             </el-table-column>
-                            <el-table-column prop="sort" label="菜单排序" show-overflow-tooltip align="center"></el-table-column>
-                            <el-table-column prop="create_time" label="添加时间" show-overflow-tooltip align="center"></el-table-column>
-                            <el-table-column align="center" width="260"  label="操作">
+                            <el-table-column prop="add_time" label="操作时间" show-overflow-tooltip align="center"></el-table-column>
+                            <el-table-column prop="state" label="操作"   align="center">
                                 <template scope="scope">
-                                    <el-button size="small" type="text" @click="edit(scope.row.id)"><button type="button" class="btn btn-success">编辑</button></el-button>
+                                    <span v-if="scope.row.state===0">
+                                        <button class="btn btn-primary" type="button" @click="add(scope.row.content)">查看详情</button>
+                                        <button class="btn btn-primary" type="button"  @click="edit(scope.row.id)">确认完成</button>
+                                    </span>
+                                    <span v-if="scope.row.state==1"><button class="btn btn-primary" type="button" @click="add(scope.row.content)">查看详情</button></span>
                                 </template>
                             </el-table-column>
                         </el-table>
@@ -70,21 +82,23 @@
 
 
 {include file="public/footer" /}
-
 <script type="text/javascript">
 
     var vm = new Vue({
         el: '#app',
         data: {
-            imgPath: '/uploads/face/',
+            imgPath: '',
             //表格当前页数据
             tableData: [],
             //多选数组
             multipleSelection: [],
             //搜索条件
             key: '',
+            state: '',
+            stare_time: '',
+            end_time: '',
             //默认每页数据量
-            pageSize: 100,
+            pageSize: 10,
             //当前页码
             currentPage: 1,
             //默认数据总数
@@ -102,9 +116,9 @@
         },
         methods: {
             //从服务器读取数据
-            loadData(key, currentPage, pageSize){
+            loadData(key, currentPage, pageSize,state,stare_time,end_time){
                 vm.listLoading = true;
-                $.post('{:url("adminlist/menu_list")}', {key:key,page:currentPage,rows:pageSize}, function(data){
+                $.post('{:url("adminlist/proposal_list")}', {key:key,page:currentPage,rows:pageSize,state:state,stare_time:stare_time,end_time:end_time}, function(data){
                     vm.tableData = [];
                     vm.totalCount = data.count;
                     for(var i=0;i<data.list.length;i++){
@@ -126,12 +140,12 @@
             //每页显示数据量变更
             handleSizeChange(val) {
                 this.pageSize = val;
-                this.loadData(this.key, this.currentPage, this.pageSize);
+                this.loadData(this.key, this.currentPage, this.pageSize,this.state,this.stare_time,this.end_time);
             },
             //页码变更
             handleCurrentChange(val) {
                 this.currentPage = val;
-                this.loadData(this.key, this.currentPage, this.pageSize);
+                this.loadData(this.key, this.currentPage, this.pageSize,this.state,this.stare_time,this.end_time);
             },
             //多选响应
             handleSelectionChange(val) {
@@ -139,20 +153,41 @@
             },
             //搜索
             search(){
-                this.loadData(this.key, this.currentPage, this.pageSize);
+                this.loadData(this.key, this.currentPage, this.pageSize,this.state,this.stare_time,this.end_time);
                 vm.listLoading = false;
             },
             //添加
-            add() {
-                window.location.href = "/admins/adminlist/add_menu.html";
+            add(info) {
+                //页面层
+                layer.open({
+                    type: 1,
+                    skin: 'layui-layer-rim', //加上边框
+                    area: ['420px', '240px'], //宽高
+                    content: info
+                });
             },
             //编辑
             edit(id) {
-                window.location.href = "/admins/adminlist/edit_menu.html?id="+id;
+                //询问框
+                layer.confirm('是否确认完成审阅？', {
+                    btn: ['确认','取消'] //按钮
+                }, function(){
+                    $.post("{:url('admins/adminlist/proposal_state')}",{id:id},function (re) {
+                        if(re.code == 1011){
+                            layer.msg(re.msg,{icon:1},function (re) {
+                                window.location.reload();
+                            });
+                        }else{
+                            layer.msg(re.msg,{icon:2});
+                        }
+                    });
+                }, function(){
+                    layer.msg('已取消');
+                });
             },
             //状态
             state(id){
-                $.post("{:url('admins/adminlist/state_menu')}",{id:id},function (re) {
+                $.post("{:url('admins/adminlist/proposal_list')}",{id:id},function (re) {
                     if(re.code == 1011){
                         layer.msg(re.msg,{icon:1});
                     }else{
@@ -172,13 +207,13 @@
                     array.push(row.id);
                 })
 
-                this.$confirm('此操作将永久删除该菜单, 是否继续?', '提示', {
+                this.$confirm('此操作将永久删除该分类, 是否继续?', '提示', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
                     type: 'warning'
                 }).then(() => {
                     $.ajax({
-                        url: '{:url("adminlist/del_menu")}',
+                        url: '{:url("article/del_article")}',
                         data:"id="+array,
                         type: "POST",
                         dataType:'json',
@@ -206,29 +241,11 @@
 
 
     function openAdd(){
-        layer.open({
-            type: 2,
-            title: '添加',
-            shadeClose: false,
-            scrollbar: false,
-            maxmin: true,
-            shade: 0.2,
-            area: ['45%', '80%'],
-            content: '{:url("add")}',
-        });
+        window.location.href='{:url("add_article")}';
     }
 
     function openEdit(id){
-        layer.open({
-            type: 2,
-            title: '编辑',
-            shadeClose: false,
-            scrollbar: false,
-            maxmin: true,
-            shade: 0.2,
-            area: ['45%', '80%'],
-            content: './edit/id/'+id+'.html',
-        });
+        window.location.href='{:url("edit_article")}?id='+id;
     }
 
 </script>

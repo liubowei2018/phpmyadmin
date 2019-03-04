@@ -155,8 +155,8 @@ class Adminlist extends Base
             $data = input('post.');
             $map = [];
             //$map['pid'] = 0;
-            $page = input('get.page') ? input('get.page'):1;
-            $rows = input('get.rows');// 获取总条数
+            $page = input('post.page') ? input('post.page'):1;
+            $rows = input('post.rows');// 获取总条数
             $count = Db::name('auth_rule')->where($map)->count();
             $list = $MenuModel->getAllMenu($map,$page,$rows);
             return json(['count'=>$count,'list'=>$list,'page'=>$page]);
@@ -211,5 +211,59 @@ class Adminlist extends Base
         $MenuModel = new MenuModel();
         $res = $MenuModel->delMenu($data);
         return json($res);
+    }
+    /*-----------------------------------用户反馈-----------------------------------*/
+    /**
+     * 反馈列表
+     */
+    public function proposal_list(){
+        if(request()->isPost()){
+            $data = input('post.');
+            $key = input('post.key');
+            $type = input('post.type');
+            $state = input('post.state');
+            $stare_time = input('post.stare_time');
+            $end_time = input('post.end_time');
+            $map = [];
+            if(!empty($key)){
+                $map['m.username|m.mobile'] = ['like','%'.$key.'%'];
+            }
+            if(!empty($type)){
+                $map['l.type'] = $type;
+            }
+            if(!empty($state)){
+                $map['l.state'] = $state;
+            }
+            if($state === '0'){
+                $map['l.state'] = $state;
+            }
+            if(!empty($stare_time)){
+                $stare_time = $stare_time.' 00:00:00';
+                $map['l.create_time'] = ['>= time',$stare_time];
+            }
+            if(!empty($end_time)){
+                $end_time = $end_time.' 23:59:59';
+                $map['l.create_time'] = ['<= time',$end_time];
+            }
+            if(!empty($stare_time) && !empty($end_time)){
+                $map['l.create_time'] = ['between time',[$stare_time,$end_time]];
+            }
+            $page = input('post.page');
+            $rows = input('post.rows');
+            $page = $page?$page:1;
+            $count = Db::name('proposal')->alias('l')->where($map)->join('member m','m.id = l.user_id')->count();
+            $list = Db::name('proposal')->alias('l')->field("l.*,m.username,m.mobile,FROM_UNIXTIME(l.add_time, '%Y-%m-%d %H:%i:%s') as add_time")->where($map)->join('member m','m.id = l.user_id')->page($page,$rows)->order('l.add_time DESC')->select();
+            return json(['count'=>$count,'list'=>$list,'page'=>$page]);
+        }
+        return $this->fetch();
+    }
+    public function proposal_state(){
+        $id = input('post.id');
+        try{
+            Db::name('proposal')->where('id',$id)->update(['state'=>1,'admin_id'=>$this->admin_uid,'admin_name'=>$this->admin_name]);
+            return json(['code'=>1011,'msg'=>'确认成功']);
+        }catch (\Exception $exception){
+            return json(['code'=>1012,'msg'=>'确认失败']);
+        }
     }
 }
