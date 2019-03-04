@@ -19,8 +19,8 @@
                                 <select name="type" id="type" v-model="type"  class="form-control">
                                     <option value="">会员类型</option>
                                     <option value="1">注册会员</option>
-                                    <option value="3">VIP会员</option>
-                                    <option value="4">合伙人</option>
+                                    <option value="2">VIP会员</option>
+                                    <option value="3">合伙人</option>
                                 </select>
                             </div>
                             <div class="col-md-1">
@@ -66,7 +66,7 @@
                                 <template scope="scope">
                                     <span v-if="scope.row.type==1" style="color:#FF4949">注册会员</span>
                                     <span v-if="scope.row.type==2" style="color:#07a379">vip会员</span>
-                                    <span v-if="scope.row.type==3" style="color:#07a379">代理</span>
+                                    <span v-if="scope.row.type==3" style="color:#07a379">合伙人</span>
                                 </template>
                             </el-table-column>
                             <el-table-column prop="create_time" label="注册时间" show-overflow-tooltip align="center"></el-table-column>

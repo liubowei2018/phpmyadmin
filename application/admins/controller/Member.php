@@ -19,10 +19,30 @@ class Member extends Base
         if(request()->isPost()){
          $map = [];
          $key = input('post.key');
+         $type = input('post.type');
+         $state = input('post.state');
+         $stare_time = input('post.stare_time');
+         $end_time = input('post.end_time');
          if(!empty($key)){
-            $map['account|mobile|username'] = $key;
+             $map['username|mobile'] = ['like','%'.$key.'%'];
          }
-         dump($input());
+         if(!empty($type)){
+             $map['type'] = $type;
+         }
+         if(!empty($state)){
+             $map['state'] = $state;
+         }
+         if(!empty($stare_time)){
+             $stare_time = $stare_time.' 00:00:00';
+             $map['create_time'] = ['>= time',$stare_time];
+         }
+         if(!empty($end_time)){
+             $end_time = $end_time.' 23:59:59';
+             $map['create_time'] = ['<= time',$end_time];
+         }
+         if(!empty($stare_time) && !empty($end_time)){
+             $map['create_time'] = ['between time',[$stare_time,$end_time]];
+         }
          $page = input('get.page') ? input('get.page'):1;
          $rows = input('get.rows');// 获取总条数
          $count = Db::name('member')->where($map)->count();
