@@ -133,6 +133,95 @@ class Hongbao extends ApiBase
     }
 
     /**
+     * 添加红包
+     */
+    public function add_wx_red(){
+        $data = input('post.');
+        $validate_res = $this->validate($data,'HongbaoValidate.hongbao');
+        if($validate_res !== true){ return json(['code'=>1015,'msg'=>$validate_res]); } //数据认证
+        if(getSign($data) != $data['Sign']){ return json(['code'=>1013,'msg'=>'签名错误']);} //签名认证
+        if(Cache::get($data['uuid'].'_token') != $data['token']) return json(['code'=>1004,'msg'=>'用户未登录']);//登陆验证
+        $member_info = Db::name('member')->where('uuid',$data['uuid'])->find();
+        $money_info = Db::name('money')->where('user_id',$member_info['id'])->find();
+        $config = app_config_list();
+        if($data['money'] > $money_info['balance']){
+            return json(['code'=>1012,'msg'=>'账户余额不足，请充值','data'=>'']);
+        }
+        $type = input('post.type');
+        Db::startTrans();
+        try{
+            $order_number = "H".time().rand(10000,99999).$member_info['id'];
+            $money = $data['money'] * $config['app_hongbao']/100;
+            $order_data = [
+                'order_number'=>$order_number,
+                'lng'=>$data['lng'],
+                'lat'=>$data['lat'],
+                'distance'=>$data['distance'],
+                'user_id'=>$member_info['id'],
+                'money'=>$money,
+                'original_money'=>$data['money'],
+                'number'=>$data['number'],
+                'type'=>$data['type'],
+                'add_time'=>time(),
+                'state'=>1,
+                'citycode'=>current_city($data['lng'],$data['lat'],$member_info['id'])
+            ];
+            if($money * 100 < $data['number'] ){
+                Db::rollback();
+                return json(['code'=>1012,'msg'=>'红包领取数量不能大于'.$money*100,'data'=>'']);
+            }
+            switch ($type){
+                case 1://详情红包
+                    $files = request()->file('image');
+                    $array = [];
+                    $array_str = '';
+                    if($files){
+                        foreach($files as $k=>$file){
+                            $info = $file->validate(['size'=>10485760,'ext'=>'jpg,png'])->move(ROOT_PATH . 'public' . DS . 'uploads/user');
+                            if($info){
+                                $str= str_replace("\\",'/','/uploads/user/'.$info->getSaveName());
+                                $array[] = $str;
+                            }else{
+                                Db::rollback();
+                                return json(['code'=>1012,'msg'=>'第'.$k.'上传失败','data'=>$file->getError()]);
+                            }
+                        }
+                        $array_str = implode(',',$array);
+                        $this->add_member_img($member_info['id'],$array);
+                    }
+                    $order_data['content'] = $data['content'];
+                    $order_data['img_path'] = $array_str;
+                    break;
+                case 2://链接红包
+                    $order_data['web_url'] = $data['web_url'];
+                    break;
+                default:
+                    Db::rollback();
+                    return json(['code'=>1012,'msg'=>'请选择红包类型','data'=>'']);
+            }
+
+            //创建红包
+            Db::name('red_order_list')->insertGetId($order_data);
+            $Wxpay = new Wxpay();
+            $url = web_url_str().'/Interactive/hongbao/pay_notify';
+            $wx_pay_one = $Wxpay->getPrePayOrder('购买会员',$order_number['order_number'],0.01*100,$url);
+            $res = $Wxpay->getOrder($wx_pay_one['prepay_id']);
+            Db::commit();
+            return json(['code'=>1011,'msg'=>'红包发送成功','data'=>$res]);
+        }catch (\Exception $exception){
+            Db::rollback();
+            return json(['code'=>1012,'msg'=>'红包发放失败','data'=>""]);
+        }
+    }
+    /**
+     * 支付回调地址
+     */
+    public function pay_notify(){
+
+    }
+
+
+    /**
      * 创建子红包
      */
     private function splitting_red_packets($order_id){
