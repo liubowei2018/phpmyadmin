@@ -48,6 +48,26 @@ class Member extends Base
         $this->assign('money',$money_info);
         return $this->fetch();
     }
+
+    /**
+     * 推荐一二级列表
+     */
+    public function recommend_list(){
+        $type = input('param.type');
+        $user_id = input('param.user_id');
+        $map = [];
+        if($type == 1){
+            $map['pid'] = $user_id;
+        }else{
+            $map['gid'] = $user_id;
+        }
+        $list = Db::name('member')->where($map)->order('id DESC')->paginate(20,false,['query'=>input('get.')]);
+        $page = $list->render();
+        $this->assign('list',$list);
+        $this->assign('page',$page);
+        return $this->fetch();
+    }
+
     /**
      * 修改用户资金
      */
