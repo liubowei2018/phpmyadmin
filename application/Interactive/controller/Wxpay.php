@@ -22,7 +22,7 @@ class Wxpay extends ApiBase
     );
 
     /**
-     * 测试支付 212121
+     * 测试支付
      */
     public function order_pay(){
         $body = 'APP支付测试';
