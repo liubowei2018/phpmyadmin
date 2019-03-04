@@ -96,9 +96,10 @@ class Wxpay extends ApiBase
             }
         }
         //如果数组中有签名删除签名
-        if(isset($arr['Sign']))
+        if(isset($arr['sign']) || isset($arr['Sign']))
         {
             unset($arr['Sign']);
+            unset($arr['sign']);
         }
         //按照键名字典排序
         ksort($arr);

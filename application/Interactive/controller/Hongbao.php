@@ -62,6 +62,7 @@ class Hongbao extends ApiBase
                 'type'=>$data['type'],
                 'add_time'=>time(),
                 'state'=>1,
+                'money_type'=>1,
                 'citycode'=>current_city($data['lng'],$data['lat'],$member_info['id'])
             ];
             if($money * 100 < $data['number'] ){
@@ -163,7 +164,8 @@ class Hongbao extends ApiBase
                 'number'=>$data['number'],
                 'type'=>$data['type'],
                 'add_time'=>time(),
-                'state'=>1,
+                'state'=>2,
+                'money_type'=>2,
                 'citycode'=>current_city($data['lng'],$data['lat'],$member_info['id'])
             ];
             if($money * 100 < $data['number'] ){
@@ -217,7 +219,38 @@ class Hongbao extends ApiBase
      * 支付回调地址
      */
     public function pay_notify(){
-
+        $testxml  = file_get_contents("php://input");
+        $jsonxml = json_encode(simplexml_load_string($testxml, 'SimpleXMLElement', LIBXML_NOCDATA));
+        $result = json_decode($jsonxml, true);//转成数组，
+        $Wxpay = new Wxpay();
+        $sign = $Wxpay->getSign($result);
+        if($result['sign'] == $sign){
+            //如果成功返回了
+            $out_trade_no = $result['out_trade_no'];
+            if($result['return_code'] == 'SUCCESS' || $result['return_msg'] == 'OK'){
+                $order_info = Db::name('red_order_list')->where('order_number',$out_trade_no)->find();
+                if($order_info['state'] == '2'){
+                    Db::startTrans();
+                    try{
+                        //修改订单状态
+                        Db::name('red_order_list')->where('id',$order_info['id'])->update(['state'=>1,'wx_order_number'=>$result['transaction_id']]);
+                        //分解子订单
+                        $this->splitting_red_packets($order_info['id']);
+                        Db::commit();
+                        echo '<xml><return_code><![CDATA[SUCCESS]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>';
+                    }catch (\Exception $exception){
+                        Db::rollback();
+                        echo 'error';
+                    }
+                }else{
+                    echo '<xml><return_code><![CDATA[SUCCESS]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>';
+                }
+            }else{
+                echo 'error';
+            }
+        }else{
+            echo 'error';
+        }
     }
 
 

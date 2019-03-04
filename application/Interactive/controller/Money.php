@@ -275,7 +275,53 @@ class Money extends ApiBase
         $jsonxml = json_encode(simplexml_load_string($testxml, 'SimpleXMLElement', LIBXML_NOCDATA));
         //转成数组
         $result = json_decode($jsonxml, true);
-        $res = Db::name('admin_order')->insert(['info'=>json_encode($result)]);
+        //验签
+        $Wxpay = new Wxpay();
+        $sign = $Wxpay->getSign($result);
+        if($result['sign'] == $sign){
+            //验证回调
+            if($result['result_code'] == 'SUCCESS' || $result['return_code'] == 'SUCCESS'){
+                //处理业务逻辑
+                Db::startTrans();
+                try{
+                    //查询订单
+                    $order_info = Db::name('upgrade_list')->where('order_number',$result['out_trade_no'])->find();
+                    if($order_info['state'] == 1){
+                        //订单已处理
+                        Db::rollback();
+                        echo '<xml><return_code><![CDATA[SUCCESS]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>';
+                    }else{
+                        //未处理
+                        //修改订单状态
+                       Db::name('upgrade_list')->where('id',$order_info['id'])->update(['state'=>1,'wx_order_number'=>$result['transaction_id']]);
+                       //修改用户等级
+                        //进行二级分润
+                        $this->two_level_award($order_info['user_id'],$order_info['money']);
+                        //修改可以领取的红包个数
+                        $config = privilege_config_list();
+                        switch ($order_info['grade']){
+                            case 2:
+                                Db::name('member')->where('id',$order_info['user_id'])->update(['type'=>2]);
+                                Db::name('money')->where('user_id',$order_info['user_id'])->update(['red_number'=>$config['vip_today_hongbao_number']]);
+                                break;
+                            case 3:
+                                Db::name('member')->where('id',$order_info['user_id'])->update(['type'=>3]);
+                                Db::name('money')->where('user_id',$order_info['user_id'])->update(['red_number'=>$config['partner_today_hongbao_number']]);
+                                break;
+                        }
+                    }
+                    Db::commit();
+                    echo '<xml><return_code><![CDATA[SUCCESS]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>';
+                }catch (\Exception $exception){
+                    Db::rollback();
+                    echo 'error';
+                }
+            }else{
+                echo 'error';
+            }
+        }else{
+            echo 'error';
+        }
 
     }
 
