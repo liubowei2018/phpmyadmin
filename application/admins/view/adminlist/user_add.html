@@ -31,7 +31,7 @@
     <div class="layui-form-item">
         <label class="layui-form-label"></label>
         <div class="layui-input-block">
-            <select name="pid" lay-filter="aihao">
+            <select name="group_id" lay-filter="aihao">
                 <option value="0" >请选择管理员</option>
                 {foreach $typelist as $k=>$v}
                 <option value="{$v.id}">{$v.title}</option>
@@ -80,7 +80,7 @@
         form.verify({
             title: function(value){
                 if(value.length < 5){
-                    return '标题至少得5个字符啊';
+                    return '账号至少为5个字符';
                 }
             }
             ,pass: [
@@ -102,9 +102,23 @@
 
         //监听提交
         form.on('submit(demo1)', function(data){
-            layer.alert(JSON.stringify(data.field), {
-                title: '最终的提交信息'
-            })
+            var param = data.field;
+            layui.jquery.ajax({
+                url:"{:url('admins/adminlist/user_add')}",
+                type:'post',
+                dataType:'json',
+                data:JSON.stringify(param),
+                contentType: "application/json; charset=utf-8",
+                success:function(res){
+                    if(res.code==1011){
+                        layer.alert(res.msg,{icon:1},function () {
+                            window.location.reload();
+                        });
+                    }else{
+                        layer.alert(res.msg,{icon: 5});
+                    }
+                }
+            });
             return false;
         });
 

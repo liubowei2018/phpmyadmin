@@ -9,9 +9,8 @@
 namespace app\Interactive\controller;
 
 
-use think\Controller;
 
-class Wxpay extends Controller
+class Wxpay extends ApiBase
 {
     /*
    配置参数
@@ -36,12 +35,6 @@ class Wxpay extends Controller
     }
 
     /**
-     * 支付回调地址
-     */
-    public function pay_notify(){
-
-    }
-    /**
      * 获取预支付订单
      * @param $body 标题信息
      * @param $out_trade_no  订单号
@@ -49,7 +42,7 @@ class Wxpay extends Controller
      * @param $notify_url    回调地址
      * @return mixed
      */
-    private function getPrePayOrder($body, $out_trade_no, $total_fee, $notify_url){
+    public function getPrePayOrder($body, $out_trade_no, $total_fee, $notify_url){
         $url = "https://api.mch.weixin.qq.com/pay/unifiedorder";
 
         $onoce_str = $this->getRandChar(32);

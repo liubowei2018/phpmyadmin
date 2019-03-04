@@ -247,7 +247,11 @@ class Money extends ApiBase
         if($order_number['code'] == 1011){ //预下单成功
             switch ($state){
                 case 1://微信支付
-
+                    $Wxpay = new Wxpay();
+                    $url = web_url_str().'/Interactive/money/pay_notify';
+                    $wx_pay_one = $Wxpay->getPrePayOrder('购买会员',$order_number['data'],$order_number['money']*100,$url);
+                    $res = $Wxpay->getOrder($wx_pay_one['prepay_id']);
+                    return json(['code'=>1011,'msg'=>'成功','data'=>$res]);
                     break;
                 case 2://余额支付
                     $res = $this->upgrade_pay_balance($order_number['data'],$user_info['id'],$str);
@@ -260,6 +264,14 @@ class Money extends ApiBase
             return json(['code'=>1012,'msg'=>'预下单失败，请稍后再试','data'=>'']);
         }
     }
+
+    /**
+     * 支付回调地址
+     */
+    public function pay_notify(){
+
+    }
+
 
     /**
      * 余额 升级 支付
@@ -347,7 +359,7 @@ class Money extends ApiBase
         ];
         try{
             Db::name('upgrade_list')->insert($array);
-            return ['code'=>1011,'data'=>$array['order_number']];
+            return ['code'=>1011,'data'=>$array['order_number'],'money'=>$money];
         }catch (\Exception $exception){
             return ['code'=>1012,'data'=>''];
         }

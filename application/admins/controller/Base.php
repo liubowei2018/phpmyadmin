@@ -43,7 +43,7 @@ class Base extends Controller
         if($this->admin_uid!=1){
             if(!in_array($url, ['admin/index/index','admin/index/indexpage','admin/upload/upload','admin/index/uploadface'])){
                 if(!$auth->check($url,session('uid'))){
-                   // $this->error('抱歉，您没有操作权限');
+                    $this->error('抱歉，您没有操作权限');
                 }
             }
         }

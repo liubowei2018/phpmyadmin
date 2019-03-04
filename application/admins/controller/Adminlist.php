@@ -42,7 +42,7 @@ class Adminlist extends Base
     public function user_add(){
         if(request()->isPost()){
             $data = input('post.');
-            dump($data);
+            $data[''] = '';
         }
         $UserType = new UserType();
         $typelist = $UserType->getRole();
