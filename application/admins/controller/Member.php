@@ -22,6 +22,7 @@ class Member extends Base
          if(!empty($key)){
             $map['account|mobile|username'] = $key;
          }
+         dump($input());
          $page = input('get.page') ? input('get.page'):1;
          $rows = input('get.rows');// 获取总条数
          $count = Db::name('member')->where($map)->count();
