@@ -19,15 +19,15 @@
     <div class="layui-form-item">
         <label class="layui-form-label">登录密码</label>
         <div class="layui-input-block">
-            <input type="password" name="password" placeholder="请输入登录密码" autocomplete="off" class="layui-input">
+            <input type="password" name="password" lay-verify="password" placeholder="请输入登录密码" autocomplete="off" class="layui-input">
         </div>
     </div>
-    <div class="layui-form-item">
+<!--    <div class="layui-form-item">
         <label class="layui-form-label">校验密码</label>
         <div class="layui-input-block">
             <input type="password" name="check_password" placeholder="请输入校验密码" autocomplete="off" class="layui-input">
         </div>
-    </div>
+    </div>-->
     <div class="layui-form-item">
         <label class="layui-form-label"></label>
         <div class="layui-input-block">
@@ -81,6 +81,11 @@
             title: function(value){
                 if(value.length < 5){
                     return '账号至少为5个字符';
+                }
+            },
+            password: function(value){
+                if(value.length < 5){
+                    return '密码至少为5个字符';
                 }
             }
             ,pass: [

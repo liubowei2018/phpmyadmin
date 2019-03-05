@@ -41,8 +41,8 @@ class Base extends Controller
         $url        = $module."/".$controller."/".$action;
         //跳过检测以及主页权限
         if($this->admin_uid!=1){
-            if(!in_array($url, ['admin/index/index','admin/index/indexpage','admin/upload/upload','admin/index/uploadface'])){
-                if(!$auth->check($url,session('uid'))){
+            if(!in_array($url, ['admins/index/index','admins/index/index_detail','admins/uploads/article','admins/index/logout'])){
+                if(!$auth->check($url,session('admin_uid'))){
                     $this->error('抱歉，您没有操作权限');
                 }
             }

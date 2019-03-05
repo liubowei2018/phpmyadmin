@@ -14,6 +14,7 @@ use app\admins\model\MenuModel;
 use app\admins\model\Node;
 use app\admins\model\UserType;
 use think\Db;
+use think\Config;
 
 class Adminlist extends Base
 {
@@ -42,11 +43,85 @@ class Adminlist extends Base
     public function user_add(){
         if(request()->isPost()){
             $data = input('post.');
-            $data[''] = '';
+            $count = Db::name('admin')->where('name',$data['username'])->count();
+            if($count > 0){
+                return json(['code'=>1012,'msg'=>'登录账号已存在']);
+            }
+            $key = Config::get('auth_key');
+            $admin_data = [
+                'name'=>$data['username'],
+                'password'=>md5(md5($data['password']).$key),
+                'check_password'=>md5(md5($data['password']).$key),
+                'end_time'=>time(),
+                'group_id'=>$data['group_id'],
+                'state'=>$data['status'],
+            ];
+            Db::startTrans();
+            try{
+                $admin_id =  Db::name('admin')->insertGetId($admin_data);
+                Db::name('auth_group_access')->insert(['uid'=>$admin_id,'group_id'=>$data['group_id']]);
+                Db::commit();
+                return json(['code'=>1011,'msg'=>'添加管理员成功']);
+            }catch (\Exception $exception){
+                Db::rollback();
+                return json(['code'=>1012,'msg'=>'添加管理员失败']);
+            }
         }
         $UserType = new UserType();
         $typelist = $UserType->getRole();
         $this->assign('typelist',$typelist);
+        return $this->fetch();
+    }
+
+    /**
+     * 编辑用户
+     */
+    public function user_edit(){
+        if(request()->isPost()){
+            $data = input('post.');
+            $admin_info = Db::name('admin')->where('id',$data['id'])->find();
+            $edit_date = [];
+            Db::startTrans();
+            try{
+                $key = Config::get('auth_key');
+                //账号修改
+                if($data['username'] != $admin_info['name']){
+                    $count = Db::name('admin')->where('name',$data['username'])->count();
+                    if($count > 0){
+                        return json(['code'=>1012,'msg'=>'登录账号已存在']);
+                    }else{
+                        $edit_date['name'] = $data['username'];
+                    }
+                }
+                //权限修改
+                if($data['group_id'] != $admin_info['group_id']){
+                    $edit_date['group_id'] = $data['group_id'];
+                    Db::name('auth_group_access')->where('uid',$data['id'])->update(['group_id'=>$data['group_id']]);
+                }
+                //修改密码
+                if(!empty($data['password'])){
+                    $edit_date['password'] =md5(md5($data['password']).$key);
+                }
+                //修改状态
+                if($data['status'] != $admin_info['state']){
+                    $edit_date['state'] = $data['status'];
+                }
+                if(count($edit_date) > 0){
+                    Db::name('admin')->where('id',$data['id'])->update($edit_date);
+                }
+                Db::commit();
+                return json(['code'=>1011,'msg'=>'修改管理员成功']);
+            }catch (\Exception $exception){
+                Db::rollback();
+                return json(['code'=>1012,'msg'=>'修改管理员失败']);
+            }
+        }
+        $id = input('param.id');
+        $info = Db::name('admin')->where('id',$id)->find();
+        $UserType = new UserType();
+        $typelist = $UserType->getRole();
+        $this->assign('typelist',$typelist);
+        $this->assign('info',$info);
         return $this->fetch();
     }
 
