@@ -400,14 +400,18 @@ class Hongbao extends ApiBase
         } elseif($order_info['state'] == 1){
             return json(['code'=>1012,'msg'=>'红包已领取','data'=>'']);
         }else{
+            $user_money = Db::name('money')->where('user_id',$member_info['id'])->find();
+            if($user_money['total_red_number'] < 1){
+                return json(['code'=>1012,'msg'=>'领取红包次数已用完','data'=>'']);
+            }
             Db::startTrans();
             try{
                 //修改红包信息
                 Db::name('red_order_info')->where('id',$order_info['id'])->update(['member_id'=>$member_info['id'],'state'=>1]);
                 //给用户增加金额
-                $user_money = Db::name('money')->where('user_id',$member_info['id'])->find();
                 $money = $order_info['money'];
                 Db::name('money')->where('user_id',$member_info['id'])->setInc('balance',$money);
+                Db::name('money')->where('user_id',$member_info['id'])->setDec('total_red_number',1);
                 //添加记录
                 getAddMoneyLog($member_info['id'],$money,$user_money['balance'],$user_money['balance']+$money,1,1,'领取红包',$order_list['order_number'],'1',time(),'');
                 //分润上级
