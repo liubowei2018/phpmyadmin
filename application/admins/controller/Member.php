@@ -32,6 +32,9 @@ class Member extends Base
          if(!empty($state)){
              $map['state'] = $state;
          }
+         if($state === '0'){
+                $map['state'] = $state;
+            }
          if(!empty($stare_time)){
              $stare_time = $stare_time.' 00:00:00';
              $map['create_time'] = ['>= time',$stare_time];
