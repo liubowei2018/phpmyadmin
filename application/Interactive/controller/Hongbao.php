@@ -536,7 +536,7 @@ class Hongbao extends ApiBase
         $array = [
             'user_img'=>$member_info['user_img'],
             'content'=>$info['content'],
-            'money'=>$money,
+            'money'=>sprintf("%.2f",$money),
             'type'=>$str,
             'add_time'=>$time,
         ];
