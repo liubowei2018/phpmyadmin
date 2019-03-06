@@ -33,7 +33,7 @@ class Member extends ApiBase
         $member_info = $MmemberModel->getMemberInfo('id,mobile,username,sex,user_img,pid,synopsis,type',['uuid'=>$data['uuid']]);
         if($member_info){
             $money_info = $MoneyModel->getMemberMoney('*', ['user_id' => $member_info['id']]);
-            $bonus_close = $money_info['one_bonus_log'] + $money_info['one_bonus_log'];
+            $bonus_close = $money_info['one_bonus_log'] + $money_info['two_bonus_log'];
             $p_mobile = Db::name('member')->where('id',$member_info['pid'])->value('mobile');
             if($member_info['type'] == 3){
                 $group = '0';
@@ -50,7 +50,7 @@ class Member extends ApiBase
                 'balance' => $money_info['balance'],//余额
                 'bonus' => $money_info['bonus'],//奖金余额
                 'one_bonus_log' => $money_info['one_bonus_log'],
-                'two_bonus_log' => $money_info['one_bonus_log'],
+                'two_bonus_log' => $money_info['two_bonus_log'],
                 'bonus_close' => (string)$bonus_close,
                 'p_mobile' => $p_mobile?$p_mobile:'',
                 'total_push' => Db::name('member')->where('pid',$member_info['id'])->count()
