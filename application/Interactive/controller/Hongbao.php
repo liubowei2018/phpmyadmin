@@ -145,9 +145,6 @@ class Hongbao extends ApiBase
         $member_info = Db::name('member')->where('uuid',$data['uuid'])->find();
         $money_info = Db::name('money')->where('user_id',$member_info['id'])->find();
         $config = app_config_list();
-        if($data['money'] > $money_info['balance']){
-            return json(['code'=>1012,'msg'=>'账户余额不足，请充值','data'=>'']);
-        }
         $type = input('post.type');
         Db::startTrans();
         try{
@@ -206,7 +203,7 @@ class Hongbao extends ApiBase
             Db::name('red_order_list')->insertGetId($order_data);
             $Wxpay = new Wxpay();
             $url = web_url_str().'/Interactive/hongbao/pay_notify';
-            $wx_pay_one = $Wxpay->getPrePayOrder('购买会员',$order_number['order_number'],0.01*100,$url);
+            $wx_pay_one = $Wxpay->getPrePayOrder('购买会员',$order_number,0.01*100,$url);
             $res = $Wxpay->getOrder($wx_pay_one['prepay_id']);
             Db::commit();
             return json(['code'=>1011,'msg'=>'红包发送成功','data'=>$res]);
@@ -401,9 +398,9 @@ class Hongbao extends ApiBase
             return json(['code'=>1012,'msg'=>'红包已领取','data'=>'']);
         }else{
             $user_money = Db::name('money')->where('user_id',$member_info['id'])->find();
-            if($user_money['total_red_number'] < 1){
+/*            if($user_money['total_red_number'] < 1){
                 return json(['code'=>1012,'msg'=>'领取红包次数已用完','data'=>'']);
-            }
+            }*/
             Db::startTrans();
             try{
                 //修改红包信息
