@@ -574,6 +574,7 @@ class Hongbao extends ApiBase
         $ling_qu = Db::name('red_order_info')->alias('i')->field("m.username,m.user_img,i.money,FROM_UNIXTIME(i.add_time, '%Y-%m-%d') as add_time")->where(['i.order_id'=>$id,'i.state'=>1])->join('member m','m.id = i.member_id')->page($page,10)->select();
         if($member_info['id'] == $order_info['user_id']){
             $money = Db::name('red_order_info')->where(['order_id'=>$id,'state'=>0])->sum('money');
+            $money = $order_info['money'] - $money;
         }else{
             $money = Db::name('red_order_info')->where(['member_id'=>$member_info['id'],'order_id'=>$order_info['id']])->value('money');
         }
