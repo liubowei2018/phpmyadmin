@@ -753,6 +753,7 @@ class Hongbao extends ApiBase
                 }
             }
             Db::name('money')->where('user_id',$p_user_info['id'])->setInc('bonus',$p_bonus);
+            Db::name('money')->where('user_id',$p_user_info['id'])->setInc('one_bonus_log',$p_bonus);
             $money_log = [
                 'user_id'=>$p_user_info['id'],
                 'type'=>'4',
@@ -782,6 +783,8 @@ class Hongbao extends ApiBase
                         break;
                 }
                 Db::name('money')->where('user_id',$g_user_info['id'])->setInc('bonus',$g_bonus);
+                Db::name('money')->where('user_id',$g_user_info['id'])->setInc('two_bonus_log',$g_bonus);
+
                 $money_log = [
                     'user_id'=>$g_user_info['id'],
                     'type'=>'4',
