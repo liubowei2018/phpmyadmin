@@ -315,8 +315,8 @@ class Hongbao extends ApiBase
         //距离红包
         //$city_list = Db::query("CALL QueryRedEnvelopes($lat,$lng,$user_id,1,$citycode)");
         $distance = 1;
-        //$red_list_sql = " SELECT id,order_id,lng,lat,state FROM think_red_order_info WHERE citycode = $citycode AND state = 0 AND order_id NOT IN (SELECT l.id FROM think_red_order_info AS i INNER JOIN  think_red_order_list AS l ON l.id = i.order_id WHERE i.member_id = $user_id OR l.user_id = $user_id AND i.state = 1 ) AND sqrt( ( (($lng-lng)*PI()*12656*cos((($lat+lat)/2)*PI()/180)/180) * (($lng-lng)*PI()*12656*cos ((($lat+lat)/2)*PI()/180)/180) ) + ( (($lat-lat)*PI()*12656/180) * (($lat-lat)*PI()*12656/180) ) )< $distance group by order_id limit 10;";
-        $red_list_sql = " SELECT id,order_id,lng,lat,state FROM think_red_order_info WHERE citycode = $citycode AND state = 0 AND sqrt( ( (($lng-lng)*PI()*12656*cos((($lat+lat)/2)*PI()/180)/180) * (($lng-lng)*PI()*12656*cos ((($lat+lat)/2)*PI()/180)/180) ) + ( (($lat-lat)*PI()*12656/180) * (($lat-lat)*PI()*12656/180) ) )< $distance group by order_id limit 10;";
+        $red_list_sql = " SELECT id,order_id,lng,lat,state FROM think_red_order_info WHERE citycode = $citycode AND state = 0 AND order_id NOT IN (SELECT l.id FROM think_red_order_info AS i INNER JOIN  think_red_order_list AS l ON l.id = i.order_id WHERE i.member_id = $user_id OR l.user_id = $user_id AND i.state = 1 ) AND sqrt( ( (($lng-lng)*PI()*12656*cos((($lat+lat)/2)*PI()/180)/180) * (($lng-lng)*PI()*12656*cos ((($lat+lat)/2)*PI()/180)/180) ) + ( (($lat-lat)*PI()*12656/180) * (($lat-lat)*PI()*12656/180) ) )< $distance group by order_id limit 10;";
+        //$red_list_sql = " SELECT id,order_id,lng,lat,state FROM think_red_order_info WHERE citycode = $citycode AND state = 0 AND sqrt( ( (($lng-lng)*PI()*12656*cos((($lat+lat)/2)*PI()/180)/180) * (($lng-lng)*PI()*12656*cos ((($lat+lat)/2)*PI()/180)/180) ) + ( (($lat-lat)*PI()*12656/180) * (($lat-lat)*PI()*12656/180) ) )< $distance group by order_id limit 10;";
         $city_list = Db::query($red_list_sql);
         if(count($city_list) > 0){
             $city_list = $city_list;
