@@ -401,9 +401,9 @@ class Hongbao extends ApiBase
             return json(['code'=>1012,'msg'=>'红包已领取','data'=>'']);
         }else{
             $user_money = Db::name('money')->where('user_id',$member_info['id'])->find();
-/*            if($user_money['total_red_number'] < 1){
+            if($user_money['total_red_number'] < 1){
                 return json(['code'=>1012,'msg'=>'领取红包次数已用完','data'=>'']);
-            }*/
+            }
             Db::startTrans();
             try{
                 //修改红包信息
