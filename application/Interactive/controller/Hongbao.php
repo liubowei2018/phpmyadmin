@@ -519,7 +519,7 @@ class Hongbao extends ApiBase
             $money = $order_info['money'];
             $time = $order_info['add_time'];
         }
-        switch ($info['type']){
+        switch ($info['distance']){
             case 1:
                 $str = '一公里';
                 break;
