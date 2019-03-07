@@ -506,7 +506,7 @@ class Hongbao extends ApiBase
         $id = input('post.id');
         $info = Db::name('red_order_list')->where('id',$id)->find();
         $money = '';
-        $red_member_detail = $MemberModel->getMemberInfo('id,user_img',['id'=>$info['user_id']]);
+        $red_member_detail = $MemberModel->getMemberInfo('id,username,user_img',['id'=>$info['user_id']]);
         if($info['user_id'] == $member_info['id']){
             //查看自己的红包
             $money = Db::name('red_order_info')->where(['order_id'=>$info['id'],'state'=>0])->sum('money');
@@ -539,6 +539,7 @@ class Hongbao extends ApiBase
         $hongbao = $hongbao?$hongbao:"";
         $array = [
             'user_img'=>$red_member_detail['user_img'],
+            'username'=>$red_member_detail['username'],
             'content'=>$info['content'],
             'money'=>sprintf("%.2f",$money),
             'type'=>$str,
