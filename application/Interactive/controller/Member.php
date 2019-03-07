@@ -53,7 +53,9 @@ class Member extends ApiBase
                 'two_bonus_log' => $money_info['two_bonus_log'],
                 'bonus_close' => (string)$bonus_close,
                 'p_mobile' => $p_mobile?$p_mobile:'',
-                'total_push' => Db::name('member')->where('pid',$member_info['id'])->count()
+                'total_push' => Db::name('member')->where('pid',$member_info['id'])->count(),
+                'share_web'=>web_url_str().'/dowload/',
+                'share_qrcode'=>web_url_str().'/dowload/rongdian.png',
             ];
             return json(['code'=>1011,'msg'=>'查询成功','data'=>$array]);
         }else{
