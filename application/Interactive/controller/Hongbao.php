@@ -379,7 +379,8 @@ class Hongbao extends ApiBase
         $radiusLng = $dpmLng*$raidus;
         $minLng = $longitude - $radiusLng;
         $maxLng = $longitude + $radiusLng;
-        return ['minLat'=>sprintf("%.6f",$minLat), 'maxLat'=>sprintf("%.6f",$maxLat), 'minLng'=>sprintf("%.6f",$minLng), 'maxLng'=>sprintf("%.6f",$maxLng)];
+        $array = ['minLat'=>sprintf("%.6f",$minLat), 'maxLat'=>sprintf("%.6f",$maxLat), 'minLng'=>sprintf("%.6f",$minLng), 'maxLng'=>sprintf("%.6f",$maxLng)];
+        return $array;
     }
 
     /**
@@ -520,16 +521,16 @@ class Hongbao extends ApiBase
         }
         switch ($info['type']){
             case 1:
-                $str = '一公里可领';
+                $str = '一公里';
                 break;
             case 2:
-                $str = '五公里可领';
+                $str = '五公里';
                 break;
             case 3:
-                $str = '全市可领';
+                $str = '全市';
                 break;
             case 4:
-                $str = '全国可领';
+                $str = '全国';
                 break;
             default:
                 $str = '暂无类型';
