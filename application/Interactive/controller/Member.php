@@ -216,8 +216,10 @@ class Member extends ApiBase
         if(!$push_user_info){
             return json(['code'=>1012,'msg'=>'推荐人不存在','data'=>'']);
         }
-
-        $user_info = $MemberModel->getMemberInfo('id,pid,gid',['uuid'=>$data['uuid']]);
+        $user_info = $MemberModel->getMemberInfo('id,pid,gid,mobile',['uuid'=>$data['uuid']]);
+        if($user_info['mobile'] == $data['mobile']){
+            return json(['code'=>1012,'msg'=>'推荐人手机号不能为自己','data'=>'']);
+        }
         if($user_info){
             if($user_info['pid'] || $user_info['gid']){
                 return json(['code'=>1012,'msg'=>'已绑定推荐人，请勿重复提交','data'=>'']);
