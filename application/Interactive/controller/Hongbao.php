@@ -585,6 +585,7 @@ class Hongbao extends ApiBase
         if($member_info['id'] == $order_info['user_id']){
             $money = Db::name('red_order_info')->where(['order_id'=>$id,'state'=>0])->sum('money');
             $money = $order_info['money'] - $money;
+            $member_info = $MemberModel->getMemberInfo('id,username,user_img',['id'=>$order_info['user_id']]);
         }else{
             $money = Db::name('red_order_info')->where(['member_id'=>$member_info['id'],'order_id'=>$order_info['id']])->value('money');
         }
