@@ -408,7 +408,7 @@ class Hongbao extends ApiBase
                 return json(['code'=>1012,'msg'=>'领取红包次数已用完','data'=>'']);
             }
             $order_list = Db::name('red_order_list')->where('id',$order_info['order_id'])->find();
-            $order_info_count = Db::name('red_order_info')->where(['order_id'=>$order_info['order_info'],'user_id'=>$member_info['id']])->count();
+            $order_info_count = Db::name('red_order_info')->where(['order_id'=>$order_info['order_id'],'user_id'=>$member_info['id']])->count();
             if($order_info_count > 0){
                 return json(['code'=>1011,'msg'=>'红包已领取','data'=>'']);
             }
