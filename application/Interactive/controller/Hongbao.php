@@ -415,7 +415,7 @@ class Hongbao extends ApiBase
             Db::startTrans();
             try{
                 //修改红包信息
-                Db::name('red_order_info')->where('id',$order_info['id'])->update(['member_id'=>$member_info['id'],'state'=>1]);
+                Db::name('red_order_info')->where('id',$order_info['id'])->update(['member_id'=>$member_info['id'],'state'=>1,'add_time'=>time()]);
                 //给用户增加金额
                 $money = $order_info['money'];
                 Db::name('money')->where('user_id',$member_info['id'])->setInc('balance',$money);
