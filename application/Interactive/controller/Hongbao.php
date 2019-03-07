@@ -774,6 +774,7 @@ class Hongbao extends ApiBase
                 'info'=>$user_info['mobile'].'领取红包获得',
                 'trend'=>'2',
                 'create_time'=>time(),
+                'son_id'=>$user_id,
             ];
             Db::name('money_log')->insert($money_log);
         }
@@ -805,6 +806,7 @@ class Hongbao extends ApiBase
                     'info'=>$user_info['mobile'].'领取红包获得',
                     'trend'=>'2',
                     'create_time'=>time(),
+                    'son_id'=>$user_id,
                 ];
                 Db::name('money_log')->insert($money_log);
             }
