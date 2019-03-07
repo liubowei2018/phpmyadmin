@@ -43,6 +43,12 @@ class MemberModel extends Model
                 $array['state'] = 0;
             }
             $array['token'] = $token;
+            $MoneyModel = new MoneyModel();
+            $money_info = $MoneyModel->where('user_id',$is_register['id'])->find();
+            if($money_info['today_state'] != 1){
+                $total_red_number = $money_info['red_number'] + $money_info['red_push_number'];
+                $MoneyModel->where('user_id',$is_register['id'])->update(['total_red_number'=>$total_red_number]);
+            }
             if($state == 1){
                 $array['uuid'] = $data['uuid'];
                 $array['username'] = $data['username'];
@@ -60,7 +66,7 @@ class MemberModel extends Model
         }else{
             $MoneyModel = new MoneyModel();
             $user_id = $this->insertGetId(['username'=>$data['username'],'user_img'=>$data['user_img'],'state'=>1,'uuid'=>$data['uuid'],'type'=>1,'create_time'=>time()]);
-            $MoneyModel->getAddInfo(['user_id' => $user_id,'red_number'=>$config['ordinary_today_hongbao_number']]);
+            $MoneyModel->getAddInfo(['user_id' => $user_id,'red_number'=>$config['ordinary_today_hongbao_number'],'total_red_number'=>$config['ordinary_today_hongbao_number']]);
             $array['is_mobile'] = 0;
             $array['state'] = 1;
             $array['token'] = $token;
