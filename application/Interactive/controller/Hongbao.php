@@ -397,7 +397,6 @@ class Hongbao extends ApiBase
         $MemberModel = new MemberModel();
         $member_info = $MemberModel->getMemberInfo('id',['uuid'=>$data['uuid']]);
         $order_id = input('post.id');
-        $order_list = Db::name('red_order_list')->where('id',$order_id)->find();
         $order_info = Db::name('red_order_info')->where(['id'=>$order_id])->find();
         if(!$order_info){
             return json(['code'=>1012,'msg'=>'红包不存在','data'=>'']);
@@ -407,6 +406,11 @@ class Hongbao extends ApiBase
             $user_money = Db::name('money')->where('user_id',$member_info['id'])->find();
             if($user_money['total_red_number'] < 1){
                 return json(['code'=>1012,'msg'=>'领取红包次数已用完','data'=>'']);
+            }
+            $order_list = Db::name('red_order_list')->where('id',$order_info['order_id'])->find();
+            $order_info_count = Db::name('red_order_info')->where(['order_id'=>$order_info['$order_info'],'user_id'=>$member_info['id']])->count();
+            if($order_info_count > 0){
+                return json(['code'=>1011,'msg'=>'红包已领取','data'=>'']);
             }
             Db::startTrans();
             try{
