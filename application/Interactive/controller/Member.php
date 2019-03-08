@@ -41,7 +41,8 @@ class Member extends ApiBase
                 $group = '1';
             }
             //二维码
-            $qr_code = Db::name('banner')->where(['group_id'=>6,'state'=>1])->order('id DESC')->find();
+            $url = web_url_str();
+            $qr_code = Db::name('banner')->field("CONCAT('$url',path) as path,web_url")->where(['group_id'=>6,'state'=>1])->order('id DESC')->select();
             $array = [
                 'mobile' => $member_info['mobile'],
                 'group' => $group,
@@ -57,7 +58,8 @@ class Member extends ApiBase
                 'p_mobile' => $p_mobile?$p_mobile:'',
                 'total_push' => Db::name('member')->where('pid',$member_info['id'])->count(),
                 'share_web'=>web_url_str().'/dowload/',
-                'share_qrcode'=>web_url_str().$qr_code['path'],
+                'share_qrcode'=>"",
+                'share_qrcode_array'=>$qr_code,
             ];
             return json(['code'=>1011,'msg'=>'查询成功','data'=>$array]);
         }else{
