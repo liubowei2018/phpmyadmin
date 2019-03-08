@@ -92,7 +92,7 @@ class Member extends ApiBase
         if(count($list) > 0){
             foreach ($list as $k=>$v){
                 $list[$k]['unclaimed'] = "0.00";
-                $list[$k]['total_money'] = (string) Db::name('money_log')->where(['son_id'=>$v['id'],'user_id'=>$user_info['id'],'state'=>1,'type'=>1,'trend'=>'1'])->sum('money');
+                $list[$k]['total_money'] = (string) Db::name('money_log')->where(['son_id'=>$v['id'],'user_id'=>$user_info['id'],'state'=>1,'type'=>1,'trend'=>'2'])->sum('money');
             }
         }
         return json(['code'=>1011,'msg'=>'成功','data'=>$list]);
