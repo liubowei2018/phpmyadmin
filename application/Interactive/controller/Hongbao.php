@@ -610,8 +610,8 @@ class Hongbao extends ApiBase
         $page = input('post.page')?input('post.page'):1;
         $list = Db::name('red_order_list')->field("id,content,img_path,FROM_UNIXTIME(add_time, '%Y-%m-%d') as add_time")->where('user_id',$member_info['id'])->page($page,15)->order('add_time DESC')->select();
 
-        $number = Db::name('red_order_list')->where('user_id',$member_info['id'])->count();
-        $place_money = Db::name('red_order_list')->where('user_id',$member_info['id'])->sum('money');
+        $number = Db::name('red_order_list')->where(['user_id'=>$member_info['id'],'state'=>1])->count();
+        $place_money = Db::name('red_order_list')->where(['user_id'=>$member_info['id'],'state'=>1])->sum('money');
         $enter_money = Db::name('red_order_info')->where('member_id',$member_info['id'])->sum('money');
 
         if(count($list) > 0){
