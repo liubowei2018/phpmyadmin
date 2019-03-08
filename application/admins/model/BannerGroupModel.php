@@ -36,7 +36,7 @@ class BannerGroupModel extends Model
     public function getAddGroup($data){
         try{
             $this->insert($data);
-            return ['code'=>1011,'msg'=>'添加文章分类成功','data'=>''];
+            return ['code'=>1011,'msg'=>'添加图片分类成功','data'=>''];
         }catch (\Exception $e){
             return ['code'=>1012,'msg'=>$e->getMessage()];
         }
