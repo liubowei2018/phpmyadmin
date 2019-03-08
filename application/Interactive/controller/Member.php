@@ -219,7 +219,7 @@ class Member extends ApiBase
         if(Cache::get($data['uuid'].'_token') != $data['token']) return json(['code'=>1004,'msg'=>'用户未登录']);//登陆验证
         $MemberModel = new MemberModel();
 
-        $push_user_info = $MemberModel->getMemberInfo('id,pid,type',['mobile'=>$data['mobile']]);
+        $push_user_info = $MemberModel->getMemberInfo('id,gid,pid,type',['mobile'=>$data['mobile']]);
         $user_info = $MemberModel->getMemberInfo('id,pid,gid,mobile',['uuid'=>$data['uuid']]);
         if(!$push_user_info){
             return json(['code'=>1012,'msg'=>'推荐人不存在','data'=>'']);
