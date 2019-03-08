@@ -763,21 +763,23 @@ class Hongbao extends ApiBase
                         break;
                 }
             }
-            Db::name('money')->where('user_id',$p_user_info['id'])->setInc('bonus',$p_bonus);
-            Db::name('money')->where('user_id',$p_user_info['id'])->setInc('one_bonus_log',$p_bonus);
-            $money_log = [
-                'user_id'=>$p_user_info['id'],
-                'type'=>'4',
-                'money'=>$p_bonus,
-                'original'=>$p_money_list['bonus'],
-                'now'=>$p_money_list['bonus']+$p_bonus,
-                'state'=>'1',
-                'info'=>$user_info['mobile'].'领取红包获得',
-                'trend'=>'2',
-                'create_time'=>time(),
-                'son_id'=>$user_id,
-            ];
-            Db::name('money_log')->insert($money_log);
+            if($p_bonus > 0) {
+                Db::name('money')->where('user_id', $p_user_info['id'])->setInc('bonus', $p_bonus);
+                Db::name('money')->where('user_id', $p_user_info['id'])->setInc('one_bonus_log', $p_bonus);
+                $money_log = [
+                    'user_id' => $p_user_info['id'],
+                    'type' => '4',
+                    'money' => $p_bonus,
+                    'original' => $p_money_list['bonus'],
+                    'now' => $p_money_list['bonus'] + $p_bonus,
+                    'state' => '1',
+                    'info' => $user_info['mobile'] . '领取红包获得',
+                    'trend' => '2',
+                    'create_time' => time(),
+                    'son_id' => $user_id,
+                ];
+                Db::name('money_log')->insert($money_log);
+            }
         }
         if($user_info['gid'] > 0){  //二级
             $g_user_info = Db::name('member')->where('id',$user_info['gid'])->find();
@@ -794,22 +796,23 @@ class Hongbao extends ApiBase
                         $g_bonus = $money*$config['partner_two_hongbao_bonus']/100;
                         break;
                 }
-                Db::name('money')->where('user_id',$g_user_info['id'])->setInc('bonus',$g_bonus);
-                Db::name('money')->where('user_id',$g_user_info['id'])->setInc('two_bonus_log',$g_bonus);
-
-                $money_log = [
-                    'user_id'=>$g_user_info['id'],
-                    'type'=>'4',
-                    'money'=>$g_bonus,
-                    'original'=>$g_money_list['bonus'],
-                    'now'=>$g_money_list['bonus']+$g_bonus,
-                    'state'=>'1',
-                    'info'=>$user_info['mobile'].'领取红包获得',
-                    'trend'=>'2',
-                    'create_time'=>time(),
-                    'son_id'=>$user_id,
-                ];
-                Db::name('money_log')->insert($money_log);
+                if($g_bonus > 0) {
+                    Db::name('money')->where('user_id', $g_user_info['id'])->setInc('bonus', $g_bonus);
+                    Db::name('money')->where('user_id', $g_user_info['id'])->setInc('two_bonus_log', $g_bonus);
+                    $money_log = [
+                        'user_id' => $g_user_info['id'],
+                        'type' => '4',
+                        'money' => $g_bonus,
+                        'original' => $g_money_list['bonus'],
+                        'now' => $g_money_list['bonus'] + $g_bonus,
+                        'state' => '1',
+                        'info' => $user_info['mobile'] . '领取红包获得',
+                        'trend' => '2',
+                        'create_time' => time(),
+                        'son_id' => $user_id,
+                    ];
+                    Db::name('money_log')->insert($money_log);
+                }
             }
         }
     }
