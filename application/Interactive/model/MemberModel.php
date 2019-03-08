@@ -31,6 +31,9 @@ class MemberModel extends Model
         }
         $array = [];
         if($is_register){
+            if($is_register['state'] != 1){
+                return ['code'=>1012,'msg'=>'账号已冻结','data'=>[]];
+            }
             //验证时候绑定手机号
             if(empty($is_register['mobile'])){
                 $array['is_mobile'] = 0;
