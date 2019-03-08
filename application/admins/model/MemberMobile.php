@@ -21,10 +21,10 @@ class MemberMobile extends Model
     public function getMemberList($field,$map,$page,$rows,$order){
         $list = $this->field($field)->where($map)->page($page,$rows)->order($order)->select();
         foreach ($list as $k=>$v){
-            if($v['pid'] > 0){
+            if($v['pid'] != ''){
                 $list[$k]['pid'] = $this->where('pid',$v['pid'])->value('mobile');
             }else{
-                $list[$k]['pid'] = '公司账号';
+                $list[$k]['pid'] = '未绑定推荐人';
             }
         }
         return $list;
