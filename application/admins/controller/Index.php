@@ -28,8 +28,8 @@ class Index extends Base
     public function index_detail(){
         $webConf = getWebConfigList();
 
-        $hb_yue_money_count = Db::name('red_order_list')->where('money_type',1)->sum('original_money');
-        $hb_wx_money_count = Db::name('red_order_list')->where('money_type',2)->sum('original_money');
+        $hb_yue_money_count = Db::name('red_order_list')->where(['money_type'=>1,'state'=>1])->sum('original_money');
+        $hb_wx_money_count = Db::name('red_order_list')->where(['money_type'=>2,'state'=>1])->sum('original_money');
 
         //会员总数
         $member_today = Db::name('member')->whereTime('create_time','D')->count();
