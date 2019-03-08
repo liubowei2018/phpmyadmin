@@ -304,15 +304,16 @@ class Money extends ApiBase
                             case 2:
                                 Db::name('member')->where('id',$order_info['user_id'])->update(['type'=>2]);
                                 $today_red_number = $config['vip_today_hongbao_number'] - $red_number['red_number'];
-                                Db::name('money')->where('user_id',$order_info['user_id'])->update(['red_number'=>$config['vip_today_hongbao_number'],'total_red_number'=>$today_red_number]);
+                                Db::name('money')->where('user_id',$order_info['user_id'])->update(['red_number'=>$config['vip_today_hongbao_number']]);
                                 break;
                             case 3:
                                 Db::name('member')->where('id',$order_info['user_id'])->update(['type'=>3]);
-                                $today_red_number = $config['vip_today_hongbao_number'] - $red_number['red_number'];
-                                Db::name('money')->where('user_id',$order_info['user_id'])->update(['red_number'=>$config['partner_today_hongbao_number'],'total_red_number'=>$today_red_number]);
+                                $today_red_number = $config['partner_today_hongbao_number'] - $red_number['red_number'];
+                                Db::name('money')->where('user_id',$order_info['user_id'])->update(['red_number'=>$config['partner_today_hongbao_number']]);
                                 break;
                         }
                     }
+                    Db::name('money')->where('user_id',$order_info['user_id'])->setInc('total_red_number',$today_red_number);
                     Db::commit();
                     echo '<xml><return_code><![CDATA[SUCCESS]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>';
                 }catch (\Exception $exception){
@@ -372,14 +373,15 @@ class Money extends ApiBase
                                 case 2:
                                     Db::name('member')->where('id',$user_id)->update(['type'=>2]);
                                     $today_red_number = $config['vip_today_hongbao_number'] - $red_number['red_number'];
-                                    Db::name('money')->where('user_id',$user_id)->update(['red_number'=>$config['vip_today_hongbao_number'],'total_red_number'=>$today_red_number]);
+                                    Db::name('money')->where('user_id',$user_id)->update(['red_number'=>$config['vip_today_hongbao_number']]);
                                     break;
                                 case 3:
                                     Db::name('member')->where('id',$user_id)->update(['type'=>3]);
-                                    $today_red_number = $config['vip_today_hongbao_number'] - $red_number['red_number'];
-                                    Db::name('money')->where('user_id',$user_id)->update(['red_number'=>$config['partner_today_hongbao_number'],'total_red_number'=>$today_red_number]);
+                                    $today_red_number = $config['partner_today_hongbao_number'] - $red_number['red_number'];
+                                    Db::name('money')->where('user_id',$user_id)->update(['red_number'=>$config['partner_today_hongbao_number']]);
                                     break;
                             }
+                            Db::name('money')->where('user_id',$order_info['user_id'])->setInc('total_red_number',$today_red_number);
                             Db::commit();
                             return ['code'=>1011,'msg'=>'购买成功','data'=>''];
                         }catch (\Exception $exception){
