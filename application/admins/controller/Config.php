@@ -62,7 +62,7 @@ class Config extends Base
                 $res = $PrivilegeConfigModel->SaveConfig($map,$value);
             }
         }
-        //Cache::rm('app_config_list');
+        Cache::rm('privilege_config_list');
         $this->success('保存成功！');
     }
 }
