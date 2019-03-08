@@ -57,7 +57,7 @@ class MemberModel extends Model
                 $array['username'] = $data['username'];
                 $array['user_img'] = $data['user_img'];
                 $array['sex'] = $data['sex'];
-                $this->save(['username'=>$data['username'],'user_img'=>$data['user_img'],'sex'=>$is_register['sex']],['uuid'=>$data['uuid']]);
+                $this->save(['username'=>$data['username'],'user_img'=>$data['user_img'],'sex'=>$data['sex']],['uuid'=>$data['uuid']]);
             }else{
                 $array['uuid'] = $is_register['uuid'];
                 $array['username'] = $is_register['username'];
