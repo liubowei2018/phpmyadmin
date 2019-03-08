@@ -299,16 +299,15 @@ class Money extends ApiBase
                         $this->two_level_award($order_info['user_id'],$order_info['money']);
                         //修改可以领取的红包个数
                         $config = privilege_config_list();
-                        $red_number = Db::name('money')->where('user_id',$order_info['user_id'])->find();
                         switch ($order_info['grade']){
                             case 2:
                                 Db::name('member')->where('id',$order_info['user_id'])->update(['type'=>2]);
-                                $today_red_number = $config['vip_today_hongbao_number'] - $red_number['red_number'];
+                                $today_red_number = $config['vip_today_hongbao_number'];
                                 Db::name('money')->where('user_id',$order_info['user_id'])->update(['red_number'=>$config['vip_today_hongbao_number']]);
                                 break;
                             case 3:
                                 Db::name('member')->where('id',$order_info['user_id'])->update(['type'=>3]);
-                                $today_red_number = $config['partner_today_hongbao_number'] - $red_number['red_number'];
+                                $today_red_number = $config['partner_today_hongbao_number'];
                                 Db::name('money')->where('user_id',$order_info['user_id'])->update(['red_number'=>$config['partner_today_hongbao_number']]);
                                 break;
                         }
@@ -368,16 +367,15 @@ class Money extends ApiBase
                             $this->two_level_award($user_id,$order_info['money']);
                             //修改可以领取的红包个数
                             $config = privilege_config_list();
-                            $red_number = Db::name('money')->where('user_id',$order_info['user_id'])->find();
                             switch ($order_info['grade']){
                                 case 2:
                                     Db::name('member')->where('id',$user_id)->update(['type'=>2]);
-                                    $today_red_number = $config['vip_today_hongbao_number'] - $red_number['red_number'];
+                                    $today_red_number = $config['vip_today_hongbao_number'];
                                     Db::name('money')->where('user_id',$user_id)->update(['red_number'=>$config['vip_today_hongbao_number']]);
                                     break;
                                 case 3:
                                     Db::name('member')->where('id',$user_id)->update(['type'=>3]);
-                                    $today_red_number = $config['partner_today_hongbao_number'] - $red_number['red_number'];
+                                    $today_red_number = $config['partner_today_hongbao_number'];
                                     Db::name('money')->where('user_id',$user_id)->update(['red_number'=>$config['partner_today_hongbao_number']]);
                                     break;
                             }
