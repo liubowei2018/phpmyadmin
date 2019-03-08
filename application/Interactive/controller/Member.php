@@ -216,11 +216,13 @@ class Member extends ApiBase
         $MemberModel = new MemberModel();
 
         $push_user_info = $MemberModel->getMemberInfo('id,pid,type',['mobile'=>$data['mobile']]);
-
+        $user_info = $MemberModel->getMemberInfo('id,pid,gid,mobile',['uuid'=>$data['uuid']]);
         if(!$push_user_info){
             return json(['code'=>1012,'msg'=>'推荐人不存在','data'=>'']);
         }
-        $user_info = $MemberModel->getMemberInfo('id,pid,gid,mobile',['uuid'=>$data['uuid']]);
+        if($push_user_info['gid'] == $user_info['id'] || $push_user_info['pid'] == $user_info['id']){
+            return json(['code'=>1012,'msg'=>'账号为推荐人手机号的父级，请更换推荐人','data'=>'']);
+        }
         if($user_info['mobile'] == $data['mobile']){
             return json(['code'=>1012,'msg'=>'推荐人手机号不能为自己','data'=>'']);
         }
