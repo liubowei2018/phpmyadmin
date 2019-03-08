@@ -459,7 +459,7 @@ class Hongbao extends ApiBase
         $total_count = Db::name('red_order_info')->where(['member_id'=>$member_info['id'],'state'=>1])->count();
         $today_money = Db::name('red_order_info')->where(['member_id'=>$member_info['id'],'state'=>1])->whereTime('add_time','d')->sum('money');
         $today_count = Db::name('red_order_info')->where(['member_id'=>$member_info['id'],'state'=>1])->whereTime('add_time','d')->count();
-        $list = Db::name('red_order_list')->alias('l')->field('l.id,l.img_path,l.content,l.add_time')
+        $list = Db::name('red_order_list')->alias('l')->field('l.id,l.img_path,l.content,i.add_time')
             ->where(['i.member_id'=>$member_info['id'],'i.state'=>1])->join('red_order_info i','i.order_id = l.id')->page($page,15)->order('add_time DESC')->select();
         if(count($list) > 0){
             foreach ($list as $k=>$v){
