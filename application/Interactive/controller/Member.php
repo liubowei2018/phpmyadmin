@@ -113,6 +113,10 @@ class Member extends ApiBase
             'uuid'=>$data['uuid']
         ];
         $member_info = $MemberModel->getMemberInfo('*',$map);
+        $phone_count = Db::name('member')->where('mobile',$data['phone'])->count();
+        if($phone_count){
+            return json(['code'=>1012,'msg'=>'手机号码已绑定微信','data'=>'']);
+        }
         if(!empty($member_info['mobile'])){
             return json(['code'=>1012,'msg'=>'手机号码已绑定，请勿重复提交','data'=>'']);
         }
