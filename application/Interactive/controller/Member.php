@@ -284,6 +284,7 @@ class Member extends ApiBase
                 }
                 if($number > 0){
                     Db::name('money')->where('user_id',$push_user_info['id'])->setInc('red_push_number',$number);
+                    Db::name('money')->where('user_id',$push_user_info['id'])->setInc('total_red_number',$number);
                 }
                 return json($res);
             }
