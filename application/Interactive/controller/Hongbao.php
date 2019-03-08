@@ -117,7 +117,20 @@ class Hongbao extends ApiBase
             ];
             Db::name('money_log')->insert($money_log);
             //拆分红包
-
+            $member_type = Db::name('member')->where('id',$member_info['id'])->value('type');
+            $config = privilege_config_list();
+            switch ($member_type){
+                case 1: //普通会员
+                    $red_number = $config['ordinary_today_pay_red'];
+                    break;
+                case 2: //vip会员
+                    $red_number = $config['vip_today_pay_red'];
+                    break;
+                case 3: //合伙人
+                    $red_number = $config['partner_today_pay_red'];
+                    break;
+            }
+            Db::name('money')->where('user_id',$member_info['id'])->setInc('total_red_number',$red_number);
             $this->splitting_red_packets($order_id);
 
             $user_money = Db::name('money')->where('user_id',$member_info['id'])->value('balance');
@@ -231,6 +244,20 @@ class Hongbao extends ApiBase
                     try{
                         //修改订单状态
                         Db::name('red_order_list')->where('id',$order_info['id'])->update(['state'=>1,'wx_order_number'=>$result['transaction_id']]);
+                        $member_type = Db::name('member')->where('id',$order_info['user_id'])->value('type');
+                        $config = privilege_config_list();
+                        switch ($member_type){
+                            case 1: //普通会员
+                                $red_number = $config['ordinary_today_pay_red'];
+                                break;
+                            case 2: //vip会员
+                                $red_number = $config['vip_today_pay_red'];
+                                break;
+                            case 3: //合伙人
+                                $red_number = $config['partner_today_pay_red'];
+                                break;
+                        }
+                        Db::name('money')->where('user_id',$order_info['user_id'])->setInc('total_red_number',$red_number);
                         //分解子订单
                         $this->splitting_red_packets($order_info['id']);
                         Db::commit();
