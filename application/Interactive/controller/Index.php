@@ -82,7 +82,7 @@ class Index extends ApiBase
                         'title'=>'升级合伙人',
                         'money'=>$config['partner_money']-$config['vip_money'],
                         'content'=>$config['partner_content'],
-                        'label'=>implode('#',$config['partner_label'])
+                        'label'=>explode('#',$config['partner_label'])
                     ];
                     break;
                 case 3:
