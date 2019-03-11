@@ -57,10 +57,13 @@ class Index extends ApiBase
                 $list[] = [
                     'id'=>2,
                     'title'=>'升级VIP会员',
-                    'money'=>$config['vip_money']
+                    'money'=>$config['vip_money'],
+                    'content'=>$config['vip_content'],
+                    'label'=>explode('#',$config['vip_label'])
                 ];
             }
         }
+
 
         if($config['partner_state'] == 1){
             switch ($user_info['type']){
@@ -68,14 +71,18 @@ class Index extends ApiBase
                     $list[] = [
                         'id'=>3,
                         'title'=>'升级合伙人',
-                        'money'=>$config['partner_money']
+                        'money'=>$config['partner_money'],
+                        'content'=>$config['partner_content'],
+                        'label'=>explode('#',$config['partner_label'])
                     ];
                     break;
                 case 2:
                     $list[] = [
                         'id'=>3,
                         'title'=>'升级合伙人',
-                        'money'=>$config['partner_money']-$config['vip_money']
+                        'money'=>$config['partner_money']-$config['vip_money'],
+                        'content'=>$config['partner_content'],
+                        'label'=>implode('#',$config['partner_label'])
                     ];
                     break;
                 case 3:
