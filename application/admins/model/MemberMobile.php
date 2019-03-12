@@ -22,7 +22,7 @@ class MemberMobile extends Model
         $list = $this->field($field)->where($map)->page($page,$rows)->order($order)->select();
         foreach ($list as $k=>$v){
             if($v['pid'] != ''){
-                $list[$k]['pid'] = $this->where('pid',$v['pid'])->value('mobile');
+                $list[$k]['pid'] = $this->where('id',$v['pid'])->value('mobile');
             }else{
                 $list[$k]['pid'] = '未绑定推荐人';
             }
