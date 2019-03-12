@@ -126,7 +126,7 @@ class Hongbao extends ApiBase
                 case 2: //vip会员
                     $red_number = $config['vip_today_pay_red'];
                     break;
-                case 3: //合伙人
+                case 3: //广告商
                     $red_number = $config['partner_today_pay_red'];
                     break;
             }
@@ -253,7 +253,7 @@ class Hongbao extends ApiBase
                             case 2: //vip会员
                                 $red_number = $config['vip_today_pay_red'];
                                 break;
-                            case 3: //合伙人
+                            case 3: //广告商
                                 $red_number = $config['partner_today_pay_red'];
                                 break;
                         }
@@ -785,7 +785,7 @@ class Hongbao extends ApiBase
                     case 2: //vip会员
                         $p_bonus = $money*$config['vip_one_hongbao_bonus']/100;
                         break;
-                    case 3: //合伙人
+                    case 3: //广告商
                         $p_bonus = $money*$config['partner_one_hongbao_bonus']/100;
                         break;
                 }
@@ -819,7 +819,7 @@ class Hongbao extends ApiBase
                     case 2: //vip会员
                         $g_bonus = $money*$config['vip_two_hongbao_bonus']/100;
                         break;
-                    case 3: //合伙人
+                    case 3: //广告商
                         $g_bonus = $money*$config['partner_two_hongbao_bonus']/100;
                         break;
                 }

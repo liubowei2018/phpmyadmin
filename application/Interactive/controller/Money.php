@@ -225,20 +225,20 @@ class Money extends ApiBase
                     return json(['code'=>1012,'msg'=>'升级vip暂未开放','data'=>'']);
                 }
                 break;
-            case 3://合伙人
+            case 3://广告商
                 if($config['vip_state'] == 1){
                     if($user_info['type'] == 3){
-                        return json(['code'=>1012,'msg'=>'您已经是合伙人，请勿重复提交','data'=>'']);
+                        return json(['code'=>1012,'msg'=>'您已经是广告商，请勿重复提交','data'=>'']);
                     }
-                    if($user_info['type'] == 2){ //已经是VIP 升级 合伙人补差额
+                    if($user_info['type'] == 2){ //已经是VIP 升级 广告商补差额
                         $order_number = $this->upgrade_add_order($user_info['id'],$config['partner_money'] - $config['vip_money'],3);
-                        $str = '升级合伙人';
+                        $str = '升级广告商';
                     }else{  //普通会员升级
                         $order_number = $this->upgrade_add_order($user_info['id'],$config['partner_money'],3);
-                        $str = '升级合伙人';
+                        $str = '升级广告商';
                     }
                 }else{
-                    return json(['code'=>1012,'msg'=>'升级合伙人暂未开放','data'=>'']);
+                    return json(['code'=>1012,'msg'=>'升级广告商暂未开放','data'=>'']);
                 }
                 break;
             default:
@@ -444,7 +444,7 @@ class Money extends ApiBase
                     case 2: //vip会员
                         $p_bonus = $money*$config['vip_one_upgrade']/100;
                         break;
-                    case 3: //合伙人
+                    case 3: //广告商
                         $p_bonus = $money*$config['partner_one_upgrade']/100;
                         break;
                 }
@@ -474,7 +474,7 @@ class Money extends ApiBase
                     case 2: //vip会员
                         $g_bonus = $money*$config['vip_two_upgrade']/100;
                         break;
-                    case 3: //合伙人
+                    case 3: //广告商
                         $g_bonus = $money*$config['partner_two_upgrade']/100;
                         break;
                 }

@@ -48,7 +48,7 @@ class Index extends ApiBase
         $MemberModel = new MemberModel();
         $user_info = $MemberModel->getMemberInfo('',['uuid'=>$data['uuid']]);
         $config = privilege_config_list();
-        //1 普通会员 2 vip会员  3 合伙人
+        //1 普通会员 2 vip会员  3 广告商
         $list = [];
         if($config['vip_state'] == 1){
             //如果是普通会员
@@ -70,7 +70,7 @@ class Index extends ApiBase
                 case 1:
                     $list[] = [
                         'id'=>3,
-                        'title'=>'升级合伙人',
+                        'title'=>'升级广告商',
                         'money'=>$config['partner_money'],
                         'content'=>$config['partner_content'],
                         'label'=>explode('#',$config['partner_label'])
@@ -79,7 +79,7 @@ class Index extends ApiBase
                 case 2:
                     $list[] = [
                         'id'=>3,
-                        'title'=>'升级合伙人',
+                        'title'=>'升级广告商',
                         'money'=>$config['partner_money']-$config['vip_money'],
                         'content'=>$config['partner_content'],
                         'label'=>explode('#',$config['partner_label'])

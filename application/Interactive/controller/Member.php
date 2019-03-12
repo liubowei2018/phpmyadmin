@@ -268,7 +268,7 @@ class Member extends ApiBase
                                 break;
                         }
                         break;
-                    case 3://合伙人
+                    case 3://广告商
                         switch ($count){
                             case 1:
                                 $number = $config['partner_pushone_hongbao_number'];

@@ -67,7 +67,7 @@ class Article extends ApiBase
             case 'vip': //升级vip
                 $map = ['state'=>1,'id'=>3];
                 break;
-            case 'partner': //升级 合伙人
+            case 'partner': //升级 广告商
                 $map = ['state'=>1,'id'=>4];
                 break;
             case 'task': //任务简介

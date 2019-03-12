@@ -164,7 +164,7 @@ class Money extends Base
     }
     /*----------------------------------------资金提现----------------------------------------------------*/
     /**
-     * 会员或合伙人发放奖励
+     * 会员或广告商发放奖励
      */
     public function reward(){
         $vip_count = Db::name('member')->where('type',2)->count();
@@ -184,7 +184,7 @@ class Money extends Base
                 $res = $this->vip_reward($data['money']);
                 return json($res);
                 break;
-            case 3: //发放合伙人奖励
+            case 3: //发放广告商奖励
                 $res = $this->hehuoren_reward($data['money']);
                 return json($res);
                 break;
@@ -215,7 +215,7 @@ FROM think_member as u INNER JOIN think_money as m ON m.user_id = u.id WHERE u.t
     }
 
     /**
-     * 发放合伙人奖励
+     * 发放广告商奖励
      */
     private function hehuoren_reward($money){
         Db::startTrans();
@@ -226,12 +226,12 @@ FROM think_member as u INNER JOIN think_money as m ON m.user_id = u.id WHERE u.t
             $admin_id = $this->admin_uid;
             $admin_name = $this->admin_name;
             Db::query("INSERT INTO think_admin_money (user_id,money,type,state,info,admin_id,admin_name,add_time) 
-(SELECT id as user_id,$money as money,'1' as type,'1' as state,'发放合伙人奖励' as info,$admin_id as admin_id,'$admin_name' as name,unix_timestamp(now()) as add_time FROM think_member WHERE type = 3 AND state = 1)");
+(SELECT id as user_id,$money as money,'1' as type,'1' as state,'发放广告商奖励' as info,$admin_id as admin_id,'$admin_name' as name,unix_timestamp(now()) as add_time FROM think_member WHERE type = 3 AND state = 1)");
             Db::commit();
-            return ['code'=>1011,'msg'=>'发放合伙人奖励完毕'];
+            return ['code'=>1011,'msg'=>'发放广告商奖励完毕'];
         }catch (\Exception $exception){
             Db::rollback();
-            return ['code'=>1012,'msg'=>'发放合伙人奖励失败'];
+            return ['code'=>1012,'msg'=>'发放广告商奖励失败'];
         }
     }
 }
