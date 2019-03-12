@@ -433,7 +433,7 @@ class Money extends ApiBase
     {
         $config = privilege_config_list();
         $user_info = Db::name('member')->where('id',$user_id)->find();
-        if($user_id['pid'] > 0){  //一级
+        if($user_info['pid'] > 0){  //一级
             $p_user_info = Db::name('member')->where('id',$user_info['pid'])->find();
             $p_money_list = Db::name('money')->where('user_id',$p_user_info['id'])->find();
             if($p_user_info){
@@ -463,7 +463,7 @@ class Money extends ApiBase
             ];
             Db::name('money_log')->insert($money_log);
         }
-        if($user_id['gid'] > 0){  //二级
+        if($user_info['gid'] > 0){  //二级
             $g_user_info = Db::name('member')->where('id',$user_info['gid'])->find();
             $g_money_list = Db::name('money')->where('user_id',$g_user_info['id'])->find();
             if($g_user_info){
