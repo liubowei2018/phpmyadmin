@@ -50,6 +50,11 @@ class Member extends Base
          $rows = input('get.rows');// 获取总条数
          $count = Db::name('member')->where($map)->count();
          $list = $MemberModel->getMemberList('*',$map,$page,$rows,'id DESC');
+         foreach ($list as $k=>$v){
+             $money = Db::name('money')->where('user_id',$list['id'])->find();
+             $list[$k]['balance'] = $money['balance'];
+             $list[$k]['bonus'] =  $money['bonus'];
+         }
          return json(['count'=>$count,'list'=>$list,'page'=>$page]);
         }
         return $this->fetch();
