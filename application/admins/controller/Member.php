@@ -51,7 +51,7 @@ class Member extends Base
          $count = Db::name('member')->where($map)->count();
          $list = $MemberModel->getMemberList('*',$map,$page,$rows,'id DESC');
          foreach ($list as $k=>$v){
-             $money = Db::name('money')->where('user_id',$list['id'])->find();
+             $money = Db::name('money')->where('user_id',$v['id'])->find();
              $list[$k]['balance'] = $money['balance'];
              $list[$k]['bonus'] =  $money['bonus'];
          }
