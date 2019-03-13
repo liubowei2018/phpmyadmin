@@ -142,4 +142,37 @@ class Member extends Base
                 $this->error('操作类型异常');
         }
     }
+
+    /**
+     * 推荐人邦定记录
+     */
+    public function push_log(){
+        if(request()->isPost()){
+            $map = [];
+            $key = input('post.key');
+            $stare_time = input('post.stare_time');
+            $end_time = input('post.end_time');
+            if(!empty($key)){
+                $map['m.username|m.mobile'] = ['like','%'.$key.'%'];
+            }
+            if(!empty($stare_time)){
+                $stare_time = $stare_time.' 00:00:00';
+                $map['p.add_time'] = ['>= time',$stare_time];
+            }
+            if(!empty($end_time)){
+                $end_time = $end_time.' 23:59:59';
+                $map['p.add_time'] = ['<= time',$end_time];
+            }
+            if(!empty($stare_time) && !empty($end_time)){
+                $map['p.add_time'] = ['between time',[$stare_time,$end_time]];
+            }
+            $page = input('get.page') ? input('get.page'):1;
+            $rows = input('get.rows');// 获取总条数
+            $count = Db::name('member_push')->alias('p')->where($map)->join('member m','m.id = p.user_id')->count();
+            $list = Db::name('member_push')->alias('p')->field("p.*,FROM_UNIXTIME(p.add_time, '%Y-%m-%d %H:%i:%s') as add_time,m.username,mobile")->where($map)->join('member m','m.id = p.user_id')->page($page,$rows)->order('id DESC')->select();
+
+            return json(['count'=>$count,'list'=>$list,'page'=>$page]);
+        }
+        return $this->fetch();
+    }
 }
