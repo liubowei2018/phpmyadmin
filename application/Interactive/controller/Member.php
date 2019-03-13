@@ -240,6 +240,7 @@ class Member extends ApiBase
                 $res = $MemberModel->getEditInfo($param,['id'=>$user_info['id']],'');
                 $config = privilege_config_list();
                 $count = Db::name('member')->where('pid',$push_user_info['id'])->count();
+                Db::name('member_push')->insert(['user_id'=>$user_info['id'],'push_mobile'=>$data['mobile'],'add_time'=>time()]);
                 $number = 0;
                 switch ($push_user_info['type']){
                     case 1://注册会员
