@@ -130,7 +130,7 @@ class Money extends ApiBase
         $user_info = $MemberModel->getMemberInfo('id',['uuid'=>$data['uuid']]);
         $page = input('post.page');
         $page = $page?$page:1;
-        $list = Db::name('money_log')->field('state,money,info,create_time')->where(['user_id'=>$user_info['id'],'type'=>1])->page($page,15)->order('create_time DESC')->select();
+        $list = Db::name('money_log')->field('state,money,info,create_time')->where(['user_id'=>$user_info['id'],'type'=>array('in','1,2')])->page($page,15)->order('create_time DESC')->select();
         if(count($list) > 0) {
             foreach ($list as $k => $v) {
                 switch ($v['state']){
