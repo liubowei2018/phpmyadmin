@@ -46,7 +46,7 @@ class Config extends Base
                 $WebConfigModel->SaveConfig($map,$value);
             }
         }
-        Cache::rm('WebConfigList');
+        Cache::rm('app_config_list');
         $this->success('保存成功！');
     }
 
