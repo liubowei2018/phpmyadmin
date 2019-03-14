@@ -9,9 +9,27 @@
             </div>
             <div class="ibox-content">
                 <!--工具条-->
-                <el-form :inline="true" class="demo-form-inline">
+                <el-form  class="demo-form-inline">
                     <el-form-item>
 
+                        <div class="col-md-2">
+                            <select name="article_state" id="article_state" v-model="article_state"  class="form-control">
+                                <option value="">文章状态</option>
+                                <option value="1">启用</option>
+                                <option value="0">禁止</option>
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <select name="article_group_id" id="article_group_id" v-model="article_group_id"  class="form-control">
+                                <option value="">文章分类</option>
+                                {foreach $group as $k=>$v}
+                                <option value="{$v.id}">--{$v.title}</option>
+                                {/foreach}
+                            </select>
+                        </div>
+                        <div class="col-md-2">
+                            <a type="button" class="btn btn-primary" @click="search"><i class="fa fa-search"></i> 搜索</a>
+                        </div>
                         <a @click="add" type="button" class="btn btn-primary" >
                             <i class="fa fa-plus"></i> 添加
                         </a>
@@ -25,7 +43,7 @@
                     <div class="example" >
                         <el-table :data="tableData" border highlight-current-row v-loading="listLoading" element-loading-text="拼命加载中..." @selection-change="handleSelectionChange" style="width: 100%">
                             <el-table-column type="selection" width="60" align="center"></el-table-column>
-                            <!--<el-table-column prop="id" label="ID" width="80" align="center"></el-table-column>-->
+                            <el-table-column prop="id" label="ID" width="80" align="center"></el-table-column>
                             <el-table-column prop="title" label="文章标题" width="180" show-overflow-tooltip align="left"></el-table-column>
                             <el-table-column prop="group_title" label="文章分类" width="180" show-overflow-tooltip align="left"></el-table-column>
                             <el-table-column prop="img_path" label="文章图片" show-overflow-tooltip align="center">
@@ -81,9 +99,11 @@
             //搜索条件
             key: '',
             //默认每页数据量
-            pageSize: 100,
+            pageSize: 10,
             //当前页码
             currentPage: 1,
+            article_state: '',
+            article_group_id: '',
             //默认数据总数
             totalCount: 0,
             //列表加载遮罩
@@ -99,9 +119,9 @@
         },
         methods: {
             //从服务器读取数据
-            loadData(key, currentPage, pageSize){
+            loadData(key, currentPage, pageSize,article_state,article_group_id){
                 vm.listLoading = true;
-                $.post('{:url("article/index")}', {key:key,page:currentPage,rows:pageSize}, function(data){
+                $.post('{:url("article/index")}', {key:key,page:currentPage,rows:pageSize,state:article_state,group_id:article_group_id}, function(data){
                     vm.tableData = [];
                     vm.totalCount = data.count;
                     for(var i=0;i<data.list.length;i++){
@@ -123,12 +143,12 @@
             //每页显示数据量变更
             handleSizeChange(val) {
                 this.pageSize = val;
-                this.loadData(this.key, this.currentPage, this.pageSize);
+                this.loadData(this.key, this.currentPage, this.pageSize,this.article_state,this.article_group_id);
             },
             //页码变更
             handleCurrentChange(val) {
                 this.currentPage = val;
-                this.loadData(this.key, this.currentPage, this.pageSize);
+                this.loadData(this.key, this.currentPage, this.pageSize,this.article_state,this.article_group_id);
             },
             //多选响应
             handleSelectionChange(val) {
@@ -136,7 +156,7 @@
             },
             //搜索
             search(){
-                this.loadData(this.key, this.currentPage, this.pageSize);
+                this.loadData(this.key, this.currentPage, this.pageSize,this.article_state,this.article_group_id);
                 vm.listLoading = false;
             },
             //添加

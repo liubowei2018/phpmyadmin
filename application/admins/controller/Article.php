@@ -21,8 +21,16 @@ class Article extends Base
         if(request()->isPost()){
             $map = [];
             $key = input('post.key');
+            $state = input('post.state');
+            $group_id = input('post.group_id');
             if(!empty($key)){
                 $map['a.title'] = $key;
+            }
+            if(!empty($state) || $state === '0'){
+                $map['a.state'] = $state;
+            }
+            if(!empty($group_id)){
+                $map['a.group_id'] = $group_id;
             }
             $page = input('get.page') ? input('get.page'):1;
             $rows = input('get.rows');// 获取总条数
@@ -30,6 +38,8 @@ class Article extends Base
             $list = $ArticleModel->getArticleList($map,$page,$rows);
             return json(['count'=>$count,'list'=>$list,'page'=>$page]);
         }
+        $group = Db::name('article_group')->select();
+        $this->assign('group',$group);
         return $this->fetch();
     }
 
