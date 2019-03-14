@@ -30,8 +30,12 @@ class Sms extends Controller
         ];
         $member_info = $MemberModel->getMemberInfo('*',$map);
         if($member_info){
-            $number = rand(100000,999999);
-            $number = 123456;
+            $config_list = app_config_list();
+            if($config_list['app_sms'] == 1){
+                $number = rand(100000,999999);
+            }else{
+                $number = 123456;
+            }
             $sms_str =  "【红包】短信验证码为：$number ,短信有效期为5分钟，如非本人操作请忽略此条信息";
             Cache::set($data['phone'].'_entry_sms',$number,300);
             $res = $this->Sending_SMS($data['phone'],$sms_str,'');
