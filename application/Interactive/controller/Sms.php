@@ -95,7 +95,7 @@ class Sms extends Controller
         }
         $post_data = substr($o,0,-1);
         if($config_list['app_sms'] == 1){
-            $result = curl_post_https($url,$post_data);
+            $result = post_curls($url,$post_data);
             $objectxml = simplexml_load_string($result);//将文件转换成 对象
             $xmljson= json_encode($objectxml );//将对象转换个JSON
             $xmlarray=json_decode($xmljson,true);//将json转换成数组
