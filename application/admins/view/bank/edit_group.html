@@ -1,0 +1,109 @@
+{include file="public/header" /}
+<link rel="stylesheet" href="/common/layui/css/layui.css"  media="all">
+<body class="gray-bg">
+<div class="wrapper wrapper-content animated fadeInRight" style="background: #fff">
+    <div class="row">
+        <div class="col-sm-12">
+
+            <blockquote class="layui-elem-quote layui-text">
+                添加分类
+            </blockquote>
+            <form class="layui-form" action="" lay-filter="example">
+                <div class="layui-form-item">
+                    <label class="layui-form-label">分类名称</label>
+                    <div class="layui-input-block">
+                        <input type="hidden" name="id" value="{$info.id}">
+                        <input type="text" name="bankname" lay-verify="title" autocomplete="off" placeholder="请输入银行名称" class="layui-input">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">菜单状态</label>
+                    <div class="layui-input-block">
+                        <input type="radio" name="state" value="1" title="开启" checked="">
+                        <input type="radio" name="state" value="0" title="禁用">
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-input-block">
+                        <button class="layui-btn" lay-submit="" type="button" lay-filter="demo1">立即提交</button>
+                        <button class="layui-btn layui-btn-danger" type="button" onclick="PreviousPage()">取消</button>
+                    </div>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+<script src="/common/layui/layui.js" charset="utf-8"></script>
+<script type="text/javascript">
+    layui.use(['form', 'layedit', 'laydate'], function(){
+        var form = layui.form
+            ,layer = layui.layer
+            ,layedit = layui.layedit
+            ,laydate = layui.laydate;
+
+        //日期
+        laydate.render({
+            elem: '#date'
+        });
+        laydate.render({
+            elem: '#date1'
+        });
+
+        //创建一个编辑器
+        var editIndex = layedit.build('LAY_demo_editor');
+
+        //自定义验证规则
+        form.verify({
+            title: function(value){
+                if(value.length < 1){
+                    return '请输入银行名称';
+                }
+            }
+            ,pass: [
+                /^[\S]{6,12}$/
+                ,'密码必须6到12位，且不能出现空格'
+            ]
+            ,content: function(value){
+                layedit.sync(editIndex);
+            }
+        });
+
+        //监听提交
+        form.on('submit(demo1)', function(data){
+            var param = data.field;
+            layui.jquery.ajax({
+                url:"{:url('admins/bank/edit_group')}",
+                type:'post',
+                dataType:'json',
+                data:JSON.stringify(param),
+                contentType: "application/json; charset=utf-8",
+                success:function(res){
+                    if(res.code==1011){
+                        layer.alert(res.msg,{icon:1},function () {
+                            var win = parent.layer.getFrameIndex(window.name);  //获取窗口索引
+                            parent.layer.close(win);     //关闭父页面
+                            window.parent.location.reload();
+                        });
+                    }else{
+                        layer.alert(res.msg,{icon: 5});
+                    }
+                }
+            });
+            return false;
+        });
+
+        //表单初始赋值
+        form.val('example', {
+            "state": "{$info.state}",
+            "bankname": "{$info.bankname}",
+        })
+
+    });
+    function PreviousPage() {
+        var win = parent.layer.getFrameIndex(window.name);  //获取窗口索引
+        parent.layer.close(win);     //关闭父页面
+    }
+</script>
+</body>
+</html>
