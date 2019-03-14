@@ -42,6 +42,10 @@ class Banner extends Base
             return json($res);
         }
         $groupList = $BannerGroupModel->getGroupList('all');
+
+        $url = web_url_str();
+        $web_url_info =$url.'/Interactive/Article/article_info.html?id=';
+        $this->assign('web_url_info',$web_url_info);
         $this->assign('group_list',$groupList);
         return $this->fetch();
     }
@@ -59,6 +63,11 @@ class Banner extends Base
         $id = input('param.id');
         $groupList = $BannerGroupModel->getGroupList('all');
         $info = $BannerModel->getArticleOnes($id);
+
+        $url = web_url_str();
+        $web_url_info =$url.'/Interactive/Article/article_info.html?id=';
+        $this->assign('web_url_info',$web_url_info);
+
         $this->assign('info',$info);
         $this->assign('group_list',$groupList);
         return $this->fetch();
