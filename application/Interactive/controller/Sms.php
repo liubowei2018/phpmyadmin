@@ -60,8 +60,12 @@ class Sms extends Controller
             if($mobile_info){
                 return json(['code'=>1012,'msg'=>'手机号吗已绑定','data'=>'']);
             }
-            $number = rand(100000,999999);
-            $number = 123456;
+            $config_list = app_config_list();
+            if($config_list['app_sms'] == 1){
+                $number = rand(100000,999999);
+            }else{
+                $number = 123456;
+            }
             $sms_str =  "【红包】短信验证码为：$number ,短信有效期为5分钟，如非本人操作请忽略此条信息";
             Cache::set($data['uuid'].'_'.$data['phone'].'_edit_mobile',$number,300);
             $res = $this->Sending_SMS($data['phone'],$sms_str,'');
@@ -77,9 +81,9 @@ class Sms extends Controller
         $config_list = app_config_list();
         $url="http://121.42.138.95:8888/sms.aspx";
         $post_data['action']="send";
-        $post_data['userid']="599";
-        $post_data['account']="blc";
-        $post_data['password']="cz12659";
+        $post_data['userid']="610";
+        $post_data['account']="rongdian";
+        $post_data['password']="rongdian666...";
         $post_data['mobile']=$mobile;
         $post_data['content']=$str;
         $post_data['sendTime']="";
