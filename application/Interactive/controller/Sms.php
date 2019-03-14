@@ -70,7 +70,7 @@ class Sms extends Controller
             }else{
                 $number = 123456;
             }
-            $sms_str =  "【红包】短信验证码为：$number ,短信有效期为5分钟，如非本人操作请忽略此条信息";
+            $sms_str =  "【荣众荣点】短信验证码为：$number ,短信有效期为5分钟，如非本人操作请忽略此条信息";
             Cache::set($data['uuid'].'_'.$data['phone'].'_edit_mobile',$number,300);
             $res = $this->Sending_SMS($data['phone'],$sms_str,'');
             return json($res);
