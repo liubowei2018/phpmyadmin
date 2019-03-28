@@ -1,0 +1,285 @@
+.Android {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: url("../img/../img/bg.png");
+    background-size: 100% 100%;
+	/* display: none; */
+
+}
+.Android > .animg {
+    width: 70%;
+    height: 4rem;
+    position: absolute;
+    top: 15%;
+	text-align: center;
+    left: 15%;
+}
+.Android > .animg > img {
+	width: 100px;
+	margin-bottom: 130px;
+}
+.Android > .animg > a > img {
+    width: 100%;
+}
+
+
+
+
+.Android > .fit {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: black;
+    opacity: 0.7;
+}
+.Android > .tip {
+    width: 100%;
+    height: 100%;
+}
+.Android > .tip > .img01 {
+    position: absolute;
+    right: 1rem;
+    top: 1rem;
+    width: 8rem;
+}
+.Android > .tip > .p01 {
+    position: absolute;
+    top: 30%;
+    color: white;
+    font-size: 1.4rem;
+    text-align: center;
+    left: 6%;
+}
+.Android > .tip > .p01 > span {
+    display: inline-block;
+    width: 1.6rem;
+    height: 1.6rem;
+    border-radius: 50%;
+    background-color: #2db962;
+    line-height: 1.6rem;
+    vertical-align: middle;
+
+}
+.Android > .tip > .p02 {
+    position: absolute;
+    top: 37%;
+    color: white;
+    font-size: 1.4rem;
+    text-align: center;
+    left: 6%;
+}
+.Android > .tip > .p02 > span {
+    display: inline-block;
+    width: 1.6rem;
+    height: 1.6rem;
+    border-radius: 50%;
+    background-color: #2db962;
+    line-height: 1.6rem;
+    vertical-align: middle;
+
+}
+.Android > .tip > .p03 {
+    position: absolute;
+    top: 43%;
+    color: white;
+    font-size: 1.4rem;
+    text-align: center;
+    left: 6%;
+}
+.Android > .tip > .p03 > span {
+    display: inline-block;
+    width: 1.6rem;
+    height: 1.6rem;
+    border-radius: 50%;
+    background-color: #2db962;
+    line-height: 1.6rem;
+    vertical-align: middle;
+
+}
+.Android > .tip > .p01 > img {
+    width: 1.5rem;
+    height: 1.5rem;
+    vertical-align: middle;
+
+}
+
+
+
+
+
+
+
+
+
+
+
+.iphone {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: url(../img/bg.jpg);
+    background-size: 100% 100%;
+    display: none;
+}
+.iphone > .fit {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: black;
+    opacity: 0.7;
+    /* display: none; */
+}
+.iphone > .tip {
+    width: 100%;
+    height: 100%;
+    /* display: none; */
+
+}
+.iphone > .tip > .img01 {
+    position: absolute;
+    right: 1rem;
+    top: 1rem;
+    width: 8rem;
+}
+.iphone > .tip > .p01 {
+    position: absolute;
+    top: 30%;
+    color: white;
+    font-size: 1.4rem;
+    text-align: center;
+    left: 10%;
+}
+.iphone > .tip > .p01 > span {
+    display: inline-block;
+    width: 1.6rem;
+    height: 1.6rem;
+    border-radius: 50%;
+    background-color: #2db962;
+    line-height: 1.6rem;
+    vertical-align: middle;
+
+}
+.iphone > .tip > .p02 {
+    position: absolute;
+    top: 37%;
+    color: white;
+    font-size: 1.4rem;
+    text-align: center;
+    left: 10%;
+}
+.iphone > .tip > .p02 > span {
+    display: inline-block;
+    width: 1.6rem;
+    height: 1.6rem;
+    border-radius: 50%;
+    background-color: #2db962;
+    line-height: 1.6rem;
+    vertical-align: middle;
+
+}
+.iphone > .tip > .p03 {
+    position: absolute;
+    top: 43%;
+    color: white;
+    font-size: 1.4rem;
+    text-align: center;
+    left: 10%;
+}
+.iphone > .tip > .p03 > span {
+    display: inline-block;
+    width: 1.6rem;
+    height: 1.6rem;
+    border-radius: 50%;
+    background-color: #2db962;
+    line-height: 1.6rem;
+    vertical-align: middle;
+
+}
+.iphone > .tip > .p01 > img {
+    width: 1.5rem;
+    height: 1.5rem;
+    vertical-align: middle;
+
+}
+.iphone > .btn {
+    width: 70%;
+    height: 4rem;
+    position: absolute;
+    top: 15%;
+    left: 15%;
+	text-align: center;
+}
+.iphone > .btn > img {
+	width: 100px;
+	margin-bottom: 130px;
+}
+.iphone > .btn >a> img {
+    width: 100%;
+}
+.iphone > .fit2 {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: black;
+    opacity: 0.7;
+    display: none;
+}
+.iphone > .fit-cont {
+    position: fixed;
+    width: 90%;
+    height: 90%;
+    left: 5%;
+    bottom: 0;
+    border-top-right-radius: 1rem;
+    border-top-left-radius: 1rem;
+    background-color: white;
+    display: none;
+}
+.iphone > .fit-cont >.guu {
+    width: 2rem;
+    position: absolute;
+    right: 1rem;
+    top: 0.5rem;
+}
+
+.iphone > .fit-cont > p {
+    width: 90%;
+    margin: auto;
+    font-size: 1.4rem;
+    margin-top: 1rem;
+}
+.iphone > .fit-cont > .p01 {
+    margin-top: 3rem;
+}
+.iphone > .fit-cont > .p02 > img {
+    width: 100%;
+}
+.iphone > .fit-cont > .p04 > img {
+    width: 100%;
+}
+.iphone > .fit-cont > a {
+    display: inline-block;
+    line-height: 3rem;
+    vertical-align: middle;
+    text-decoration: none;
+    width: 90%;
+    border: 0;
+    background-color: #2db962;
+    color: white;
+    height: 3rem;
+    border-radius: .8rem;
+    text-align: center;
+    margin-left: 5%;
+    margin-top: 3rem;
+}
