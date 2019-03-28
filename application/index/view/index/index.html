@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <title>荣点APP--下载</title>
+    <link rel="stylesheet" href="/download/css/download.css">
+    <script src="/download/js/jquery-3.3.1.min.js"></script>
+    <script src="/download/js/download.js"></script>
+</head>
+<body onload="check()">
+<!--安卓下载页面-->
+<div class="Android">
+    <div class="animg">
+        <!-- #为安卓的下载路径 -->
+        <img src="/download/img/logo.png" alt="">
+        <a href="./ume.apk"><img src="/download/img/android.png" alt=""></a>
+    </div>
+    <div class="fit"></div>
+    <div class="tip">
+        <img src="/download/img/icon_line.png" alt="" class="img01">
+        <p class="p01"><span>1</span>&nbsp;&nbsp;点击右上角的 <img src="/download/img/icon_click.png" alt="">按钮</p>
+        <p class="p02"><span>2</span>&nbsp;&nbsp;选择在浏览器中打开</p>
+        <p class="p03"><span>3</span>&nbsp;&nbsp;点击下载安装</p>
+    </div>
+</div>
+
+<div class="iphone">
+
+    <div class="btn">
+        <img src="/download/img/logo.png" alt="">
+        <!-- #位置为苹果下载路径 -->
+        <a href="itms-services://?action=download-manifest&url=https://raw.githubusercontent.com/Li19901203mei/Vpay/master/manifest.plist"><img src="/download/img/iphone.png" alt="" onclick="zz()"></a>
+    </div>
+    <div class="fit"></div>
+    <div class="tip">
+        <img src="/download/img/icon_line.png" alt="" class="img01">
+        <p class="p01"><span>1</span>&nbsp;&nbsp;点击右上角的 <img src="/download/img/icon_click.png" alt="">按钮</p>
+        <p class="p02"><span>2</span>&nbsp;&nbsp;选择在Safari浏览器中打开</p>
+        <p class="p03"><span>3</span>&nbsp;&nbsp;点击下载安装</p>
+    </div>
+    <div class="fit2">
+    </div>
+    <div class="fit-cont">
+        <img src="/download/img/guan.png" alt="" class="guu"  onclick="uu()">
+        <p class="p01">1.同意安装桌面将出现UME应用图标</p>
+        <p class="p02"><img src="/download/img/agreedown.png" alt=""></p>
+        <p class="p03">2.安装后，首次打开需要信任描述文件</p>
+        <p class="p04"><img src="/download/img/ioio.jpg" alt=""></p>
+        <a href="http://lc-PtgCh6G4.cn-n1.lcfile.com/7bc192e364d37fb2e4af.mobileprovision"> 快速信任</a>
+    </div>
+</div>
+</body>
+</html>
+<script>
+    function zz() {
+        $('.fit2').show();
+        $('.fit-cont').show();
+    }
+    function uu() {
+        $('.fit2').hide();
+        $('.fit-cont').hide();
+    }
+
+</script>

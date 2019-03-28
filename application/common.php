@@ -235,3 +235,19 @@ function getAddAdminMoneyLog($user_id,$money,$type,$state,$info,$admin_id,$admin
     $res = \think\Db::name('admin_money')->insert($data);
     return $res;
 }
+/*
+ * $url
+ * $使用curl发送get请求
+ * */
+
+function get_request($url){
+    $curlObj = curl_init();
+    curl_setopt($curlObj,CURLOPT_URL,$url);
+    curl_setopt($curlObj,CURLOPT_SSL_VERIFYHOST,0);
+    curl_setopt($curlObj,CURLOPT_SSL_VERIFYPEER,0);
+    curl_setopt($curlObj,CURLOPT_RETURNTRANSFER,1);
+    curl_setopt($curlObj,CURLOPT_HEADER,0);
+    $result = curl_exec($curlObj);
+    curl_close($curlObj);
+    return $result;
+}
