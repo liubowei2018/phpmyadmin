@@ -240,5 +240,10 @@ return [
         'var_page'  => 'page',
         'list_rows' => 15,
     ],
-    'auth_key'=>'JUD6FCtZsqrmVXc2apev4TRn3O8gAhxbSlH9wfPN'
+    'auth_key'=>'JUD6FCtZsqrmVXc2apev4TRn3O8gAhxbSlH9wfPN',
+    'WeChatConfig'  =>[
+        'app_id'=>'wx233ad62f7c43babe',
+        'app_security'=>'16b7ed1074283340906a4d0093d2e6cf',
+        'token'=>'rongdian',
+    ]
 ];
