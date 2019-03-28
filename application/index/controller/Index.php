@@ -2,12 +2,13 @@
 namespace app\index\controller;
 
 use think\Controller;
+use think\Session;
 
 class Index extends Controller
 {
     public function index()
     {
-        $data = request()->get();
+/*        $data = request()->get();
         $token="rongdian";
         $sigArr=[$token,$data['timestamp'],$data['nonce']];
         sort($sigArr,SORT_STRING);
@@ -17,14 +18,28 @@ class Index extends Controller
             echo $data['echostr'];
         }else{
             return false;
-        }
+        }*/
+
         return $this->fetch();
      }
-
     /**
      * 会员注册
      */
      public function register(){
+         $phone = input('param.phone');
+         $wx_unionid = Session::get('wx_unionid');
+         if($wx_unionid){
+             dump($phone);
+             dump($wx_unionid);
+         }else{
+            $phone = (int)$phone;
+            $this->redirect('index/authorization', ['phone' => $phone]);
+         }
+     }
+    /**
+     * 微信授权
+     */
+     public function authorization(){
          $phone = input('param.phone');
          $code = request()->get('code');
          $wechatConfig = config('WeChatConfig');
@@ -44,7 +59,7 @@ class Index extends Controller
          $userUrl = "https://api.weixin.qq.com/sns/userinfo?access_token={$accessToken}&openid={$openId}&lang=zh_CN";
          $user_info = get_request($userUrl);
          $userInfoArr = json_decode($user_info,true);
-         dump($userInfoArr);
-         return $this->fetch();
+         Session::set('wx_unionid',$userInfoArr['unionid']);
+         $this->redirect('index/register', ['phone' => $phone]);
      }
 }
