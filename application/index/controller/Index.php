@@ -28,9 +28,10 @@ class Index extends Controller
      public function register(){
          $phone = input('param.phone');
          $wx_unionid = Session::get('wx_unionid');
+         $wx_unionid = 1;
          if($wx_unionid){
-             dump($phone);
-             dump($wx_unionid);
+
+             return $this->fetch();
          }else{
             $phone = (int)$phone;
             $this->redirect('index/authorization', ['phone' => $phone]);
