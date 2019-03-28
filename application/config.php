@@ -241,9 +241,14 @@ return [
         'list_rows' => 15,
     ],
     'auth_key'=>'JUD6FCtZsqrmVXc2apev4TRn3O8gAhxbSlH9wfPN',
-    'WeChatConfig'  =>[
+/*    'WeChatConfig'  =>[
         'app_id'=>'wx233ad62f7c43babe',
         'app_security'=>'16b7ed1074283340906a4d0093d2e6cf',
         'token'=>'rongdian',
-    ]
+    ],*/
+    'WeChatConfig'  =>[
+        'app_id'=>'wx079a58a46b9a86d0',
+        'app_security'=>'73b92c89aacff64fcf310f19c1df6bea',
+        'token'=>'rongdian',
+    ],
 ];
