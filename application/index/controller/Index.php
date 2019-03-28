@@ -44,7 +44,7 @@ class Index extends Controller
          $code = request()->get('code');
          $wechatConfig = config('WeChatConfig');
          if(empty($code)){
-             $web_url = web_url_str()."/index/index/register/phone/".$phone;
+             $web_url = web_url_str()."/index/index/authorization/phone/".$phone;
             $curUrl = urlencode($web_url);
              $url = "https://open.weixin.qq.com/connect/oauth2/authorize?appid={$wechatConfig['app_id']}&redirect_uri={$curUrl}&response_type=code&scope=snsapi_userinfo&state=STATE#wechat_redirect ";
              return redirect($url);
