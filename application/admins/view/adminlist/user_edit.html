@@ -29,6 +29,7 @@
                             <input type="password" name="check_password" placeholder="请输入校验密码" autocomplete="off" class="layui-input">
                         </div>
                     </div>-->
+                {if condition="$info.id != 1"}
                 <div class="layui-form-item">
                     <label class="layui-form-label"></label>
                     <div class="layui-input-block">
@@ -47,7 +48,7 @@
                         <input type="radio" name="status" value="0" title="禁用">
                     </div>
                 </div>
-
+                {/if}
                 <div class="layui-form-item">
                     <div class="layui-input-block">
                         <button class="layui-btn" lay-submit="" lay-filter="demo1">立即提交</button>
