@@ -21,7 +21,11 @@ class Index extends Controller
         }else{
             return false;
         }*/
-
+        $param = input('param.phone');
+        $member_id = Session::get('wx_unionid');
+        if(empty($member_id)){
+            $this->redirect('News/category', ['phone' => $param]);
+        }
         return $this->fetch();
      }
 
@@ -74,6 +78,8 @@ class Index extends Controller
                  }
              }
          }
+         //处理完毕跳转回 下载页面
+         $this->redirect('index/index');
      }
 
     /**
