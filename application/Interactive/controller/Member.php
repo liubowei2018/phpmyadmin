@@ -53,6 +53,7 @@ class Member extends ApiBase
             }else{
                 $user_qr_code = web_url_str().'/'.$member_info['qr_code'];
             }
+            $config = app_config_list();
             $array = [
                 'mobile' => $member_info['mobile'],
                 'group' => $group,
@@ -68,8 +69,8 @@ class Member extends ApiBase
                 'p_mobile' => $p_mobile?$p_mobile:'',
                 'total_push' => Db::name('member')->where('pid',$member_info['id'])->count(),
                 'share_web'=>$share_web,
-                'share_title'=>"荣众荣点",
-                'share_info'=>"点击分享 获得红包",
+                'share_title'=>$config['share_title'],
+                'share_info'=>$config['share_info'],
                 'share_qrcode'=>$user_qr_code,
                 'share_qrcode_array'=>$qr_code,
             ];
