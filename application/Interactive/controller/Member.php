@@ -57,9 +57,7 @@ class Member extends ApiBase
                 'bonus_close' => (string)$bonus_close,
                 'p_mobile' => $p_mobile?$p_mobile:'',
                 'total_push' => Db::name('member')->where('pid',$member_info['id'])->count(),
-                'share_web'=>web_url_str().'/index/index/index/phone/'.$member_info['mobile'],
-                'share_title'=>"荣众荣点",
-                'share_info'=>"快来分享吧",
+                'share_web'=>'http://rd.hnrongzhong.com/index/index/index/phone/'.$member_info['mobile'],
                 'share_qrcode'=>"",
                 'share_qrcode_array'=>$qr_code,
             ];
@@ -90,7 +88,8 @@ class Member extends ApiBase
             default:
                 return json(['code'=>1015,'msg'=>'类型不存在']);
         }
-        $list = $MemeberModel->getPushList('id,username,user_img,mobile',$map,$data['page'],15);
+        $page = input('post.page')?input('post.page'):1;
+        $list = $MemeberModel->getPushList('id,username,user_img,mobile',$map,$page,15);
         if(count($list) > 0){
             foreach ($list as $k=>$v){
                 $list[$k]['unclaimed'] = "0.00";
