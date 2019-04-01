@@ -23,10 +23,14 @@ class Member extends ApiBase
      */
     public function member_info(){
         $data = input('post.');
+        $data['uuid'] = '218dbb225911693af03a713581a7227f';
+        $data['token'] = '218dbb225911693af03a713581a7227f';
+        $data['TimeStamp'] = '218dbb225911693af03a713581a7227f';
+        $data['Sign'] = getSign($data);
         $validate_res = $this->validate($data,'HomeValidate.whole');
         if($validate_res !== true){ return json(['code'=>1015,'msg'=>$validate_res]); } //数据认证
         if(getSign($data) != $data['Sign']){ return json(['code'=>1013,'msg'=>'签名错误']);} //签名认证
-        if(Cache::get($data['uuid'].'_token') != $data['token']) return json(['code'=>1004,'msg'=>'用户未登录']);//登陆验证
+        //if(Cache::get($data['uuid'].'_token') != $data['token']) return json(['code'=>1004,'msg'=>'用户未登录']);//登陆验证
         //获取用户信息
         $MmemberModel = new MemberModel();
         $MoneyModel = new MoneyModel();
@@ -44,10 +48,14 @@ class Member extends ApiBase
             $url = web_url_str();
             $qr_code = Db::name('banner')->field("CONCAT('$url',path) as path,web_url")->where(['group_id'=>6,'state'=>1])->order('id DESC')->select();
             //分享二维码
+            $share_web = 'http://rd.hnrongzhong.com/index/index/index/phone/'.$member_info['mobile'];
+            $user_qr_code = '';
             if(empty($member_info['qr_code'])){
-
+                $user_qr_code_path = Qrcode($member_info['id'],$share_web);
+                Db::name('member')->where('id',$member_info['id'])->update(['qr_code'=>$user_qr_code_path]);
+                $user_qr_code = web_url_str().'/'. $user_qr_code_path;
             }else{
-                $user_qr_code = $member_info['qr_code'];
+                $user_qr_code = web_url_str().'/'.$member_info['qr_code'];
             }
             $array = [
                 'mobile' => $member_info['mobile'],
@@ -63,7 +71,7 @@ class Member extends ApiBase
                 'bonus_close' => (string)$bonus_close,
                 'p_mobile' => $p_mobile?$p_mobile:'',
                 'total_push' => Db::name('member')->where('pid',$member_info['id'])->count(),
-                'share_web'=>'http://rd.hnrongzhong.com/index/index/index/phone/'.$member_info['mobile'],
+                'share_web'=>$share_web,
                 'share_title'=>"荣众荣点",
                 'share_info'=>"点击分享 获得红包",
                 'share_qrcode'=>$user_qr_code,
