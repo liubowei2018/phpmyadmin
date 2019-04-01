@@ -43,6 +43,12 @@ class Member extends ApiBase
             //二维码
             $url = web_url_str();
             $qr_code = Db::name('banner')->field("CONCAT('$url',path) as path,web_url")->where(['group_id'=>6,'state'=>1])->order('id DESC')->select();
+            //分享二维码
+            if(empty($member_info['qr_code'])){
+
+            }else{
+                $user_qr_code = $member_info['qr_code'];
+            }
             $array = [
                 'mobile' => $member_info['mobile'],
                 'group' => $group,
@@ -58,7 +64,9 @@ class Member extends ApiBase
                 'p_mobile' => $p_mobile?$p_mobile:'',
                 'total_push' => Db::name('member')->where('pid',$member_info['id'])->count(),
                 'share_web'=>'http://rd.hnrongzhong.com/index/index/index/phone/'.$member_info['mobile'],
-                'share_qrcode'=>"",
+                'share_title'=>"荣众荣点",
+                'share_info'=>"点击分享 获得红包",
+                'share_qrcode'=>$user_qr_code,
                 'share_qrcode_array'=>$qr_code,
             ];
             return json(['code'=>1011,'msg'=>'查询成功','data'=>$array]);
