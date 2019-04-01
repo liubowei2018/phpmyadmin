@@ -57,7 +57,9 @@ class Member extends ApiBase
                 'bonus_close' => (string)$bonus_close,
                 'p_mobile' => $p_mobile?$p_mobile:'',
                 'total_push' => Db::name('member')->where('pid',$member_info['id'])->count(),
-                'share_web'=>web_url_str().'/dowload/',
+                'share_web'=>web_url_str().'/index/index/index/phone/'.$member_info['mobile'],
+                'share_title'=>"荣众荣点",
+                'share_info'=>"快来分享吧",
                 'share_qrcode'=>"",
                 'share_qrcode_array'=>$qr_code,
             ];
