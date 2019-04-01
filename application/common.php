@@ -251,3 +251,22 @@ function get_request($url){
     curl_close($curlObj);
     return $result;
 }
+//生成网址的二维码 返回图片地址
+function Qrcode($token, $url, $size = 8){
+    vendor('phpqrcode.phpqrcode');
+    $md5 = md5($token);
+    $dir = date('Ymd'). '/' . substr($md5, 0, 10) . '/';
+    $patch = 'public/qrcode/' . $dir;
+    if (!file_exists($patch)){
+        mkdir($patch, 0755, true);
+    }
+    $file = 'public/qrcode/' . $dir . $md5 . '.png';
+    $fileName =  $file;
+    if (!file_exists($fileName)) {
+
+        $level = 'L';
+        $data = $url;
+        \QRcode::png($data, $fileName, $level, $size, 2, true);
+    }
+    return $file;
+}
