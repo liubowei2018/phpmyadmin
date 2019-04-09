@@ -16,6 +16,30 @@ use think\Cache;
 class Money extends ApiBase
 {
     /**
+     * 提现配置列表
+     */
+    public function propose_config(){
+        $data = input('post.');
+        $validate_res = $this->validate($data,'HomeValidate.whole');
+        if($validate_res !== true){ return json(['code'=>1015,'msg'=>$validate_res]); } //数据认证
+        if(getSign($data) != $data['Sign']){ return json(['code'=>1013,'msg'=>'签名错误']);} //签名认证
+        //if(Cache::get($data['uuid'].'_token') != $data['token']) return json(['code'=>1004,'msg'=>'用户未登录']);//登陆验证
+        //查询用户最后一次提现金额
+        $user_info = Db::name('member')->field('id')->where(['uuid'=>$data['uuid']])->find();
+        $last_propose = Db::name('reflect_list')->where(['user_id'=>$user_info['id']])->order('money DESC')->find();
+        $criticality = Db::name('web_config')->where('name','criticality')->value('value');
+        $map['state']= 1;
+        if($last_propose){
+            if($last_propose['money'] > $criticality){
+                $map['number'] = ['>=',$criticality];
+            }else{
+                $map['number'] = ['>',$last_propose['money']];
+            }
+        }
+        $list = Db::name('config_propose')->where($map)->limit('6')->select();
+        return json(['code'=>1011,'msg'=>'成功','data'=>$list]);
+    }
+    /**
      * 用户资金提现
      */
     public function withdraw_cash(){
